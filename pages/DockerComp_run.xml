@@ -1,0 +1,21 @@
+<componentContainer>
+  <!--
+    The helpLink element points to a page containing help text. This
+    shows up as the target of the EC Help link in the top-right corner
+    of the page. If you don't have page-specific help for this page, you
+    should point this to the plugin help page.
+  -->
+  <helpLink>help</helpLink>
+  <title>@PLUGIN_KEY@ @PLUGIN_VERSION@ DockerComp Title</title>
+  <table width="100%">
+    <tr>
+      <td valign="top" width="50%">
+        <component plugin="EC-Core" ref="urlLoader">
+          <plugin>@PLUGIN_KEY@</plugin>
+          <version>@PLUGIN_VERSION@</version>
+          <url>cgi-bin/DockerComp.cgi</url>
+        </component>
+      </td>
+    </tr>
+  </table>
+</componentContainer>

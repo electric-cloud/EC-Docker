@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<exportedData xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="commander.xsd" version="61" buildLabel="build_main_60729_2013.06.24_10:58:22" buildVersion="4.2.2.60729" passkey="75207e739a9c4c91c523526fa19ae659f28dad2f">
+  <exportPath>/projects/EC-Docker</exportPath>
+  <project>
+    <projectName>EC-Docker</projectName>
+    <description>Plugin for Docker</description>
+    <resourceName></resourceName>
+    <workspaceName></workspaceName>
+    <propertySheet>
+      <property>
+        <propertyName>ec_component_plugin</propertyName>
+        <description></description>
+        <propertySheet>
+          <property>
+            <propertyName>operations</propertyName>
+            <description></description>
+            <propertySheet>
+              <property>
+                <propertyName>Fetch content</propertyName>
+                <description>This operation retrieves the content from the repository.</description>
+                <expandable>1</expandable>
+                <value>runDockerPull</value>
+              </property>
+            </propertySheet>
+          </property>
+          <property>
+            <propertyName>pluginType</propertyName>
+            <description></description>
+            <expandable>1</expandable>
+            <value>Repository</value>
+          </property>
+        </propertySheet>
+      </property>
+    </propertySheet>
+     <procedure>
+      <procedureName>runDockerPull</procedureName>
+      <description>Performs a docker pull on the requested image</description>
+      <jobNameTemplate></jobNameTemplate>
+      <resourceName></resourceName>
+      <timeLimit></timeLimit>
+      <timeLimitUnits>minutes</timeLimitUnits>
+      <workspaceName></workspaceName>
+      <propertySheet>
+	  	 <property>
+          <propertyName>ec_parameterForm</propertyName>
+          <description></description>
+          <expandable>1</expandable>
+          <value>&lt;editor&gt;&#10;    &lt;formElement&gt;&#10;        &lt;type&gt;entry&lt;/type&gt;&#10;        &lt;label&gt;Docker image:&lt;/label&gt;&#10;        &lt;property&gt;image&lt;/property&gt;&#10;        &lt;value&gt;&lt;/value&gt;&#10;        &lt;documentation&gt;Name of the docker image to pull&lt;/documentation&gt;&#10;    &lt;/formElement&gt;&#10;&lt;/editor&gt;</value>
+        </property>
+        <property>
+          <propertyName>ec_customEditorData</propertyName>
+          <propertySheet>
+            <property>
+              <propertyName>parameters</propertyName>
+              <propertySheet>
+                <property>
+                  <propertyName>image</propertyName>
+                  <propertySheet>
+                    <property>
+                      <propertyName>formType</propertyName>
+                      <expandable>1</expandable>
+                      <value>standard</value>
+                    </property>
+                  </propertySheet>
+                </property>
+              </propertySheet>
+            </property>
+          </propertySheet>
+        </property>
+      </propertySheet>
+      <formalParameter>
+        <formalParameterName>image</formalParameterName>
+        <defaultValue></defaultValue>
+        <description></description>
+        <expansionDeferred>0</expansionDeferred>
+        <required>0</required>
+        <type>entry</type>
+      </formalParameter>
+      <step>
+        <stepName>runDockerPull</stepName>
+        <alwaysRun>0</alwaysRun>
+        <broadcast>0</broadcast>
+        <command>docker pull $[image]</command>
+        <condition></condition>
+        <description></description>
+        <errorHandling>abortProcedure</errorHandling>
+        <exclusiveMode>none</exclusiveMode>
+        <logFileName></logFileName>
+        <parallel>0</parallel>
+        <postProcessor></postProcessor>
+        <precondition></precondition>
+        <releaseMode>none</releaseMode>
+        <resourceName></resourceName>
+        <shell></shell>
+        <timeLimit></timeLimit>
+        <timeLimitUnits>minutes</timeLimitUnits>
+        <workingDirectory></workingDirectory>
+        <workspaceName></workspaceName>
+        <propertySheet>
+        </propertySheet>
+      </step>
+    </procedure>
+  </project>
+</exportedData>
