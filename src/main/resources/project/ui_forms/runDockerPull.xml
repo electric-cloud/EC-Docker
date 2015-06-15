@@ -19,10 +19,10 @@
     </formElement>
     <formElement>
         <type>checkbox</type>
-        <label>All tags?:</label>
+        <label>Download all tags?:</label>
         <property>all_tags</property>
         <required>0</required>
-        <documentation>docker option -a</documentation>
+        <documentation>Download all tagged images in the repository</documentation>
 		<checkedValue>1</checkedValue>
         <uncheckedValue>0</uncheckedValue>
         <initiallyChecked>0</initiallyChecked>
