@@ -1,0 +1,20 @@
+<editor>
+    <help/>
+	<formElement>
+        <type>checkbox</type>
+        <label>Use sudo:</label>
+        <property>use_sudo</property>
+        <required>0</required>
+        <documentation>Use sudo for running docker build</documentation>
+		<checkedValue>1</checkedValue>
+        <uncheckedValue>0</uncheckedValue>
+        <initiallyChecked>0</initiallyChecked>
+    </formElement>
+    <formElement>
+        <type>entry</type>
+        <label>Build path:</label>
+        <property>build_path</property>
+        <required>1</required>
+        <documentation>Path to source code</documentation>
+    </formElement>
+</editor>

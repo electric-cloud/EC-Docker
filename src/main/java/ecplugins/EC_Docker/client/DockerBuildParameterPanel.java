@@ -1,7 +1,7 @@
 
-// DockerPullParameterPanel.java --
+// DockerBuildParameterPanel.java --
 //
-// DockerPullParameterPanel.java is part of ElectricCommander.
+// DockerBuildParameterPanel.java is part of ElectricCommander.
 //
 // Copyright (c) 2005-2014 Electric Cloud, Inc.
 // All rights reserved.
@@ -28,7 +28,7 @@ import ecinternal.client.InternalComponentBase;
 
 import static com.electriccloud.commander.gwt.client.ui.FormBuilder.MISSING_REQUIRED_ERROR_MESSAGE;
 
-public class DockerPullParameterPanel
+public class DockerBuildParameterPanel
     extends InternalComponentBase
     implements ParameterPanel,
         ParameterPanelProvider
@@ -36,31 +36,26 @@ public class DockerPullParameterPanel
 
     //~ Static fields/initializers ---------------------------------------------
 	private static final String USE_SUDO      = "use_sudo";
-    private static final String IMAGE_NAME    = "image_name";
-    private static final String ALL_TAGS      = "all_tags";
+    private static final String BUILD_PATH    = "build_path";
 
     //~ Instance fields --------------------------------------------------------
 
     private FormTable    m_form;
 	private CheckBox     m_UseSudo;
-    private TextBox      m_ImageName;
-    private CheckBox     m_AllTags;
+    private TextBox      m_BuildPath;
 
     //~ Methods ----------------------------------------------------------------
 
     @Override public Widget doInit()
     {
-        m_form      = getUIFactory().createFormTable();
-		m_UseSudo   = new CheckBox();
-        m_AllTags   = new CheckBox();
-        m_ImageName = new TextBox();
+        m_form         = getUIFactory().createFormTable();
+		m_UseSudo      = new CheckBox();
+        m_BuildPath    = new TextBox();
 
 		m_form.addFormRow(USE_SUDO, "Use sudo:", m_UseSudo, true,
-            "Use sudo for running docker pull");	
-        m_form.addFormRow(IMAGE_NAME, "Image name:", m_ImageName, true,
-            "Image to pull from Docker Hub");
-        m_form.addFormRow(ALL_TAGS, "All tags?:", m_AllTags, true,
-            "docker option -a");
+            "Use sudo for running docker build");
+        m_form.addFormRow(BUILD_PATH, "Build path:", m_BuildPath, true,
+            "Path to source code or URL");
 
         return m_form.asWidget();
     }
@@ -69,14 +64,14 @@ public class DockerPullParameterPanel
     {
         m_form.clearAllErrors();
 
-        if (StringUtil.isEmpty(m_ImageName.getValue())) {
-            m_form.setErrorMessage(IMAGE_NAME, MISSING_REQUIRED_ERROR_MESSAGE);
+        if (StringUtil.isEmpty(m_BuildPath.getValue())) {
+            m_form.setErrorMessage(BUILD_PATH, MISSING_REQUIRED_ERROR_MESSAGE);
 
             return false;
         }
 
-        return true;
-    }
+		return true;
+	}
 
     @Override public ParameterPanel getParameterPanel()
     {
@@ -94,14 +89,7 @@ public class DockerPullParameterPanel
 			values.put(USE_SUDO, "0");
 		}
 		
-		boolean all_tags = m_AllTags.getValue();
-		if(all_tags) {
-			values.put(ALL_TAGS, "1");
-        } else {
-			values.put(ALL_TAGS, "0");
-		}
-		
-		values.put(IMAGE_NAME, m_ImageName.getValue());
+        values.put(BUILD_PATH, m_BuildPath.getValue());
 
         return values;
     }
@@ -115,10 +103,8 @@ public class DockerPullParameterPanel
 
             if (USE_SUDO.equals(name)) {
                 m_UseSudo.setValue(value.equals("1"));
-            } else if (ALL_TAGS.equals(name)) {
-                m_AllTags.setValue(value.equals("1"));
-            } else if (IMAGE_NAME.equals(name)) {
-                m_ImageName.setValue(value);
+            } else if (BUILD_PATH.equals(name)) {
+                m_BuildPath.setValue(value);
             }
         }
     }

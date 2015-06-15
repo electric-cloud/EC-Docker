@@ -1,0 +1,30 @@
+<editor>
+    <help/>
+	<formElement>
+        <type>checkbox</type>
+        <label>Use sudo:</label>
+        <property>use_sudo</property>
+        <required>0</required>
+        <documentation>Use sudo for running docker pull</documentation>
+		<checkedValue>1</checkedValue>
+        <uncheckedValue>0</uncheckedValue>
+        <initiallyChecked>0</initiallyChecked>
+    </formElement>
+    <formElement>
+        <type>entry</type>
+        <label>Image name:</label>
+        <property>image_name</property>
+        <required>1</required>
+        <documentation>Image to pull from Docker Hub</documentation>
+    </formElement>
+    <formElement>
+        <type>checkbox</type>
+        <label>All tags?:</label>
+        <property>all_tags</property>
+        <required>0</required>
+        <documentation>docker option -a</documentation>
+		<checkedValue>1</checkedValue>
+        <uncheckedValue>0</uncheckedValue>
+        <initiallyChecked>0</initiallyChecked>
+    </formElement>
+</editor>

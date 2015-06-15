@@ -16,4 +16,18 @@
 			</parameterPanel>
 		</customType>
 	</customTypes>
+	<customTypes>
+		<customType name="DockerBuild">
+			<parameterPanel>
+				<javascript>war/ecplugins.EC_Docker.DockerBuildParameterPanel/ecplugins.EC_Docker.DockerBuildParameterPanel.nocache.js</javascript>
+			</parameterPanel>
+		</customType>
+	</customTypes>
+	<customTypes>
+		<customType name="DockerRun">
+			<parameterPanel>
+				<javascript>war/ecplugins.EC_Docker.DockerRunParameterPanel/ecplugins.EC_Docker.DockerRunParameterPanel.nocache.js</javascript>
+			</parameterPanel>
+		</customType>
+	</customTypes>
 </plugin>

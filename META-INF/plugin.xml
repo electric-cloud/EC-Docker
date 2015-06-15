@@ -8,11 +8,25 @@
 	<help>@PLUGIN_KEY@_help.xml</help>
 	<author>Electric Cloud</author>
 	<authorUrl>http://www.electric-cloud.com/support</authorUrl>
-	<commander-version min="3.6"/>
+	<commander-version min="4.2"/>
 	<customTypes>
 		<customType name="DockerPull">
 			<parameterPanel>
 				<javascript>war/ecplugins.EC_Docker.DockerPullParameterPanel/ecplugins.EC_Docker.DockerPullParameterPanel.nocache.js</javascript>
+			</parameterPanel>
+		</customType>
+	</customTypes>
+	<customTypes>
+		<customType name="DockerBuild">
+			<parameterPanel>
+				<javascript>war/ecplugins.EC_Docker.DockerBuildParameterPanel/ecplugins.EC_Docker.DockerBuildParameterPanel.nocache.js</javascript>
+			</parameterPanel>
+		</customType>
+	</customTypes>
+	<customTypes>
+		<customType name="DockerRun">
+			<parameterPanel>
+				<javascript>war/ecplugins.EC_Docker.DockerRunParameterPanel/ecplugins.EC_Docker.DockerRunParameterPanel.nocache.js</javascript>
 			</parameterPanel>
 		</customType>
 	</customTypes>
