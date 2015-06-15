@@ -21,7 +21,7 @@ buildscript {
  
 group = "com.electriccloud"
 description = "Plugins : EC-Docker"
-version = "0.0.1"
+version = "1.0.0"
  
 apply plugin: 'flow-gradle-plugin'
  

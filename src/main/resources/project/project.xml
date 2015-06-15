@@ -21,33 +21,26 @@
 							<expandable>1</expandable>
 							<value>runDockerPull</value>
 						</property>
-						<property>
-							<propertyName>Build Docker image</propertyName>
-							<description>This operation builds the image from the sources.</description>
-							<expandable>1</expandable>
-							<value>runDockerBuild</value>
-						</property>
-						<property>
-							<propertyName>Run container</propertyName>
-							<description>This operation runs a container.</description>
-							<expandable>1</expandable>
-							<value>runDockerRun</value>
-						</property>
 					</propertySheet>
 				</property>
-				<property>
-					<propertyName>pluginType</propertyName>
-					<description></description>
-					<expandable>1</expandable>
-					<value>Repository</value>
-				</property>
-				<property>
-					<propertyName>ec_visibility</propertyName>
-					<description/>
-					<expandable>1</expandable>
-					<value>pickListOnly</value>
-				</property>
 			</propertySheet>
+		</property>
+		<property>
+			<propertyName>pluginType</propertyName>
+			<description></description>
+			<expandable>1</expandable>
+			<value>Repository</value>
+		</property>
+        <property>
+            <propertyName>ec_setup</propertyName>
+            <expandable>0</expandable>
+            <value></value>
+        </property>
+		<property>
+			<propertyName>ec_visibility</propertyName>
+			<description/>
+			<expandable>1</expandable>
+			<value>pickListOnly</value>
 		</property>
     </propertySheet>
     <procedure>
