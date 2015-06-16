@@ -118,7 +118,7 @@
 		<formalParameter>
 			<formalParameterName>all_tags</formalParameterName>
 			<defaultValue>0</defaultValue>
-			<description>docker option -a</description>
+			<description>Download all tagged images in the repository</description>
 			<expansionDeferred>0</expansionDeferred>
 			<required>0</required>
 			<type>checkbox</type>
@@ -419,7 +419,7 @@
 		<formalParameter>
 			<formalParameterName>published_ports</formalParameterName>
 			<defaultValue>0</defaultValue>
-			<description>Publish a container's port to the host (format: ip:hostPort:containerPort | ip::containerPort | hostPort:containerPort | containerPort)</description>
+			<description>Publish a container's port to the host (format: ip:hostPort:containerPort | ip::containerPort | hostPort:containerPort | containerPort). Note: use spaces to delimit port mappings, for example "2666:1666 8088:8080"</description>
 			<expansionDeferred>0</expansionDeferred>
 			<required>0</required>
 			<type>entry</type>

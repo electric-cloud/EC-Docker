@@ -1,10 +1,12 @@
+use strict;
+use utf8;
 use ElectricCommander;
 
 $| = 1;
 
 sub getProperty {
     my ($ec, $name, $mandatory, $default) = @_;
-    $ret = $ec->getProperty($name)->findvalue('//value')->string_value;
+    my $ret = $ec->getProperty($name)->findvalue('//value')->string_value;
     
     if(!$ret && $mandatory) {
         die "Missing mandatory parameter '$name'.";
@@ -68,7 +70,10 @@ if($working_dir) {
 }
 
 if($published_ports) {
-	$command .= " -p $published_ports";
+	my @port_mappings = split / /, $published_ports;
+	foreach my $mapping (@port_mappings) {
+		$command .= " -p $mapping";
+	}
 }
 
 if($publish_all_ports) {
@@ -94,5 +99,9 @@ $command .= " 2>&1";
 print "\nCommand to execute: $command\n";
 print "Launching docker container:\n\n";
 
-my $out = `$command`;
-print $out . "\n";
+my $docker_output = system($command);
+if($? != 0) {
+    $ec->setProperty("summary", "exit code $?");
+    $ec->setProperty("outcome", "error");
+}
+print $docker_output . "\n";

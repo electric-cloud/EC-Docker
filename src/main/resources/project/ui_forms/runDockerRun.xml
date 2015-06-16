@@ -53,7 +53,7 @@
         <label>Publish ports:</label>
         <property>published_ports</property>
         <required>0</required>
-        <documentation>Publish a container's port to the host (format: ip:hostPort:containerPort | ip::containerPort | hostPort:containerPort | containerPort)</documentation>
+        <documentation>Publish a container's port to the host (format: ip:hostPort:containerPort | ip::containerPort | hostPort:containerPort | containerPort). Note: use spaces to delimit port mappings, for example "2666:1666 8088:8080"</documentation>
     </formElement>
     <formElement>
         <type>checkbox</type>

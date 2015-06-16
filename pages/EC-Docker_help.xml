@@ -18,13 +18,9 @@
 </head>
 
 <body>
-    <div class="help">
-		
-		<!-- Enter the new [Plugin name] in the following line. -->		
+    <div class="help">	
 
-        <h1>[Plugin name]</h1>
-				
-				<!-- Do not change the following line. -->		
+        <h1>EC-Docker</h1>	
 
         <p>Plugin Version @PLUGIN_VERSION@</p>
 
@@ -43,7 +39,7 @@
 				If you are writing the first version of a new plugin, change "Revised on" to "Created on" and 
 				enter the date when the current sprint will end, and the document will be published.-->		
 				
-        <p>Revised on [end date for the current sprint]</p>
+        <p>Revised on June, 17</p>
 				
 				<h1>Contents</h1>
 				
@@ -64,7 +60,7 @@
 				<li><p><a href="#example">Examples and Use Cases</a></p></li>
 				<ul>
 				
-				<!-- Add a line for each example or use case. The following is an example. -->
+					<!-- Add a line for each example or use case. The following is an example. -->
 				
 				<li><a href="#UseCase1">UseCase1</a></li>
 				</ul>
@@ -417,7 +413,7 @@
 		
 		        <p>In the <b>CustomBuildExample</b> step, click the Log button to see the diagnostic information. 
 						The output is similar to the following diagnostic report:</p>	
-						<img src="../../plugins/[Plugin Name]/images/CustomBuildExample/[Plugin Name]_CustomBuildExample4.png" /></li>
+						<li><img src="../../plugins/[Plugin Name]/images/CustomBuildExample/[Plugin Name]_CustomBuildExample4.png" /></li>
 						
 				</div>
 

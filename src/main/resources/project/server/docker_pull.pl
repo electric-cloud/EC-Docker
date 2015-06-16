@@ -1,10 +1,12 @@
+use strict;
+use utf8;
 use ElectricCommander;
 
 $| = 1;
 
 sub getProperty {
     my ($ec, $name, $mandatory, $default) = @_;
-    $ret = $ec->getProperty($name)->findvalue('//value')->string_value;
+    my $ret = $ec->getProperty($name)->findvalue('//value')->string_value;
     
     if(!$ret && $mandatory) {
         die "Missing mandatory parameter '$name'.";
@@ -44,5 +46,9 @@ $command .= " $image_name 2>&1";
 print "\nCommand to execute: $command\n";
 print "Pulling docker image:\n\n";
 
-my $out = `$command`;
-print $out . "\n";
+my $docker_output = system($command);
+if($? != 0) {
+    $ec->setProperty("summary", "exit code $?");
+    $ec->setProperty("outcome", "error");
+}
+print $docker_output . "\n";

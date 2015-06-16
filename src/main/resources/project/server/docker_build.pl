@@ -1,10 +1,12 @@
+use strict;
+use utf8;
 use ElectricCommander;
 
 $| = 1;
 
 sub getProperty {
     my ($ec, $name, $mandatory, $default) = @_;
-    $ret = $ec->getProperty($name)->findvalue('//value')->string_value;
+    my $ret = $ec->getProperty($name)->findvalue('//value')->string_value;
     
     if(!$ret && $mandatory) {
         die "Missing mandatory parameter '$name'.";
@@ -25,7 +27,6 @@ if(!defined $build_path) {
 }
 
 print "Build path: $build_path\n";
-print "URL:        $url\n";
 
 my $command;
 if($use_sudo) {
@@ -35,7 +36,11 @@ if($use_sudo) {
 }
 
 print "Command to execute: $command\n";
-print "Building docker image:\n";
+print "Building docker image:\n\n";
 
-my $out = `$command`;
-print $out . "\n";
+my $docker_output = system($command);
+if($? != 0) {
+    $ec->setProperty("summary", "exit code $?");
+    $ec->setProperty("outcome", "error");
+}
+print $docker_output . "\n";
