@@ -35,16 +35,16 @@ public class DockerPullParameterPanel
 {
 
     //~ Static fields/initializers ---------------------------------------------
-	private static final String USE_SUDO      = "use_sudo";
-    private static final String IMAGE_NAME    = "image_name";
-    private static final String ALL_TAGS      = "all_tags";
+	private static final String USE_SUDO   = "use_sudo";
+    private static final String IMAGE_NAME = "image_name";
+    private static final String TAG        = "tag";
 
     //~ Instance fields --------------------------------------------------------
 
-    private FormTable    m_form;
-	private CheckBox     m_UseSudo;
-    private TextBox      m_ImageName;
-    private CheckBox     m_AllTags;
+    private FormTable m_form;
+	private CheckBox  m_UseSudo;
+    private TextBox   m_ImageName;
+    private TextBox   m_Tag;
 
     //~ Methods ----------------------------------------------------------------
 
@@ -52,15 +52,15 @@ public class DockerPullParameterPanel
     {
         m_form      = getUIFactory().createFormTable();
 		m_UseSudo   = new CheckBox();
-        m_AllTags   = new CheckBox();
+        m_Tag       = new TextBox();
         m_ImageName = new TextBox();
 
 		m_form.addFormRow(USE_SUDO, "Use sudo:", m_UseSudo, true,
             "Use sudo for running docker pull");	
         m_form.addFormRow(IMAGE_NAME, "Image name:", m_ImageName, true,
             "Image to pull from Docker Hub");
-        m_form.addFormRow(ALL_TAGS, "All tags?:", m_AllTags, true,
-            "docker option -a");
+        m_form.addFormRow(TAG, "Image tag:", m_Tag, true,
+            "Tag of image");
 
         return m_form.asWidget();
     }
@@ -94,13 +94,7 @@ public class DockerPullParameterPanel
 			values.put(USE_SUDO, "0");
 		}
 		
-		boolean all_tags = m_AllTags.getValue();
-		if(all_tags) {
-			values.put(ALL_TAGS, "1");
-        } else {
-			values.put(ALL_TAGS, "0");
-		}
-		
+		values.put(TAG, m_Tag.getValue());
 		values.put(IMAGE_NAME, m_ImageName.getValue());
 
         return values;
@@ -115,8 +109,8 @@ public class DockerPullParameterPanel
 
             if (USE_SUDO.equals(name)) {
                 m_UseSudo.setValue(value.equals("1"));
-            } else if (ALL_TAGS.equals(name)) {
-                m_AllTags.setValue(value.equals("1"));
+            } else if (TAG.equals(name)) {
+                m_Tag.setValue(value);
             } else if (IMAGE_NAME.equals(name)) {
                 m_ImageName.setValue(value);
             }

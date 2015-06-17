@@ -85,7 +85,7 @@
 							</propertySheet>
 						</property>
 						<property>
-							<propertyName>all_tags</propertyName>
+							<propertyName>tag</propertyName>
 							<propertySheet>
 								<property>
 									<propertyName>formType</propertyName>
@@ -96,6 +96,18 @@
 						</property>
 					</propertySheet>
 					</property>
+					<property>
+						<propertyName>nameIdentifier</propertyName>
+						<description>Identifies parameter containing name for the image</description>
+						<expandable>1</expandable>
+						<value>image_name</value>
+					</property>            
+					<property>
+						<propertyName>versionIdentifier</propertyName>
+						<description>Identifies parameter containing version details for the image</description>
+						<expandable>1</expandable>
+						<value>tag</value>
+					</property>    
 				</propertySheet>
 			</property>
 		</propertySheet>
@@ -116,12 +128,12 @@
 			<type>entry</type>
 		</formalParameter>
 		<formalParameter>
-			<formalParameterName>all_tags</formalParameterName>
-			<defaultValue>0</defaultValue>
-			<description>Download all tagged images in the repository</description>
+			<formalParameterName>tag</formalParameterName>
+			<defaultValue>latest</defaultValue>
+			<description>Tag of image</description>
 			<expansionDeferred>0</expansionDeferred>
 			<required>0</required>
-			<type>checkbox</type>
+			<type>entry</type>
 		</formalParameter>
 		<step>
 			<stepName>runDockerPull</stepName>

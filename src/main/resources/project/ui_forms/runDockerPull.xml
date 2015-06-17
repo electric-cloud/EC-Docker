@@ -18,13 +18,11 @@
         <documentation>Image to pull from Docker Hub</documentation>
     </formElement>
     <formElement>
-        <type>checkbox</type>
-        <label>Download all tags?:</label>
-        <property>all_tags</property>
+        <type>entry</type>
+        <label>Image tag:</label>
+        <property>tag</property>
         <required>0</required>
-        <documentation>Download all tagged images in the repository</documentation>
-		<checkedValue>1</checkedValue>
-        <uncheckedValue>0</uncheckedValue>
-        <initiallyChecked>0</initiallyChecked>
+        <documentation>Tag of image</documentation>
+		<defaultValue>latest</defaultValue>
     </formElement>
 </editor>

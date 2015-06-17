@@ -21,14 +21,14 @@ $ec->abortOnError(0);
 
 my $use_sudo = getProperty($ec, "use_sudo", 0);
 my $image_name = getProperty($ec, "image_name", 1);
-my $all_tags = getProperty($ec, "all_tags", 0);
+my $image_tag = getProperty($ec, "tag", 0);
 
 if(!defined $image_name) {
     die "ERROR: image name parameter is required but not set.";
 }
 
 print "Image Name: $image_name\n";
-print "All tags:   $all_tags\n";
+print "Image tag:  $image_tag\n";
 
 my $command;
 if($use_sudo) {
@@ -37,8 +37,8 @@ if($use_sudo) {
 	$command = "docker pull";
 }
 
-if($all_tags) {
-    $command .= " -a";
+if($image_tag) {
+    $image_name .= ":$image_tag";
 }
 
 $command .= " $image_name 2>&1";
