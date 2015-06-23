@@ -12,7 +12,7 @@
 
     <title>ElectricFlow Plugin for Docker</title>
     <link rel="stylesheet"
-          href="../../plugins/EC-Docker/pluginhelp.css"
+          href="../../plugins/@PLUGIN_KEY@/pluginhelp.css"
           type="text/css"
           media="screen" />
 </head>
@@ -39,33 +39,36 @@
 				If you are writing the first version of a new plugin, change "Revised on" to "Created on" and 
 				enter the date when the current sprint will end, and the document will be published.-->		
 				
-        <p>Revised on June, 17</p>
+        <p>Revised on July 1, 2015</p>
 				
 				<h1>Contents</h1>
 				
 				<ul>
 				<li><p><a href="#overview">Overview</a></p></li>
-				<li><p><a href="#setupconfig">Setting Up the Plugin Configuration</a></p></li>
 				<li><p><a href="#procedures">Plugin Procedures</a></p></li>
 				<ul>
+				<li><a href="#runDockerBuild">runDockerBuild</a></li>
+				<li><a href="#runDockerPull">runDockerPull</a></li>
+				<li><a href="#runDockerRun">runDockerRun</a></li>
+	            </ul>
+				<!--	
 				
-				<!-- Add a line for each plugin procedure. The following are examples. -->		
-				
-				<li><a href="#Procuedure1">Procuedure1</a></li>
-				<li><a href="#Procuedure2">Procuedure2</a></li>
 				</ul>
-				
-				<!-- Include this section only if there are examples and use cases. -->	
-				
 				<li><p><a href="#example">Examples and Use Cases</a></p></li>
 				<ul>
-				
-					<!-- Add a line for each example or use case. The following is an example. -->
-				
 				<li><a href="#UseCase1">UseCase1</a></li>
 				</ul>
+				
+				-->
+				
 				<li><p><a href="#rns">Release Notes</a></p></li>
 				</ul>
+				
+				<p>IMPORTANT: For all parameter descriptions in this document, required parameters are shown 
+				in <span class='required'>bold italics</span>.</p>
+				
+		        <p>IMPORTANT: In the ElectricFlow UI, from the Home page, open the Main Menu, and 
+				click <b>Admin</b> > <b>Plugins</b> to open the Plugin Manager.</p>
 					
 		    <!-- The next section is required. -->
 				
@@ -76,157 +79,70 @@
 				What general functionality does the plugin include? 
 				What functionality does the plugin omit? -->
 				
-				<!-- The following is an example description. Replace it with the new plugin description. -->
-				
-				<p>This is example text (one or more paragraphs):</p>
+				<p>Docker is an open platform for developing, shipping, and running applications. 
+				Docker is designed to deliver your applications faster. With Docker, you can separate 
+				your applications from your infrastructure and treat your infrastructure like a 
+				managed application. Docker helps you ship code faster, test faster, deploy faster, 
+				and shorten the cycle between writing code and deploying it.</p>
 						
-        <p>Gerrit is a web-based code review system, facilitating online code reviews for projects using the Git version control system. 
-				It provides a systematic process for evaluating and approving source code changes before they are committed. Gerrit provides 
-				facilities to park changes until they are approved by appropriate engineers. Engineers are notified of a change (or they sign 
-				into the Gerrit server to find new changes) and must decide if the change should be accepted into the code base. This process is 
-				typically implemented by manual code review and/or by pulling changes into a local workspace, building the changes, and running 
-				some tests.</p>
+                <p>With Docker, you can package an application will all its dependencies into a standardized unit 
+				for software development. Containers wrap your application in a complete file system that has 
+                everything it needs to run (code, runtime, system tools, libraries, and other components installed 
+                on a server.  The result is an application that will run the same, regardless of the environment 
+                on which it is running.</p>
 
         <!-- This section is required. Replace the plugin name, the URL to the website with the new plugin information, and the name of the link. -->	
-				<!-- Example of [Plugin name] is OpenStack or Chef. -->	
-				<!-- Example of [Name of plugin or website page] is OpenStack or OpenStack Home Page. -->		
-							
-				<p>For more information about [Plugin Name], go to the <a href="http://code.google.com/p/gerrit/">[Name of the plugin or website page]</a>.</p>
+			
+			<p>For more information about Docker, go to the <a href="http://www.docker.com/">Docker home page</a>.</p>
 
-        <h2>ElectricCommander Integration to [Plugin Name]</h2>
+        <h2>ElectricCommander Integration to EC-Docker</h2>
 				
-				<!-- The integration description should answer the questions:
+		<!-- The integration description should answer the questions:
         How deep does our integration go? Why should I care?
         What general functionality does the plugin include? 
 				What functionality does the plugin omit? -->
 				
-				<!-- The following is an example description. Replace it with the new plugin content. -->
-
-        <p>This is example text (one or more paragraphs):</p>
-				
-				<p>The ElectricCommander Gerrit plugin simplifies the build/test approval process. The goal is to run tests automatically 
-				before the reviewer looks at the change, although a setting is available to run builds on demand only. The Android team 
-				published a <a href="http://source.android.com/submit-patches/workflow">diagram</a> that describes the workflow for 
-				submitting changes. </p> 
+			
+            <p>Use this plugin with ElectricFlow to perform Docker build, pull, and run functions.</p> 
 				
 						
-			  <h2>Integrated Version</h2>
+		<h2>Integrated Version</h2>
 				
-				<!-- Replace the [Plugin name] and [Plugin version] in the following line with the new plugin values. -->
+				
 
-        <p>This plugin was tested against Gerrit 2.8.5. (This is example text.)</p>
+            <p>This plugin was tested against Docker Engine 1.7.</p>
 				
-			<!-- The following is boilerplate text. Do not modify or remove it from the document. -->	
-				
-		<p>IMPORTANT: For all parameter descriptions in this document, required parameters are shown in <span class='required'>bold italics</span>.</p>
+			
 		
-		<!-- The next section is required. -->		
+	<!--There is no Configure link for EC-Docker on the Plugin Manager page.	
 		
     <h1 id="setupconfig">Setting Up the Plugin Configuration</h1>
 
-    <!-- This is boilerplate text. Do not modify or remove it from the document. -->	
-		
-		<p>Plugin configurations are sets of parameters that apply across some or all of the plugin procedures. 
-		They reduce repetition of common values, create predefined sets of parameters for end users, and store 
-		credentials securely. Each configuration has a unique name that is automatically entered in designated 
-		parameters in the procedures.</p>
-						
-		<h2>Input</h2>
-  
-    <ol>
-		  <li>Go to <b>Administration</b> > <b>Plugins</b> to open the Plugin Manager.</li>
-			
-			<!-- Replace the [Plugin name is ElectricFlow] in the following line with the name that appears in the UI. -->		
+    -->	
 				
-		  <li>Find the [Plugin name is ElectricFlow] row.</li>
+		
+	<h1 id="procedures">Plugin Procedures</h1>
+
+     <div class="procedure" id="runDockerBuild">
+
+     <a name='runDockerBuild' id="runDockerBuild"></a> 
+
+     <h2>runDockerBuild</h2>
 			
-		  <!-- Replace the [Plugin name] in the following lines with the new plugin name. -->
+			<p>Use this procedure to build a Docker image. Docker can build images automatically from a source 
 			
-			<li>Click <b>Configure</b> to open the [Plugin name] Configurations page.</li> 	
-		  <li>Click <b>Create Configuration</b>.</li>
-		  <li>To create a [Plugin name] configuration, enter the following information and click <b>OK</b>. 
-			<br /> Remember that you may need to create additional configurations later.</li>
-
-                <!-- Replace the information in this table with the parameters for the new plugin. -->
-								<table class="grid">
-                <thead>
-                    <tr>
-                        <th>Parameter</th>
-                        <th>Description</th>
-                    </tr>
-                </thead>
-                <tbody>
-								<!-- The following is example text. Replace it with the configuration parameters for the new plugin. -->
-								    <tr>
-                        <td class='required'>Configuration Name</td>
-                        <td>Name of the Gerrit configuration.</td>
-                    </tr>
-                    <tr>
-                        <td>Description</td>
-                        <td>A description for this configuration.</td>
-                    </tr>
-                    <tr>
-                        <td>Repository Server</td>
-                        <td>The server where the repository is located. If you do not specify a server, the default Gerrit server is used. 
-												For example, in the <i>git://github.com/ecGerrit/ecGerritTest.git</i> URL, the repository server is <i>github.com</i>. 
-												You can specify the server with the protocol that it uses, such as Secure Shell (SSH) in <i>ssh://my_gerrit_server.my_domain.com</i>. 
-												If no protocol is specified, the default protocol is <i>Git</i>.</td>		
-                    </tr>
-                    <tr>
-                        <td class='required'>Repository Path</td>
-                        <td>The path associated to the <b>Repository Server</b>. For example, the repository path is <i>ecGerrit/ecGerritTest.git</i> in the 
-												<i>git://github.com/ecGerrit/ecGerritTest.git</i> URL.</td>
-                    </tr>
-                    <tr>
-                        <td class='required'>Gerrit Server</td>
-                        <td>The hostname or IP address of the Gerrit server, such as <i>localhost</i> or <i>github.com</i>.</td>
-                    </tr>
-                 </tbody>
-            </table>
-		
-		<!-- The following image shows the parameter form consisting of the parameter name and the field in the UI. 
-		Change the filename (.png) to the new image filename. -->
-		
-		<img src="../../plugins/[Plugin Name]/images/Config/[Plugin Name]_config1.png" />
-		
-		</ol>
-						
-	  <h2>Output</h2>	 
-		
-		<!-- Replace the [Plugin name] in the following lines with the new plugin name. -->
-		
-		<p>The [Plugin name] Configurations page now shows the new configuration.</p>
-		
-		<!-- The following line is optional. Replace the [Plugin name] in the following lines with the new plugin name. -->
-		
-		<p>You can also manage your [Plugin name] configurations in this page. Click <b>Edit</b> to modify an existing configuration or 
-		<b>Delete</b> to remove an existing configuration.</p>
-						
-		</div>
-		
-		<!-- The next section is required. Replace [Procedure1} with the plugin procedure name in the following lines. -->		
-		
-		 <h1 id="procedures">Plugin Procedures</h1>
-
-     <div class="procedure" id="Procedure1">
-
-     <a name='Procedure1' id="Procedure1"></a> 
-
-     <h2>[Procedure1]</h2>
-
-      <!-- The following is an example description of the procedure. Replace it with the new plugin procedure description. -->
-			
-			<p>This is example text (one or more paragraphs):</p>
-			
-			<p>The CustomBuildPrepare procedure uses the new helper methods to prepare an environment to test all the open changes in 
-						the Gerrit server and those that were scanned previously, which can include changes from one or more projects.</p>
+			repository using the instructions in a Dockerfile.</p>
 	    
 			<h3>Input</h3>
 			
-      <ol>
-			<li>Go to the [Procedure1] procedure.</li>
+            <ol>
+			
+			<li>In the Main Menu, click <b>Admin</b> > <b>Plugins</b> to open the Plugin Manager.</li>
+			<li>Click <b>EC-Docker</b>.</li>
+			<li>Click <b>runDockerBuild</b>.</li>
 			<li>Enter the following parameters:<br />
-     <table class="grid">
+			
+            <table class="grid">
                 <thead>
                     <tr>
                         <th>Parameter</th>
@@ -234,11 +150,17 @@
                     </tr>
                 </thead>
                 <tbody>
-								<!-- The following is example text. Replace it with the  parameters for the plugin procedure. -->
-                   <tr>
-                         <td class='required'>Gerrit Config</td>
-                        <td>The name of the configuration that has the connection information for Gerrit.</td>
+				
+				 <tr>
+                        <td >Use sudo</td>
+                        <td>When this parameter is selected, ElectricFlow uses sudo to run the Docker build.</td>
                     </tr>
+
+                   <tr>
+                         <td class='required'>Build path</td>
+                        <td>Path to the source code.</td>
+                    </tr>
+					
                 </tbody>
             </table>
 
@@ -246,50 +168,56 @@
 						
 		<br />
 		
-		<!-- The following image shows the parameter form consisting of the parameter name and the field in the UI. 
-		Change the filename (.png) to the new image filename. -->
 		
-		<img src="../../plugins/[Plugin Name]/images/CustomBuildPrepare/[Plugin Name]_CustomBuildPrepare2.png" />
+		
+		<img src="../../plugins/@PLUGIN_KEY@/images/runDockerBuild1.png" />
 		<br />
 
 		</ol>   
 						
 		<h3>Output</h3>
 						
-		<p>After the job runs, you can view the results on the Job Details page in ElectricCommander. Every job step was completed successfully.</p>
+		<p>After the job runs, you can view the results on the Job Details page in ElectricFlow. 
+		</p>
 		
-		<!-- The following image shows the Job Details page with the results. Change the filename (.png) to the new image filename. -->
+		<!-- The Docker build was completed successfully.
+
+		<img src="../../plugins/@PLUGIN_KEY@/images/runDockerBuild2.png" />
 		
-		<img src="../../plugins/[Plugin Name]/images/CustomBuildPrepare/[Plugin Name]_CustomBuildPrepare3.png" />
+		-->
+				
+		<p>In the <b>runDockerBuild</b> step, click the Log button to see the diagnostic information. 
+		</p>	
 		
-		<p>In the <b>[Procedure1]</b> step, click the Log button to see the diagnostic information. 
-		The output is similar to the following diagnostic report:</p>	
+		<!-- The output is similar to the following diagnostic report:
+
+		<img src="../../plugins/@PLUGIN_KEY@/images/runDockerBuild3.png" />
 		
-		<!-- The following image shows the diagnostic report in the ElectricCommander UI. Change the filename (.png) to the new image filename. -->
-		
-		<img src="../../plugins/[Plugin Name]/images/CustomBuildPrepare/[Plugin Name]_CustomBuildPrepare4.png" />
-		
+		-->
+					
 		</div>
 		 
 		 <!-- The next section is required for additional procedures. Replace [Procedure2} with the plugin procedure name in the following lines. -->	
 		 
-		 <div class="procedure" id="Procedure2">
+		 <div class="procedure" id="runDockerPull">
 
-           <a name='Procedure2' id="Procedure2"></a> 
+           <a name='runDockerPull' id="runDockerPull"></a> 
 
-            <h2>[Procedure2]</h2>
+            <h2>runDockerPull</h2>
 
-             <!-- The following is an example description of the procedure. Replace it with the new plugin procedure description. -->
-						
-						<p>This procedure cleans up after one developer build. The working tree is cleaned up (runtime artifacts are removed, and 
-						changes are backed out). This also marks the job as complete in the Gerrit comments.</p>
-
+             <p>Use this procedure to make a Docker pull request to let others know aobut the changes you have pushed 
+			 to the repository.</p>
+	    
 			<h3>Input</h3>
-						
-			<ol>
-			<li>Go to the [Procedure2] procedure.</li>
+			
+            <ol>
+			
+			<li>In the Main Menu, click <b>Admin</b> > <b>Plugins</b> to open the Plugin Manager.</li>
+			<li>Click <b>EC-Docker</b>.</li>
+			<li>Click <b>runDockerPull</b>.</li>
 			<li>Enter the following parameters:<br />
-       <table class="grid">
+			
+            <table class="grid">
                 <thead>
                     <tr>
                         <th>Parameter</th>
@@ -297,25 +225,22 @@
                     </tr>
                 </thead>
                 <tbody>
-								
-								<!-- The following is example text. Replace it with the  parameters for the plugin procedure. -->
-								
-                    <tr>
-                        <td class='required'>Change ID</td>
-                        <td>The short change ID to build, such as <i>5</i>.</td>
+				
+				    <tr>
+                        <td >Use sudo</td>
+                        <td>When this parameter is selected, ElectricFlow uses sudo to run the Docker pull request.</td>
                     </tr>
+
                     <tr>
-                        <td class='required'>Gerrit Config</td>
-                        <td>The name of the configuration that has the connection information for Gerrit.</td>
+                         <td class='required'>Image name</td>
+                        <td>Image to pull from the Docker Hub, such as 2ac9d1098bf1, postgres, or committest.</td>
                     </tr>
-                    <tr>
-                        <td class='required'>Patch ID</td>
-                        <td>The short patch set ID to build, such as <i>1</i>.</td>
+					
+					<tr>
+                        <td >Image tag</td>
+                        <td>Tag or label of the image in the Docker Hub, such as 2.1, 2.3.6, or latest.</td>
                     </tr>
-                    <tr>
-                        <td class='required'>Project</td>
-                        <td>The project that contains the change to build.</td>
-                    </tr>
+					
                 </tbody>
             </table>
 
@@ -323,52 +248,180 @@
 						
 		<br />
 		
-		<!-- The following image shows the parameter form consisting of the parameter name and the field in the UI. 
-		Change the filename (.png) to the new image filename. -->
 		
-		<img src="../../plugins/[Plugin Name]/images/DevBuildCleanup/[Plugin Name]_DevBuildCleanup2.png" />
 		
+		<img src="../../plugins/@PLUGIN_KEY@/images/runDockerPull1.png" />
 		<br />
 
 		</ol>   
 						
 		<h3>Output</h3>
 						
-		<p>After the job runs, you can view the results on the Job Details page in ElectricCommander. The procedure was completed successfully.</p>
+		<p>After the job runs, you can view the results on the Job Details page in ElectricFlow. 
+		</p>
 		
-		<!-- The following image shows the Job Details page with the results. Change the filename (.png) to the new image filename. -->
+		<!-- The Docker build was completed successfully.
+
+		<img src="../../plugins/@PLUGIN_KEY@/images/runDockerBuild2.png" />
 		
-		<img src="../../plugins/[Plugin Name]/images/DevBuildCleanup/[Plugin Name]_DevBuildCleanup3.png" />
+		-->
+				
+		<p>In the <b>runDockerPull</b> step, click the Log button to see the diagnostic information. 
+		</p>	
 		
-		<p>In the <b>[Procedure2]</b> step, click the Log button to see the diagnostic information. 
-		The output is similar to the following diagnostic report:</p>	
+		<!-- The output is similar to the following diagnostic report:
+
+		<img src="../../plugins/@PLUGIN_KEY@/images/runDockerBuild3.png" />
 		
-		<!-- The following image shows the diagnostic report in the ElectricCommander UI. Change the filename (.png) to the new image filename. -->
-		<img src="../../plugins/[Plugin Name]/images/DevBuildCleanup/[Plugin Name]_DevBuildCleanup4.png" />			
+		-->		
+						
+    </div>
+	
+	<div class="procedure" id="runDockerRun">
+
+           <a name='runDockerRun' id="runDockerRun"></a> 
+
+            <h2>runDockerRun</h2>
+
+             <p>Use this procedure to run a process in an isolated container. Docker runs the process
+			 in its own file system, network, and  isolated process tree. Starting with an image, Docker runs
+             the process to create a container.</p>
+	    
+			<h3>Input</h3>
+			
+            <ol>
+			
+			<li>In the Main Menu, click <b>Admin</b> > <b>Plugins</b> to open the Plugin Manager.</li>
+			<li>Click <b>EC-Docker</b>.</li>
+			<li>Click <b>runDockerRun</b>.</li>
+			<li>Enter the following parameters:<br />
+			
+            <table class="grid">
+                <thead>
+                    <tr>
+                        <th>Parameter</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+				
+				    <tr>
+                        <td >Use sudo</td>
+                        <td>When this parameter is selected, ElectricFlow uses sudo to run the Docker process.</td>
+                    </tr>
+
+                    <tr>
+                        <td class='required'>Image name</td>
+                        <td>Image from which the container is run, such as 2ac9d1098bf1, postgres, or committest.</td>
+                    </tr>
+					
+					<tr>
+                        <td>Container name</td>
+                        <td>Name of the container: 
+						<ul>
+						<li>UUID long identifier (such as f78375b1c487e03c9438c729345e54db9d20cfa2ac1fc3494b6eb60872e74778)</li>
+						<li>UUID short identifier (such as f78375b1c487)</li>
+						<li>Name (such as admin)</li>
+						</ul>
+						</td>
+                    </tr>
+					
+					<tr>
+                        <td >Detached mode (-d)</td>
+                        <td>Select this parameter to run the container in the background and print the new 
+						container ID.</td>
+                    </tr>
+					
+					<tr>
+                        <td>Entrypoint</td>
+                        <td>The default command to execute at runtime. When you enter a command for this parameter, 
+						it overwrites the default entrypoint is set by the image. For example, the <b>/bin/bash example/redis</b> 
+						command overwrites the default entrypoint.</td>
+                    </tr>
+					
+					<tr>
+                        <td>Container working directory</td>
+                        <td>The working directory inside the container. such as /path/to/workdir. The default is 
+						the root directory (/).</td>
+                    </tr>
+					
+					<tr>
+					    <td>Publish ports</td>
+                        <td>Use one of the following formats to publish the container's port to the host: 
+						<ul>
+						<li>IP_address:hostPort:containerPort</li>
+						<li>IP_address::containerPort</li>
+						<li>IP_address:containerPort</li>
+						<li>containerPort</li>
+						</ul>
+						<p>Use spaces to delimit port mappings, such as "2666:1666:8088:8080".</p>
+						</td>  
+                    </tr>
+					
+					<tr>
+                        <td>Publish all ports</td>
+                        <td>Select this parameter to publish all exposed ports to the host interfaces.</td>
+                    </tr>
+					
+					<tr>
+                        <td>Publish all ports</td>
+                        <td>Select this parameter to give extended privileges to this container.</td>
+                    </tr>
+					
+					<tr>
+                        <td>Link</td>
+                        <td>The link to another container using the Name-or-ID:alias format.</td>
+                    </tr>
+					
+					<tr>
+                        <td>Command with args</td>
+                        <td>Command to run within the container.</td>
+                    </tr>
+					
+                </tbody>
+            </table>
+
+				</li>
+						
+		<br />
+				
+		<img src="../../plugins/@PLUGIN_KEY@/images/runDockerRun1.png" />
+		<br />
+
+		</ol>   
+						
+		<h3>Output</h3>
+						
+		<p>After the job runs, you can view the results on the Job Details page in ElectricFlow. 
+		</p>
+		
+		<!-- The Docker build was completed successfully.
+
+		<img src="../../plugins/@PLUGIN_KEY@/images/runDockerBuild2.png" />
+		
+		-->
+				
+		<p>In the <b>runDockerRun</b> step, click the Log button to see the diagnostic information. 
+		</p>	
+		
+		<!-- The output is similar to the following diagnostic report:
+
+		<img src="../../plugins/@PLUGIN_KEY@/images/runDockerBuild3.png" />
+		
+		-->		
 						
     </div>
 
-		<!-- Include this section only if there are examples and use cases. -->	
+	<!-- Include this section only if there are examples and use cases. 	
 			
     <h1 id="example">Examples and Use Cases</h1><br />
 		
-		<!-- The following can be an example of how to run a specific procedure or a use case showing how to perform a specific task 
-		using one or more procedures.  -->
+		<p>Instructions: The following can be an example of how to run a specific procedure or a use case showing how to perform a specific task 
+		using one or more procedures.</p>
 		
-		<!-- The following summary about use case is optional.  -->
-
-        <p>This plugin has preconfigured example procedures that include the basic process to do the following:</p>
-				<ul>
-				<li>Clone the repository.</li>
-				<li>Get specific changes.</li>
-				<li>Run user-defined builds and tests.</li>
-				<li>Review and approve changes.</li>
-				<li>Reject changes.</li>
-				</ul>
-
-        <!-- The following is a use case with several procedures showing how to perform a specific task.  
+		        <p>Instructions: The following is a use case with several procedures showing how to perform a specific task.  
 				Replace it with an example or use case for the new plugin. 
-				Replace [UseCase1} with the name of the example or use case in the following lines.-->
+				Replace [UseCase1} with the name of the example or use case in the following lines.</p>
 				
 				<h2>[UseCase1]</h2>
 
@@ -401,7 +454,7 @@
 				     </li>
 						
 		    <br />
-		    <img src="../../plugins/[Plugin Name]/images/CustomBuildExample/[Plugin Name]_CustomBuildExample2.png" />
+		    <img src="../../plugins/..." />
 		    <br />
 
 		    </ol>   
@@ -409,17 +462,19 @@
 		    <h3>Output</h3>
 						
 		        <p>After the job runs, you can view the results on the Job Details page in ElectricCommander. Every job step was completed successfully.</p>
-		        <img src="../../plugins/[Plugin Name]/images/CustomBuildExample/[Plugin Name]_CustomBuildExample3.png" />
+		        <img src="../../plugins/ />
 		
 		        <p>In the <b>CustomBuildExample</b> step, click the Log button to see the diagnostic information. 
 						The output is similar to the following diagnostic report:</p>	
-						<li><img src="../../plugins/[Plugin Name]/images/CustomBuildExample/[Plugin Name]_CustomBuildExample4.png" /></li>
+						<li><img src="../../plugins/ /></li>
 						
 				</div>
+				
+				-->
 
-       <!-- The next section is required. Replace [Procedure1} with the plugin procedure name in the following lines. -->
+       
 			 
-			  <h1>Release Notes</h1>
+	<h1 id="rns">Release Notes</h1>
 				
 				<!-- For each release, create an h2 section describing new and revised procedures, enhancements, and JIRA fixes. 
 				See the following examples for how to write the release note items, which include: 
@@ -428,70 +483,17 @@
 				- Descriptions of new features or functionality supported by the plugin.
 				-->
 
-        <h2>[Plugin name in the ElectricFlow UI]-[Plugin version x.x.x]</h2>
+        <h2>EC-Docker-1.0.0</h2>
 
         <ul>
 
-            <li>Added support for Gerrit 2.1.0</li>
-						
-						<!-- This is an example of how to write a feature update. -->
-						
-            <li>Updated the plugin logic to support the Gerrit review labels called <i>Code-Review</i> and <i>Verified</i>. Starting with 
-						Gerrit 2.6, the Verified label is no longer installed by default. Follow the steps <a href="#gerrit-verified-label">here</a> to install 
-						the label that can be used with ElectricCommander.</li>
-						
-            <!-- This is an example of how to write a new functionality of the plugin. -->
-						
-						<li>The project/branches manifest file can now be used to filter the changes.</li>
-        </ul>
-
-        <h2>[Plugin Name]-2.0.2</h2>
-       
-			  <ul>
-				
-				    <!-- These are examples of how to write descriptions of specific bug fixes. -->
-						
-            <li>Fixed the manifest file.</li>
-						
-						<li>Fixed a bug with the pseudo code snippet execution.</li>
-        </ul>
-
-        <h2 class="help">[Plugin Name]-2.0.1</h2>
-   
-	      <ul>
-				
-				    <!-- This is an example of how to write an enhancement. -->
-				 
-            <li>Updated the logic for applying eligible pending changes to honor project paths defined in the repository manifest.</li>
-        
-				</ul>
-
-        <h2 class="help">[Plugin Name]-2.0.0</h2>
-
-        <ul>
-				     <!-- These are examples of how not to write a release note issue. 
-						 Be more specific when describing fixed bugs. 
-						 The following phrase is too vague and does not provide useful information to the user. -->
-            
-						<li>Fixed minor bugs.</li>
-						
-						<li>Made minor API improvements.</li>
+            <li>Introduced the EC-Docker plugin.</li>
 						
         </ul>
 
-	      <h2 class="help">[Plugin Name]-1.0.0</h2>
+    </div>
 
-        <ul>
-				   <!-- This is an example of how not to write a release note issue.
-					 Be more specific when describing improvements or enhancements. 
-					 The following phrase is too vague and does not provide useful information to the user. -->
-           
-					 
-        </ul>
-				
-				...
-
-    </body>
+   </body>
 		
 </html>
 
