@@ -26,15 +26,6 @@
 
         <hr style="margin-left: -10px; margin-top: 10px; height: 1px; width: 100%; color: #5981BD;" noshade="noshade" />
 
-        <!-- The tool description should answer these kinds of questions: 
-				What is the tool itself is used for in the development process? 
-				Who would use this tool? What is the general use-case or problem that this tool solves? 
-				Look at the tool's documentation or website(s) to get their own descriptions. 
-				Look at Wikipedia or other outside websites. 
-				If there is a Hudson plugin, read their documentation for ideas, examples, etc. 
-				It's OK to copy word-for-word only if appropriate, such as FOSS - but not commercial software.
-            -->
-
 				<!--If you are revising a plugin, enter the date when the current sprint will end.
 				If you are writing the first version of a new plugin, change "Revised on" to "Created on" and 
 				enter the date when the current sprint will end, and the document will be published.-->		
@@ -95,7 +86,7 @@
 			
 			<p>For more information about Docker, go to the <a href="http://www.docker.com/">Docker home page</a>.</p>
 
-        <h2>ElectricCommander Integration to EC-Docker</h2>
+        <h2>ElectricFlow Integration to EC-Docker</h2>
 				
 		<!-- The integration description should answer the questions:
         How deep does our integration go? Why should I care?
@@ -412,65 +403,6 @@
 						
     </div>
 
-	<!-- Include this section only if there are examples and use cases. 	
-			
-    <h1 id="example">Examples and Use Cases</h1><br />
-		
-		<p>Instructions: The following can be an example of how to run a specific procedure or a use case showing how to perform a specific task 
-		using one or more procedures.</p>
-		
-		        <p>Instructions: The following is a use case with several procedures showing how to perform a specific task.  
-				Replace it with an example or use case for the new plugin. 
-				Replace [UseCase1} with the name of the example or use case in the following lines.</p>
-				
-				<h2>[UseCase1]</h2>
-
-        <div class="procedure" id="UseCase1">
-
-            <a name='UseCase1' id="UseCase1"></a> 
-
-            <p>This procedure runs a sample custom build using the helper methods. This procedure runs the CustomBuildPrepare, DoWork, and TeamBuildCleanup 
-						procedures as steps. The DoWork step is where the builds and tests steps are run until TeamBuildCleanup step approves or rejects the changes.</p>
-
-						<h3>Input</h3>
-						
-			      <ol>
-			      <li>Go to the [UseCase1] procedure.</li>
-			      <li>Enter the following parameters:<br />
-                <table class="grid">
-                    <thead>
-                        <tr>
-                            <th>Parameter</th>
-                            <th>Description</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td class='required'>Gerrit Config</td>
-                            <td>The name of the configuration that has the connection information for Gerrit.</td>
-                        </tr>
-                    </tbody>
-                </table>
-				     </li>
-						
-		    <br />
-		    <img src="../../plugins/..." />
-		    <br />
-
-		    </ol>   
-						
-		    <h3>Output</h3>
-						
-		        <p>After the job runs, you can view the results on the Job Details page in ElectricCommander. Every job step was completed successfully.</p>
-		        <img src="../../plugins/ />
-		
-		        <p>In the <b>CustomBuildExample</b> step, click the Log button to see the diagnostic information. 
-						The output is similar to the following diagnostic report:</p>	
-						<li><img src="../../plugins/ /></li>
-						
-				</div>
-				
-				-->
 
        
 			 
