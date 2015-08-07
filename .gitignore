@@ -10,3 +10,4 @@ staging
 .project
 .settings
 *.iml
+*.log

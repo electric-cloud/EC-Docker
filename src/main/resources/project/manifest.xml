@@ -17,6 +17,10 @@
     <xpath>//step[stepName=&quot;runDockerRun&quot;]/command</xpath>
   </file>
   <file>
+    <path>server/docker_compose_up.pl</path>
+    <xpath>//step[stepName=&quot;runDockerComposeUp&quot;]/command</xpath>
+  </file>
+  <file>
     <path>ui_forms/runDockerPull.xml</path>
     <xpath>//procedure[procedureName=&quot;runDockerPull&quot;]/propertySheet/property[propertyName=&quot;ec_parameterForm&quot;]/value</xpath>
   </file>
@@ -27,6 +31,10 @@
   <file>
     <path>ui_forms/runDockerRun.xml</path>
     <xpath>//procedure[procedureName=&quot;runDockerRun&quot;]/propertySheet/property[propertyName=&quot;ec_parameterForm&quot;]/value</xpath>
+  </file>
+  <file>
+    <path>ui_forms/runDockerComposeUp.xml</path>
+    <xpath>//procedure[procedureName=&quot;runDockerComposeUp&quot;]/propertySheet/property[propertyName=&quot;ec_parameterForm&quot;]/value</xpath>
   </file>
   <file>
     <path>ec_setup.pl</path>

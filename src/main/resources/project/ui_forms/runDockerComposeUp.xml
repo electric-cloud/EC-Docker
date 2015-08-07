@@ -1,0 +1,30 @@
+<editor>
+    <help/>
+	<formElement>
+        <type>checkbox</type>
+        <label>Use sudo:</label>
+        <property>use_sudo</property>
+        <required>0</required>
+        <documentation>Use sudo for running docker-compose up</documentation>
+		<checkedValue>1</checkedValue>
+        <uncheckedValue>0</uncheckedValue>
+        <initiallyChecked>0</initiallyChecked>
+    </formElement>
+    <formElement>
+        <type>checkbox</type>
+        <label>Detached mode (-d):</label>
+        <property>detached_mode</property>
+        <required>0</required>
+        <documentation>Detached mode: run the containers in the background</documentation>
+		<checkedValue>1</checkedValue>
+        <uncheckedValue>0</uncheckedValue>
+        <initiallyChecked>0</initiallyChecked>
+    </formElement>
+    <formElement>
+        <type>textarea</type>
+        <label>Content of docker-compose.yml:</label>
+        <property>yaml_file</property>
+        <required>0</required>
+        <documentation>Specify the file content to overwrite existing YAML file.</documentation>
+    </formElement>
+</editor>
