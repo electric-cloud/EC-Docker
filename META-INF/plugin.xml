@@ -1,0 +1,12 @@
+<plugin>
+  <author>Electric Cloud</author>
+  <authorUrl>http://www.electric-cloud.com/support</authorUrl>
+  <category>Container Management</category>
+  <commander-version min="6.0" />
+  <description>Integrates with DockerSwarm orchestration engine to deploy Docker containers.</description>
+  <help>help.xml</help>
+  <key>EC-DockerSwarm</key>
+  <configure>ec_config</configure>
+  <label>EC-DockerSwarm</label>
+  <version>1.0.0</version>
+</plugin>
