@@ -18,6 +18,9 @@ def stepsWithAttachedCredentials = [
 		[
 				procedureName: 'Check Cluster',
 				stepName: 'checkCluster'
+		], [
+				procedureName: 'Deploy Service',
+				stepName: 'createOrUpdateDeployment'
 		]
 ]
 project pluginName, {
@@ -51,6 +54,33 @@ project pluginName, {
 				}
 				property 'parameterRefs', {
 					configuration = 'config'
+				}
+			}
+			property 'defineContainerMappings', {
+				property 'procedureName', value: 'Define Container'
+				property 'ui_formRefs', {
+					parameterForm = 'containerMappingsForm'
+				}
+			}
+			property 'defineServiceMappings', {
+				property 'procedureName', value: 'Define Service'
+				property 'ui_formRefs', {
+					parameterForm = 'serviceMappingsForm'
+				}
+			}
+			property 'deployService', {
+				property 'procedureName', value: 'Deploy Service'
+				property 'ui_formRefs', {
+					parameterForm = 'ec_parameterForm'
+				}
+				property 'parameterRefs', {
+					property 'serviceName', value: 'serviceName'
+					property 'projectName', value: 'serviceProjectName'
+					property 'applicationName', value: 'applicationName'
+					property 'applicationRevisionId', value: 'applicationRevisionId'
+					property 'clusterName', value: 'clusterName'
+					property 'clusterOrEnvironmentProjectName', value: 'clusterOrEnvProjectName'
+					property 'environmentName', value: 'environmentName'
 				}
 			}
 		}

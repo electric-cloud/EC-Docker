@@ -61,7 +61,7 @@ if ( !$errorMessage ) {
     # This is here because we cannot do publishArtifactVersion in dsl today
 
     # delete artifact if it exists first
-    $commander->deleteArtifactVersion("com.electriccloud:EC-DockerSwarm-Grapes:1.0.0");
+    $commander->deleteArtifactVersion("com.electriccloud:EC-Docker-Grapes:1.0.0");
 
     if ( $promoteAction eq "promote" ) {
 
@@ -69,7 +69,7 @@ if ( !$errorMessage ) {
         my $am = new ElectricCommander::ArtifactManagement($commander);
         my $artifactVersion = $am->publish(
             {   groupId         => "com.electriccloud",
-                artifactKey     => "EC-DockerSwarm-Grapes",
+                artifactKey     => "EC-Docker-Grapes",
                 version         => "1.0.0",
                 includePatterns => "**",
                 fromDirectory   => "$pluginDir/lib/grapes",
