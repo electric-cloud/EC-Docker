@@ -1,6 +1,13 @@
 /**
  * Docker API client
  */
+
+@Grab("de.gesellix:docker-client:2017-06-25T15-38-14")
+@Grab(group='ch.qos.logback', module='logback-classic', version='1.0.13')
+
+import de.gesellix.docker.client.image.ManageImage
+import de.gesellix.docker.client.DockerClientImpl
+
 public class DockerClient extends BaseClient {
 
 
@@ -94,7 +101,7 @@ public class DockerClient extends BaseClient {
             doHttpRequest(PUT,
                     clusterEndPoint,
                     "/services/${serviceName}/update",
-                    /* Headers */ [:],
+                    /* Headers  [:],
                     /*failOnErrorCode*//* true,
                     serviceDefinition)
             */

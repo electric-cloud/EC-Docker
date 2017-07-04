@@ -50,10 +50,17 @@ public class EFClient extends BaseClient {
             [(it.propertyName): it.value]
         }
 
-        logger(INFO, "Config values: " + values)
+        // Format for name of credential object is "pluginConfigName_credential"
+        // For e.g. If plugin configuration name is "dockerConfig"
+        // then credential names are "dockerConfig_cacert", "dockerConfig_cert", "dockerConfig_key"
+        def credSuffix = ["cacert","cert","key"]
+        def cred 
+        credSuffix.each{
+            cred = getCredentials("${config}_${it}")
+            values["credential_$it"] = [userName: cred.userName, password: cred.password]
+        }
 
-        def cred = getCredentials(config)
-        values << [credential: [userName: cred.userName, password: cred.password]]
+        logger(INFO, "Config values: " + values)
 
         //Set the log level using the plugin configuration setting
         logLevel = (values.logLevel?: INFO).toInteger()

@@ -39,12 +39,32 @@
     </formElement>
     <formElement>
         <type>credential</type>
-        <label>Credentials:</label>
-        <property>credential</property>
+        <label>CA Certificate:</label>
+        <property>cacert</property>
         <required>1</required>
-        <passwordLabel>Docker token:</passwordLabel>
+        <passwordLabel>CA Cert:</passwordLabel>
         <credentialType>key</credentialType>
-        <documentation>Docker Token</documentation>
+        <documentation>CA Certificate</documentation>
+        <attachedAsParameterToStep>createAndAttachCredential</attachedAsParameterToStep>
+    </formElement>
+    <formElement>
+        <type>credential</type>
+        <label>Client Certificate:</label>
+        <property>cert</property>
+        <required>1</required>
+        <passwordLabel>Certificate:</passwordLabel>
+        <credentialType>key</credentialType>
+        <documentation>Docker Client Certificate</documentation>
+        <attachedAsParameterToStep>createAndAttachCredential</attachedAsParameterToStep>
+    </formElement>
+    <formElement>
+        <type>credential</type>
+        <label>Client Private Key:</label>
+        <property>key</property>
+        <required>1</required>
+        <passwordLabel>Private Key:</passwordLabel>
+        <credentialType>key</credentialType>
+        <documentation>Docker Client Private Key</documentation>
         <attachedAsParameterToStep>createAndAttachCredential</attachedAsParameterToStep>
     </formElement>
     <formElement> 

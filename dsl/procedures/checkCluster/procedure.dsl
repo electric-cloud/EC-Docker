@@ -16,6 +16,19 @@ procedure 'Check Cluster',
     	  actualParameter 'additionalArtifactVersion', ''
     }
 
+    step 'setupCerts',
+      subproject: '',
+      subprocedure: 'Populate Certs',
+      command: null,
+      errorHandling: 'failProcedure',
+      exclusiveMode: 'none',
+      postProcessor: 'postp',
+      releaseMode: 'none',
+      timeLimitUnits: 'minutes', {
+
+    	  actualParameter 'config', '$[config]'
+    }
+
 	step 'checkCluster',
 	  command: new File(pluginDir, 'dsl/procedures/checkCluster/steps/checkCluster.groovy').text,
 	  errorHandling: 'failProcedure',

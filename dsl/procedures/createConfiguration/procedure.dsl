@@ -19,17 +19,4 @@ procedure 'CreateConfiguration',
 	        releaseMode: 'none',
 	        shell: 'ec-perl',
 	        timeLimitUnits: 'minutes'
-
-    step 'Verify',
-	      subproject: '',
-	      subprocedure: 'Check Cluster',
-	      command: null,
-	      errorHandling: 'failProcedure',
-	      exclusiveMode: 'none',
-	      postProcessor: 'postp',
-	      releaseMode: 'none',
-	      timeLimitUnits: 'minutes', {
-
-    	  actualParameter 'config', '$[config]'
-    }
 }
