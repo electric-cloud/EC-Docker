@@ -38,10 +38,17 @@
         <documentation>The endpoint at which docker REST API will be reachable. Must be a IP address or a resolvable DNS name.</documentation>
     </formElement>
     <formElement>
+        <type>entry</type>
+        <label>The Hostname of Docker Endpoint:</label>
+        <property>swarmManagerHostname</property>
+        <required>0</required>
+        <documentation>If the machine hostname is different than one mentioned in "The Docker Endpoint" FQDN, then specify it here.</documentation>
+    </formElement>
+    <formElement>
         <type>credential</type>
         <label>CA Certificate:</label>
         <property>cacert</property>
-        <required>1</required>
+        <required>0</required>
         <passwordLabel>CA Cert:</passwordLabel>
         <credentialType>key</credentialType>
         <documentation>CA Certificate</documentation>
@@ -51,7 +58,7 @@
         <type>credential</type>
         <label>Client Certificate:</label>
         <property>cert</property>
-        <required>1</required>
+        <required>0</required>
         <passwordLabel>Certificate:</passwordLabel>
         <credentialType>key</credentialType>
         <documentation>Docker Client Certificate</documentation>
@@ -61,7 +68,7 @@
         <type>credential</type>
         <label>Client Private Key:</label>
         <property>key</property>
-        <required>1</required>
+        <required>0</required>
         <passwordLabel>Private Key:</passwordLabel>
         <credentialType>key</credentialType>
         <documentation>Docker Client Private Key</documentation>
