@@ -101,13 +101,13 @@
 						<description>Identifies parameter containing name for the image</description>
 						<expandable>1</expandable>
 						<value>image_name</value>
-					</property>            
+					</property>
 					<property>
 						<propertyName>versionIdentifier</propertyName>
 						<description>Identifies parameter containing version details for the image</description>
 						<expandable>1</expandable>
 						<value>tag</value>
-					</property>    
+					</property>
 				</propertySheet>
 			</property>
 		</propertySheet>
@@ -470,6 +470,109 @@
 		</formalParameter>
 		<step>
 			<stepName>runDockerRun</stepName>
+			<alwaysRun>0</alwaysRun>
+			<broadcast>0</broadcast>
+			<command/>
+			<condition/>
+			<description/>
+			<errorHandling>abortProcedure</errorHandling>
+			<exclusiveMode>none</exclusiveMode>
+			<logFileName/>
+			<parallel>0</parallel>
+			<postProcessor/>
+			<precondition/>
+			<releaseMode>none</releaseMode>
+			<resourceName/>
+			<shell>ec-perl</shell>
+			<timeLimit/>
+			<timeLimitUnits>minutes</timeLimitUnits>
+			<workingDirectory/>
+			<workspaceName/>
+			<propertySheet/>
+		</step>
+	</procedure>
+	<procedure>
+		<procedureName>Discover</procedureName>
+		<description>Discovers services in Docker Compose file and creates corresponding application models for them in ElectricFlow</description>
+		<jobNameTemplate>docker-discover-$[jobId]</jobNameTemplate>
+		<resourceName/>
+		<timeLimit/>
+		<timeLimitUnits>minutes</timeLimitUnits>
+		<workspaceName>default</workspaceName>
+		<propertySheet>
+			<property>
+				<propertyName>ec_parameterForm</propertyName>
+				<description/>
+				<expandable>1</expandable>
+				<value/>
+			</property>
+			<property>
+				<propertyName>ec_customEditorData</propertyName>
+				<propertySheet>
+					<property>
+						<propertyName>parameters</propertyName>
+						<propertySheet>
+							<property>
+								<propertyName>docker_compose_file_content</propertyName>
+								<propertySheet>
+									<property>
+										<propertyName>formType</propertyName>
+										<expandable>1</expandable>
+										<value>standard</value>
+									</property>
+								</propertySheet>
+							</property>
+							<property>
+								<propertyName>project</propertyName>
+								<propertySheet>
+									<property>
+										<propertyName>formType</propertyName>
+										<expandable>1</expandable>
+										<value>standard</value>
+									</property>
+								</propertySheet>
+							</property>
+							<property>
+								<propertyName>application</propertyName>
+								<propertySheet>
+									<property>
+										<propertyName>formType</propertyName>
+										<expandable>1</expandable>
+										<value>standard</value>
+									</property>
+								</propertySheet>
+							</property>
+						</propertySheet>
+					</property>
+				</propertySheet>
+			</property>
+		</propertySheet>
+		<formalParameter>
+			<formalParameterName>docker_compose_file_content</formalParameterName>
+			<defaultValue></defaultValue>
+			<description>Docker Compose YAML File Content</description>
+			<expansionDeferred>0</expansionDeferred>
+			<required>1</required>
+			<type>textarea</type>
+		</formalParameter>
+		<formalParameter>
+			<formalParameterName>project</formalParameterName>
+			<defaultValue></defaultValue>
+			<description>Name of the project in which application would be created</description>
+			<expansionDeferred>0</expansionDeferred>
+			<required>1</required>
+			<type>entry</type>
+		</formalParameter>
+		<formalParameter>
+			<formalParameterName>application</formalParameterName>
+			<defaultValue>0</defaultValue>
+			<description>Description: Name of the application created as part of discovery</description>
+			<expansionDeferred>0</expansionDeferred>
+			<required>1</required>
+			<type>entry</type>
+		</formalParameter>
+		<step>
+			<stepName>discover</stepName>
 			<alwaysRun>0</alwaysRun>
 			<broadcast>0</broadcast>
 			<command/>
