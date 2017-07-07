@@ -17,7 +17,8 @@
 if ($promoteAction eq "promote") {
 	$batch->deleteProperty("/server/ec_customEditors/pickerStep/Pull Docker image");
     $batch->deleteProperty("/server/ec_customEditors/pickerStep/Build Docker image");
-	$batch->deleteProperty("/server/ec_customEditors/pickerStep/Run Docker container");
+    $batch->deleteProperty("/server/ec_customEditors/pickerStep/Run Docker container");
+	$batch->deleteProperty("/server/ec_customEditors/pickerStep/Discover");
 }
 
 # Data that drives the create step picker registration for this plugin.
@@ -42,4 +43,11 @@ my %run = (
     category    => "Resource Management"
 );
 
-@::createStepPickerSteps = (\%pull, \%build, \%run);
+my %discover = (
+    label       => "Discover",
+    procedure   => "Discover",
+    description => "Discovers services in Docker Compose file and creates corresponding application models for them in ElectricFlow",
+    category    => "Resource Management"
+);
+
+@::createStepPickerSteps = (\%pull, \%build, \%run, \%discover);
