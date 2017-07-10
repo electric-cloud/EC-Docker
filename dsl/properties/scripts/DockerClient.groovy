@@ -120,6 +120,8 @@ public class DockerClient extends BaseClient {
         String serviceName = formatName(serviceDetails.serviceName)
         //def deployedService = getService(clusterEndPoint, serviceName)
         def deployedService = null
+        println "Args:"
+        println serviceDetails
         def serviceDefinition = buildServicePayload(serviceDetails, deployedService)
         println "service def:"
         println serviceDefinition
@@ -199,12 +201,55 @@ public class DockerClient extends BaseClient {
     def buildServicePayload(Map args, def deployedService){
 
         def serviceName = formatName(args.serviceName)
-        def imageName = args.container.imageName[0]
+        def container = args.container[0]
+        def imageName = "${container.imageName}:${container.imageVersion?:'latest'}"
+        def mounts = [:]
+        mounts= (parseJsonToList(container.volumeMounts)).collect { mount ->
+                                    [
+                                        Source: formatName(mount.name),
+                                        Target: mount.mountPath
+                                    ]
+
+                    }
+
+        def env = [:]
+        env = container.environmentVariable?.collect { envVar ->
+                   
+                   "${envVar.environmentVariableName}=${envVar.value}"
+
+                }
+        def limits = [:]
+        if (container.cpuLimit) {
+           limits.NanoCPUs= convertCpuToNanoCpu(container.cpuLimit.toFloat())
+        }
+        if (container.memoryLimit) {
+           limits.MemoryBytes= convertMBsToBytes(container.memoryLimit.toFloat())
+        }
+           
+        def reservation = [:]
+        if (container.cpuCount) {
+           reservation.NanoCPUs= convertCpuToNanoCpu(container.cpuCount.toFloat())
+        }
+        if (container.memorySize) {
+           reservation.MemoryBytes= convertMBsToBytes(container.memorySize.toFloat())
+        }
+
         def hash=[
                     "name": serviceName,
                     "TaskTemplate": [
                         "ContainerSpec": [
-                            "Image": imageName
+
+                            "Image": imageName,
+                            "Command":container.entryPoint?.split(','),
+                            "Args":container.command?.split(','),
+                            "Mounts": mounts,
+                            "Env": env
+
+                        ],
+                        "Resources":[
+           
+                            "Limits":limits,
+                            "Reservation":reservation
                         ]
                     ],
                     "EndpointSpec": [
@@ -212,19 +257,14 @@ public class DockerClient extends BaseClient {
                                     
                                     def targetPort
 
-                                    for (container in args.container) {
-                    
-                                        if(container.containerName == servicePort.subcontainer){
+                                    for (containerPort in container.port) {
 
-                                            for (containerPort in container.port) {
-
-                                                if (containerPort.portName == servicePort.subport) {
-                                                    targetPort = containerPort.containerPort
-                                                    break
-                                                }
-                                            }      
+                                        if (containerPort.portName == servicePort.subport) {
+                                            targetPort = containerPort.containerPort
+                                            break
                                         }
-                                    }
+                                    }      
+                                    
                                     def portMapping = [:]
                                     portMapping.PublishedPort=servicePort.listenerPort.toInteger()
                                     portMapping.TargetPort=targetPort.toInteger()
@@ -236,4 +276,40 @@ public class DockerClient extends BaseClient {
             return payload
     }
 
+    def convertCpuToNanoCpu(float cpu) {
+        return cpu * 1000000000 as int
+    }
+
+    def convertMBsToBytes(float mbs) {
+        return mbs * 1048576 as int
+    }
+
+    def deleteService(String clusterEndPoint,  def serviceName) {
+        serviceName = formatName(serviceName)
+        def response = dockerClient.rmService(serviceName)
+        logger INFO, "Deleted Service $serviceName. Response: $response\nWaiting for service cleanup..."
+        def service = awaitServiceRemoved(serviceName, 5000)
+        if(service == null ){
+            logger INFO, "Service $serviceName cleaned up successfully."
+        }else{
+            logger ERROR, "Service clean up timed out."
+            exit 1
+        }
+    }
+
+    def awaitServiceRemoved(def name,def timeout) {
+        def service = findService(name)
+        def timespent = 0 
+        while (service != null && timespent<timeout) {
+            service = findService(name)
+            if (service == null) {
+                break
+            }
+            else {
+                sleep(1000)
+                timespent += 1000
+            }
+        }  
+        return service
+    }
 }

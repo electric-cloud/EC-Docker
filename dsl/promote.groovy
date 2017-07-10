@@ -21,6 +21,9 @@ def stepsWithAttachedCredentials = [
 		], [
 				procedureName: 'Deploy Service',
 				stepName: 'createOrUpdateDeployment'
+		], [
+				procedureName: 'Delete Service',
+				stepName: 'cleanup'
 		]
 ]
 project pluginName, {
@@ -82,6 +85,10 @@ project pluginName, {
 					property 'clusterOrEnvironmentProjectName', value: 'clusterOrEnvProjectName'
 					property 'environmentName', value: 'environmentName'
 				}
+			}
+			property 'deleteConfiguration', {
+				property 'procedureName', value: 'DeleteConfiguration'
+				property 'ui_formRefs', propertyType: 'sheet'
 			}
 		}
 	}

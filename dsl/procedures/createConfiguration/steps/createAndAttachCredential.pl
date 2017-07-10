@@ -82,6 +82,11 @@ foreach $credential (@credentials)
          stepName => "populateDockerClientCerts"});
     $errors .= $ec->checkAllErrors($xpath);
 
+    $xpath = $ec->attachCredential($projName, $credName,
+        {procedureName => "Delete Service",
+         stepName => "cleanup"});
+    $errors .= $ec->checkAllErrors($xpath);
+
 
      if ("$errors" ne "") {
         my $errMsg = "Error creating configuration credential: " . $errors;

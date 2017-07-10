@@ -21,13 +21,6 @@
         <label>Configuration:</label>
         <property>config</property>
         <required>1</required>
-        <documentation>The name of an existing configuration which holds all the connection information for the docker swarm cluster.</documentation>
-    </formElement> 
-    <formElement>
-        <type>entry</type>
-        <label>Service name:</label>
-        <property>serviceName</property>
-        <required>1</required>
-        <documentation>The name of docker swarm serviec on which cleanup procedure should be performed.</documentation>
+        <documentation>The name of the configuration to delete.</documentation>
     </formElement>
 </editor>
