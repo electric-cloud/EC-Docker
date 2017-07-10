@@ -38,13 +38,6 @@
         <documentation>The endpoint at which docker REST API will be reachable. Must be a IP address or a resolvable DNS name.</documentation>
     </formElement>
     <formElement>
-        <type>entry</type>
-        <label>The Hostname of Docker Endpoint:</label>
-        <property>swarmManagerHostname</property>
-        <required>0</required>
-        <documentation>If the machine hostname is different than one mentioned in "The Docker Endpoint" FQDN, then specify it here.</documentation>
-    </formElement>
-    <formElement>
         <type>credential</type>
         <label>CA Certificate:</label>
         <property>cacert</property>
@@ -75,9 +68,9 @@
         <attachedAsParameterToStep>createAndAttachCredential</attachedAsParameterToStep>
     </formElement>
     <formElement> 
-        <label>Docker Swarm Mode:</label>    
-        <property>swarmMode</property> 
-        <documentation>Check this checkbox for swarm mode.</documentation> 
+        <label>Test Connection:</label>    
+        <property>testConnection</property> 
+        <documentation>Check this checkbox to verify connectivity to docker swarm manager.</documentation> 
         <type>checkbox</type>   
         <checkedValue>true</checkedValue> 
         <uncheckedValue>false</uncheckedValue> 

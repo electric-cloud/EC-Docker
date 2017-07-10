@@ -36,32 +36,16 @@ public class DockerClient extends BaseClient {
 	*/
 	def checkHealth(){
 
-            def info = dockerClient.info().content
-            println info
 
-            if (pluginConfig.swarmMode=="true"){
+            try{
+                def info = dockerClient.info().content
+                logger DEBUG, "${info}"
 
-                try{
-                    def role = dockerClient.inspectNode(pluginConfig.swarmManagerHostname).content.Spec.Role
-                    if (role != "manager"){
-                        // Given node is  worker node in swarm cluster
-                        logger ERROR, "${pluginConfig.endpoint} is not Swarm Manager. Exiting.."
-                        exit 1
-                    }
-
-                    def availability = dockerClient.inspectNode(pluginConfig.swarmManagerHostname).content.Spec.Availability
-                    if (availability!="active"){
-                        // Given node is not active manager
-                        logger ERROR, "${pluginConfig.endpoint} is not active Swarm Manager. Exiting.."
-                        exit 1
-                    }
-                }catch(Exception e){
+            }catch(Exception e){
                     // Given node is not a swarm manager
                     logger ERROR, "${e}"
                     logger ERROR, "${pluginConfig.endpoint} is not Swarm Manager. Exiting.."
                     exit 1
-                }
-
             }
 	}
 
@@ -118,24 +102,27 @@ public class DockerClient extends BaseClient {
 	def createOrUpdateService(String clusterEndPoint,  def serviceDetails) {
 
         String serviceName = formatName(serviceDetails.serviceName)
-        //def deployedService = getService(clusterEndPoint, serviceName)
-        def deployedService = null
-        println "Args:"
-        println serviceDetails
-        def serviceDefinition = buildServicePayload(serviceDetails, deployedService)
-        println "service def:"
-        println serviceDefinition
+
+        def deployedService = getService(clusterEndPoint, serviceName)
+        def deployedServiceSpec = deployedService?.Spec
+        def deployedServiceVersion = deployedService?.Version.Index
+        
+        def serviceDefinition = buildServicePayload(serviceDetails, deployedServiceSpec)
+        
         if (OFFLINE) return null
         
         if(deployedService){
             logger INFO, "Updating deployed service $serviceName"
             
-            doHttpRequest(PUT,
-                    clusterEndPoint,
-                    "/services/${serviceName}/update",
-                    /* Headers*/  [:],
-                    /*failOnErrorCode*/ true,
-                    serviceDefinition)
+            def response = dockerClient.updateService(serviceName, [version: deployedServiceVersion], serviceDefinition)
+            logger INFO, "Created Service $serviceName. Response: $response\nWaiting for service to start..."
+            def service = awaitServiceStarted(serviceName, 5000)
+            if(service){
+                logger INFO, "Service $serviceName started successfully."
+            }else{
+                logger ERROR, "Service start timed out."
+                exit 1
+            }
             
 
         } else {
@@ -183,10 +170,13 @@ public class DockerClient extends BaseClient {
 
         if (OFFLINE) return null
         
-        def response = doHttpGet(clusterEndPoint,
-                "/services/${formatName(serviceName)}",
-                null, /*failOnErrorCode*/ false)
-        response.status == 200 ? response.data : null
+        try{
+            def serviceSpec = dockerClient.inspectService(serviceName).content
+            }catch(Exception e){
+                 logger INFO, "Service $serviceName not found."
+                 return null
+            }
+
     }
 
      Object doHttpGet(String requestUrl, String requestUri, String accessToken, boolean failOnErrorCode = true) {
@@ -272,7 +262,13 @@ public class DockerClient extends BaseClient {
                             }          
                         ]
                 ]
-            def payload = hash
+            
+            def payload = deployedService
+            if (payload) {
+                payload = mergeObjs(payload, hash)
+            } else {
+                payload = hash
+            }
             return payload
     }
 

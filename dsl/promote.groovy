@@ -24,7 +24,11 @@ def stepsWithAttachedCredentials = [
 		], [
 				procedureName: 'Delete Service',
 				stepName: 'cleanup'
+		], [
+				procedureName: 'CreateConfiguration',
+				stepName: 'testConnection'
 		]
+		
 ]
 project pluginName, {
 

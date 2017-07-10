@@ -60,7 +60,7 @@ public class EFClient extends BaseClient {
             values["credential_$it"] = [userName: cred.userName, password: cred.password]
         }
 
-        logger(INFO, "Config values: " + values)
+        logger(DEBUG, "Config values: " + values)
 
         //Set the log level using the plugin configuration setting
         logLevel = (values.logLevel?: INFO).toInteger()

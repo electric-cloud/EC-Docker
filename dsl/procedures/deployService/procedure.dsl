@@ -25,4 +25,13 @@ procedure 'Deploy Service',
 	  shell: 'ec-groovy',
 	  timeLimitUnits: 'minutes'
 	  
+	step 'cleanupCerts',
+      subproject: '',
+      subprocedure: 'Cleanup Certs',
+      command: null,
+      errorHandling: 'failProcedure',
+      exclusiveMode: 'none',
+      postProcessor: 'postp',
+      releaseMode: 'none',
+      timeLimitUnits: 'minutes'
 }

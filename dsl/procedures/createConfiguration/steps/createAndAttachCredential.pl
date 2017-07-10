@@ -87,6 +87,12 @@ foreach $credential (@credentials)
          stepName => "cleanup"});
     $errors .= $ec->checkAllErrors($xpath);
 
+    $xpath = $ec->attachCredential($projName, $credName,
+        {procedureName => "CreateConfiguration",
+         stepName => "testConnection"});
+    $errors .= $ec->checkAllErrors($xpath);
+
+
 
      if ("$errors" ne "") {
         my $errMsg = "Error creating configuration credential: " . $errors;

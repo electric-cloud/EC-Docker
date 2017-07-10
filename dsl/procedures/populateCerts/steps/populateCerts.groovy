@@ -8,6 +8,7 @@ EFClient efClient = new EFClient()
 def pluginConfig = efClient.getConfigValues('ec_plugin_cfgs', configName, pluginProjectName)
 
 def tempDir = System.getProperty("java.io.tmpdir")
+
 // Create certs dir in temp directory to hold certs
 def certDir = new File("${tempDir}/certs")
 if(!certDir.exists())

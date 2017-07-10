@@ -1,7 +1,7 @@
 import java.io.File
 
 procedure 'Populate Certs',
-	description: 'Dump TLS certificates (ca-cert, client cert and client key) on agent machine in job workspace', {
+	description: 'Dump TLS certificates (ca-cert, client cert and client key) on agent machine in temp dir', {
 
     // don't add a step picker for this procedure since it is internally invoked
     property 'standardStepPicker', value: false
