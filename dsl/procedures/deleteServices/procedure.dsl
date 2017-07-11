@@ -24,6 +24,6 @@ procedure 'Delete Service',
 	  releaseMode: 'none',
 	  shell: 'ec-groovy',
 	  timeLimitUnits: 'minutes'
-	  
+
 }
   

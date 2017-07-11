@@ -15,7 +15,7 @@ procedure 'Deploy Service',
 
     	  actualParameter 'additionalArtifactVersion', ''
     }
-
+ 
 	step 'createOrUpdateDeployment',
 	  command: new File(pluginDir, 'dsl/procedures/deployService/steps/createOrUpdateDeployment.groovy').text,
 	  errorHandling: 'failProcedure',
@@ -24,14 +24,5 @@ procedure 'Deploy Service',
 	  releaseMode: 'none',
 	  shell: 'ec-groovy',
 	  timeLimitUnits: 'minutes'
-	  
-	step 'cleanupCerts',
-      subproject: '',
-      subprocedure: 'Cleanup Certs',
-      command: null,
-      errorHandling: 'failProcedure',
-      exclusiveMode: 'none',
-      postProcessor: 'postp',
-      releaseMode: 'none',
-      timeLimitUnits: 'minutes'
+	
 }

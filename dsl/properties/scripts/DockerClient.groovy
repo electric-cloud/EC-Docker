@@ -18,7 +18,9 @@ public class DockerClient extends BaseClient {
         pluginConfig = pluginConfiguration
         
         def tempDir = System.getProperty("java.io.tmpdir")
-        System.setProperty("docker.cert.path","${tempDir}/certs")
+        def pathSeparator = File.separator
+        def certDirPath = "${tempDir}certs"
+        System.setProperty("docker.cert.path","${certDirPath}")
 
         if (pluginConfig.credential_key.password){
             // If docker client private key is provided in plugin config then enable TLS mode
@@ -105,7 +107,7 @@ public class DockerClient extends BaseClient {
 
         def deployedService = getService(clusterEndPoint, serviceName)
         def deployedServiceSpec = deployedService?.Spec
-        def deployedServiceVersion = deployedService?.Version.Index
+        def deployedServiceVersion = deployedService?.Version?.Index
         
         def serviceDefinition = buildServicePayload(serviceDetails, deployedServiceSpec)
         
@@ -308,4 +310,6 @@ public class DockerClient extends BaseClient {
         }  
         return service
     }
+
 }
+ 

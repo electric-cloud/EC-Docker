@@ -26,7 +26,7 @@ procedure 'Check Cluster',
       releaseMode: 'none',
       timeLimitUnits: 'minutes', {
 
-    	  actualParameter 'config', '$[config]'
+        actualParameter 'config', '$[config]'
     }
 
 	step 'checkCluster',
