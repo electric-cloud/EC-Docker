@@ -45,7 +45,7 @@
         <passwordLabel>CA Cert:</passwordLabel>
         <credentialType>key</credentialType>
         <documentation>CA Certificate</documentation>
-        <attachedAsParameterToStep>createAndAttachCredential</attachedAsParameterToStep>
+        <attachedAsParameterToStep>createAndAttachCredential,testConnection</attachedAsParameterToStep>
     </formElement>
     <formElement>
         <type>credential</type>
@@ -55,7 +55,7 @@
         <passwordLabel>Certificate:</passwordLabel>
         <credentialType>key</credentialType>
         <documentation>Docker Client Certificate</documentation>
-        <attachedAsParameterToStep>createAndAttachCredential</attachedAsParameterToStep>
+        <attachedAsParameterToStep>createAndAttachCredential,testConnection</attachedAsParameterToStep>
     </formElement>
     <formElement>
         <type>credential</type>
@@ -65,7 +65,7 @@
         <passwordLabel>Private Key:</passwordLabel>
         <credentialType>key</credentialType>
         <documentation>Docker Client Private Key</documentation>
-        <attachedAsParameterToStep>createAndAttachCredential</attachedAsParameterToStep>
+        <attachedAsParameterToStep>createAndAttachCredential,testConnection</attachedAsParameterToStep>
     </formElement>
     <formElement> 
         <label>Test Connection:</label>    

@@ -37,21 +37,11 @@ if (efClient.toBoolean(actualParams.get('testConnection'))) {
     }
 
     def endpoint = actualParams.get('endpoint')
-    dockerClient = new DockerClientImpl()
+    dockerClient = new DockerClientImpl(endpoint)
     try{
-    	def info = dockerClient.info(endpoint).content
+    	def info = dockerClient.info().content
     }catch(Exception e){
-    	logger ERROR, "${e}"
-        logger ERROR, "${endpoint} is not Swarm Manager. Exiting.."
-        exit 1
-    }finally{
-    	if(certDir.exists())
-		{
-			def result = certDir.deleteDir() 
-			if(!result){
-				logger ERROR, "Cleaning up of ${tempDir}/certs directory failed."
-				exit 1
-			}
-		}
+        e.printStackTrace()
+    	efClient.handleConfigurationError("Error while connecting to docker endpoint ${endpoint} : ${e.getMessage()}")
     }
 }
