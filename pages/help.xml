@@ -208,7 +208,32 @@
                 </table>
             </div>          
 
-		
+		<h1 id="rns">Release Notes</h1>
+
+                <!-- For each release, create an h2 section describing new and revised procedures, enhancements, and JIRA fixes.
+                See the following examples for how to write the release note items, which include:
+                - Phrases starting with "Added the N procedure to ...", "Removed the X parameter from the ...", "Fixed the issue where  ...",
+                and so on.
+                - Descriptions of new features or functionality supported by the plugin.
+                -->
+        <h2>EC-Docker-1.2.0</h2>
+        <ul>
+            <li>Added support for Docker swarm</li>
+        </ul>
+
+        <h2>EC-Docker-1.0.1</h2>
+        <ul>
+            <li>Discover procedure has been added.</li>
+        </ul>
+
+        <h2>EC-Docker-1.0.0</h2>
+
+        <ul>
+
+            <li>Introduced the EC-Docker plugin.</li>
+
+        </ul>
+
         </div>
    </body>
 
