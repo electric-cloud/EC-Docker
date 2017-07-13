@@ -15,4 +15,12 @@ procedure 'Populate Certs',
     	  shell: 'ec-groovy',
     	  timeLimitUnits: 'minutes'
 
+    step 'setPermissions',
+            command: new File(pluginDir, 'dsl/procedures/populateCerts/steps/setPermissions.pl').text,
+            errorHandling: 'abortProcedure',
+            exclusiveMode: 'none',
+            postProcessor: 'postp',
+            releaseMode: 'none',
+            shell: 'ec-perl',
+            timeLimitUnits: 'minutes'
 }

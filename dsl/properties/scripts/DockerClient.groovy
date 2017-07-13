@@ -16,9 +16,10 @@ public class DockerClient extends BaseClient {
     DockerClient(def pluginConfiguration){
 
         pluginConfig = pluginConfiguration
-        def workspaceDir = System.getenv("COMMANDER_WORKSPACE")
-
-        System.setProperty("docker.cert.path","${workspaceDir}")
+        def homeDir = System.getProperty('user.home')
+        def pathSeparator = File.separator
+        def certDir = "${homeDir}${pathSeparator}.docker${pathSeparator}cert"
+        System.setProperty("docker.cert.path","${certDir}")
 
         if (pluginConfig.credential_key.password){
             // If docker client private key is provided in plugin config then enable TLS mode
