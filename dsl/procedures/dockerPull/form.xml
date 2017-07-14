@@ -1,0 +1,45 @@
+<!--
+
+     Copyright 2015 Electric Cloud, Inc.
+
+     Licensed under the Apache License, Version 2.0 (the "License");
+     you may not use this file except in compliance with the License.
+     You may obtain a copy of the License at
+
+         http://www.apache.org/licenses/LICENSE-2.0
+
+     Unless required by applicable law or agreed to in writing, software
+     distributed under the License is distributed on an "AS IS" BASIS,
+     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+     See the License for the specific language governing permissions and
+     limitations under the License.
+
+-->
+<editor>
+    <help/>
+	<formElement>
+        <type>checkbox</type>
+        <label>Use sudo:</label>
+        <property>use_sudo</property>
+        <required>0</required>
+        <documentation>Use sudo for running docker pull</documentation>
+		<checkedValue>1</checkedValue>
+        <uncheckedValue>0</uncheckedValue>
+        <initiallyChecked>0</initiallyChecked>
+    </formElement>
+    <formElement>
+        <type>entry</type>
+        <label>Image name:</label>
+        <property>image_name</property>
+        <required>1</required>
+        <documentation>Image to pull from Docker Hub</documentation>
+    </formElement>
+    <formElement>
+        <type>entry</type>
+        <label>Image tag:</label>
+        <property>tag</property>
+        <required>0</required>
+        <documentation>Tag of image</documentation>
+		<defaultValue>latest</defaultValue>
+    </formElement>
+</editor>

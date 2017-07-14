@@ -39,6 +39,10 @@
     				<ul>
     				<li><a href="#ProvisionCluster">Check Cluster</a></li>
     				<li><a href="#DeployService">Deploy Service</a></li>
+                    <li><a href="#runDockerBuild">runDockerBuild</a></li>
+                    <li><a href="#runDockerPull">runDockerPull</a></li>
+                    <li><a href="#runDockerRun">runDockerRun</a></li>
+                    <li><a href="#Discover">Discover</a></li>
 	            </ul>
 				<!--
 
@@ -206,7 +210,372 @@
                         </tr>
                     </tbody>
                 </table>
-            </div>          
+            </div>   
+
+            <div class="procedure" id="runDockerBuild">
+
+     <a name='runDockerBuild' id="runDockerBuild"></a>
+
+     <h2>runDockerBuild</h2>
+
+            <p>Use this procedure to build a Docker image. Docker can build images automatically from a source
+
+            repository using the instructions in a Dockerfile.</p>
+
+            <h3>Input</h3>
+
+            <ol>
+
+            <li>In the Main Menu, click <b>Admin</b> > <b>Plugins</b> to open the Plugin Manager.</li>
+            <li>Click <b>EC-Docker</b>.</li>
+            <li>Click <b>runDockerBuild</b>.</li>
+            <li>Enter the following parameters:<br />
+
+            <table class="grid">
+                <thead>
+                    <tr>
+                        <th>Parameter</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                 <tr>
+                        <td >Use sudo</td>
+                        <td>When this parameter is selected, ElectricFlow uses sudo to run the Docker build.</td>
+                    </tr>
+
+                   <tr>
+                         <td class='required'>Build path</td>
+                        <td>Path to the source code.</td>
+                    </tr>
+
+                </tbody>
+            </table>
+
+                </li>
+
+        <br />
+
+
+
+        <img src="../../plugins/@PLUGIN_KEY@/htdocs/images/runDockerBuild1.png" />
+        <br />
+
+        </ol>
+
+        <h3>Output</h3>
+
+        <p>After the job runs, you can view the results on the Job Details page in ElectricFlow.
+        </p>
+
+        <!-- The Docker build was completed successfully.
+
+        <img src="../../plugins/@PLUGIN_KEY@/images/runDockerBuild2.png" />
+
+        -->
+
+        <p>In the <b>runDockerBuild</b> step, click the Log button to see the diagnostic information.
+        </p>
+
+        <!-- The output is similar to the following diagnostic report:
+
+        <img src="../../plugins/@PLUGIN_KEY@/images/runDockerBuild3.png" />
+
+        -->
+
+        </div>
+
+         <!-- The next section is required for additional procedures. Replace [Procedure2} with the plugin procedure name in the following lines. -->
+
+         <div class="procedure" id="runDockerPull">
+
+           <a name='runDockerPull' id="runDockerPull"></a>
+
+            <h2>runDockerPull</h2>
+
+             <p>Use this procedure to make a Docker pull request to let others know aobut the changes you have pushed
+             to the repository.</p>
+
+            <h3>Input</h3>
+
+            <ol>
+
+            <li>In the Main Menu, click <b>Admin</b> > <b>Plugins</b> to open the Plugin Manager.</li>
+            <li>Click <b>EC-Docker</b>.</li>
+            <li>Click <b>runDockerPull</b>.</li>
+            <li>Enter the following parameters:<br />
+
+            <table class="grid">
+                <thead>
+                    <tr>
+                        <th>Parameter</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    <tr>
+                        <td >Use sudo</td>
+                        <td>When this parameter is selected, ElectricFlow uses sudo to run the Docker pull request.</td>
+                    </tr>
+
+                    <tr>
+                         <td class='required'>Image name</td>
+                        <td>Image to pull from the Docker Hub, such as 2ac9d1098bf1, postgres, or committest.</td>
+                    </tr>
+
+                    <tr>
+                        <td >Image tag</td>
+                        <td>Tag or label of the image in the Docker Hub, such as 2.1, 2.3.6, or latest.</td>
+                    </tr>
+
+                </tbody>
+            </table>
+
+                </li>
+
+        <br />
+
+
+
+        <img src="../../plugins/@PLUGIN_KEY@/htdocs/images/runDockerPull1.png" />
+        <br />
+
+        </ol>
+
+        <h3>Output</h3>
+
+        <p>After the job runs, you can view the results on the Job Details page in ElectricFlow.
+        </p>
+
+        <!-- The Docker build was completed successfully.
+
+        <img src="../../plugins/@PLUGIN_KEY@/images/runDockerBuild2.png" />
+
+        -->
+
+        <p>In the <b>runDockerPull</b> step, click the Log button to see the diagnostic information.
+        </p>
+
+        <!-- The output is similar to the following diagnostic report:
+
+        <img src="../../plugins/@PLUGIN_KEY@/images/runDockerBuild3.png" />
+
+        -->
+
+    </div>
+
+    <div class="procedure" id="runDockerRun">
+
+           <a name='runDockerRun' id="runDockerRun"></a>
+
+            <h2>runDockerRun</h2>
+
+             <p>Use this procedure to run a process in an isolated container. Docker runs the process
+             in its own file system, network, and  isolated process tree. Starting with an image, Docker runs
+             the process to create a container.</p>
+
+            <h3>Input</h3>
+
+            <ol>
+
+            <li>In the Main Menu, click <b>Admin</b> > <b>Plugins</b> to open the Plugin Manager.</li>
+            <li>Click <b>EC-Docker</b>.</li>
+            <li>Click <b>runDockerRun</b>.</li>
+            <li>Enter the following parameters:<br />
+
+            <table class="grid">
+                <thead>
+                    <tr>
+                        <th>Parameter</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    <tr>
+                        <td >Use sudo</td>
+                        <td>When this parameter is selected, ElectricFlow uses sudo to run the Docker process.</td>
+                    </tr>
+
+                    <tr>
+                        <td class='required'>Image name</td>
+                        <td>Image from which the container is run, such as 2ac9d1098bf1, postgres, or committest.</td>
+                    </tr>
+
+                    <tr>
+                        <td>Container name</td>
+                        <td>Name of the container:
+                        <ul>
+                        <li>UUID long identifier (such as f78375b1c487e03c9438c729345e54db9d20cfa2ac1fc3494b6eb60872e74778)</li>
+                        <li>UUID short identifier (such as f78375b1c487)</li>
+                        <li>Name (such as admin)</li>
+                        </ul>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td >Detached mode (-d)</td>
+                        <td>Select this parameter to run the container in the background and print the new
+                        container ID.</td>
+                    </tr>
+
+                    <tr>
+                        <td>Entrypoint</td>
+                        <td>The default command to execute at runtime. When you enter a command for this parameter,
+                        it overwrites the default entrypoint is set by the image. For example, the <b>/bin/bash example/redis</b>
+                        command overwrites the default entrypoint.</td>
+                    </tr>
+
+                    <tr>
+                        <td>Container working directory</td>
+                        <td>The working directory inside the container. such as /path/to/workdir. The default is
+                        the root directory (/).</td>
+                    </tr>
+
+                    <tr>
+                        <td>Publish ports</td>
+                        <td>Use one of the following formats to publish the container's port to the host:
+                        <ul>
+                        <li>IP_address:hostPort:containerPort</li>
+                        <li>IP_address::containerPort</li>
+                        <li>IP_address:containerPort</li>
+                        <li>containerPort</li>
+                        </ul>
+                        <p>Use spaces to delimit port mappings, such as "2666:1666:8088:8080".</p>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td>Publish all ports</td>
+                        <td>Select this parameter to publish all exposed ports to the host interfaces.</td>
+                    </tr>
+
+                    <tr>
+                        <td>Publish all ports</td>
+                        <td>Select this parameter to give extended privileges to this container.</td>
+                    </tr>
+
+                    <tr>
+                        <td>Link</td>
+                        <td>The link to another container using the Name-or-ID:alias format.</td>
+                    </tr>
+
+                    <tr>
+                        <td>Command with args</td>
+                        <td>Command to run within the container.</td>
+                    </tr>
+
+                </tbody>
+            </table>
+
+                </li>
+
+        <br />
+
+        <img src="../../plugins/@PLUGIN_KEY@/htdocs/images/runDockerRun1.png" />
+        <br />
+
+        </ol>
+
+        <h3>Output</h3>
+
+        <p>After the job runs, you can view the results on the Job Details page in ElectricFlow.
+        </p>
+
+        <!-- The Docker build was completed successfully.
+
+        <img src="../../plugins/@PLUGIN_KEY@/images/runDockerBuild2.png" />
+
+        -->
+
+        <p>In the <b>runDockerRun</b> step, click the Log button to see the diagnostic information.
+        </p>
+
+        <!-- The output is similar to the following diagnostic report:
+
+        <img src="../../plugins/@PLUGIN_KEY@/images/runDockerBuild3.png" />
+
+        -->
+
+    </div>
+
+    <div class="procedure" id="Discover">
+
+           <a name='Discover' id="Discover"></a>
+
+            <h2>Discover</h2>
+
+             <p>Use this procedure to discover services from Docker Compose file and create corresponding application
+                models for them in ElectricFlow.</p>
+
+            <h3>Input</h3>
+
+            <ol>
+
+            <li>In the Main Menu, click <b>Admin</b> > <b>Plugins</b> to open the Plugin Manager.</li>
+            <li>Click <b>EC-Docker</b>.</li>
+            <li>Click <b>Discover</b>.</li>
+            <li>Enter the following parameters:<br />
+
+            <table class="grid">
+                <thead>
+                    <tr>
+                        <th>Parameter</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    <tr>
+                        <td class="required">Docker Compose File Content</td>
+                        <td>Docker Compose YAML File Content.</td>
+                    </tr>
+
+                    <tr>
+                        <td class='required'>Project</td>
+                        <td>Name of the project in which application would be created.</td>
+                    </tr>
+
+                    <tr>
+                        <td class='required'>Application</td>
+                        <td>Name of the application created as part of discovery.</td>
+                    </tr>
+                </tbody>
+            </table>
+
+                </li>
+
+        <br />
+
+        <img src="../../plugins/@PLUGIN_KEY@/htdocs/images/Discover.png" />
+        <br />
+
+        </ol>
+
+        <h3>Output</h3>
+
+        <p>After the job runs, you can view the results on the Job Details page in ElectricFlow.
+        </p>
+
+        <!-- The Docker build was completed successfully.
+
+        <img src="../../plugins/@PLUGIN_KEY@/images/runDockerBuild2.png" />
+
+        -->
+
+        <p>In the <b>Discover</b> step, click the Log button to see the diagnostic information.
+        </p>
+
+        <!-- The output is similar to the following diagnostic report:
+
+        <img src="../../plugins/@PLUGIN_KEY@/images/runDockerBuild3.png" />
+
+        -->
+
+    </div>
+       
 
 		<h1 id="rns">Release Notes</h1>
 
