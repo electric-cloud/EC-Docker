@@ -2,7 +2,7 @@
  * Docker API client
  */
 
-@Grab("de.gesellix:docker-client:2017-06-25T15-38-14")
+@Grab("de.gesellix:docker-client:2017-07-02T23-30-20")
 @Grab(group='ch.qos.logback', module='logback-classic', version='1.0.13')
 
 import de.gesellix.docker.client.image.ManageImage
@@ -30,12 +30,12 @@ public class DockerClient extends BaseClient {
     }
 
 
-   /*	Function exits with return value 1 if docker endpoint specified
+   /*   Function exits with return value 1 if docker endpoint specified
     *   in plugin configuration is not reachable. In case of swarm mode,
     *   whether the endpoint is swarm manager and is in active state or
-	*   not is checked.
-	*/
-	def checkHealth(){
+    *   not is checked.
+    */
+    def checkHealth(){
 
 
             try{
@@ -48,9 +48,9 @@ public class DockerClient extends BaseClient {
                     logger ERROR, "${pluginConfig.endpoint} is not Swarm Manager. Exiting.."
                     exit 1
             }
-	}
+    }
 
-	 def getPluginConfig(EFClient efClient, String clusterName, String clusterOrEnvProjectName, String environmentName) {
+     def getPluginConfig(EFClient efClient, String clusterName, String clusterOrEnvProjectName, String environmentName) {
 
         def clusterParameters = efClient.getProvisionClusterParameters(
                 clusterName,
@@ -62,7 +62,7 @@ public class DockerClient extends BaseClient {
         efClient.getConfigValues('ec_plugin_cfgs', configName, pluginProjectName)
     }
 
-	def deployService(
+    def deployService(
             EFClient efClient,
             String clusterEndpoint,
             String serviceName,
@@ -75,7 +75,7 @@ public class DockerClient extends BaseClient {
             String resultsPropertySheet){
 
        
-    	def serviceDetails = efClient.getServiceDeploymentDetails(
+        def serviceDetails = efClient.getServiceDeploymentDetails(
                 serviceName,
                 serviceProjectName,
                 applicationName,
@@ -100,7 +100,9 @@ public class DockerClient extends BaseClient {
         */
     }
 
-	def createOrUpdateService(String clusterEndPoint,  def serviceDetails) {
+    def createOrUpdateService(String clusterEndPoint,  def serviceDetails) {
+
+        if (OFFLINE) return null
 
         String serviceName = formatName(serviceDetails.serviceName)
 
@@ -108,14 +110,20 @@ public class DockerClient extends BaseClient {
         def deployedServiceSpec = deployedService?.Spec
         def deployedServiceVersion = deployedService?.Version?.Index
         
-        def serviceDefinition = buildServicePayload(serviceDetails, deployedServiceSpec)
-        
-        if (OFFLINE) return null
-        
+        def (serviceDefinition,encodedAuthConfig) = buildServicePayload(serviceDetails, deployedServiceSpec)
+
         if(deployedService){
             logger INFO, "Updating deployed service $serviceName"
-            
-            def response = dockerClient.updateService(serviceName, [version: deployedServiceVersion], serviceDefinition)
+
+            def response
+            if(encodedAuthConfig){
+                // For private docker registries 
+                // encodedAuthConfig will be passed as "X-Registry-Auth" header
+                response = dockerClient.updateService(serviceName, [version: deployedServiceVersion], serviceDefinition, [EncodedRegistryAuth: encodedAuthConfig])
+            } else {
+                response = dockerClient.updateService(serviceName, [version: deployedServiceVersion], serviceDefinition)
+            }
+
             logger INFO, "Created Service $serviceName. Response: $response\nWaiting for service to start..."
             def service = awaitServiceStarted(serviceName, 5000)
             if(service){
@@ -130,7 +138,15 @@ public class DockerClient extends BaseClient {
 
             logger INFO, "Creating service $serviceName"
             
-            def response = dockerClient.createService(serviceDefinition)
+            def response
+            if(encodedAuthConfig){
+                // For private docker registries 
+                // encodedAuthConfig will be passed as "X-Registry-Auth" header
+                response = dockerClient.createService(serviceDefinition, [EncodedRegistryAuth: encodedAuthConfig])
+            } else {
+                response = dockerClient.createService(serviceDefinition)
+            }
+
             logger INFO, "Created Service $serviceName. Response: $response\nWaiting for service to start..."
             def service = awaitServiceStarted(serviceName, 5000)
             if(service){
@@ -194,6 +210,23 @@ public class DockerClient extends BaseClient {
         def serviceName = formatName(args.serviceName)
         def container = args.container[0]
         def imageName = "${container.imageName}:${container.imageVersion?:'latest'}"
+        def encodedAuthConfig
+
+        //Prepend the registry to the imageName
+        //if it does not already include it.
+        if (container.registryUri) {
+            if (!imageName.startsWith("${container.registryUri}/")) {
+                imageName = "${container.registryUri}/$imageName"
+            }
+        }
+
+        if(container.credentialName && container.registryUri){
+            EFClient efClient = new EFClient()
+            def cred = efClient.getCredentials(container.credentialName)
+            def authConfig = "{\"username\":\"${cred.userName}\",\"password\": \"${cred.password}\",\"serveraddress\": \"${container.registryUri}\"}"
+            encodedAuthConfig = authConfig.bytes.encodeBase64().toString()
+        }
+
         def mounts = [:]
         mounts= (parseJsonToList(container.volumeMounts)).collect { mount ->
                                     [
@@ -270,7 +303,7 @@ public class DockerClient extends BaseClient {
             } else {
                 payload = hash
             }
-            return payload
+            return [payload,encodedAuthConfig]
     }
 
     def convertCpuToNanoCpu(float cpu) {
