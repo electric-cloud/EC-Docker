@@ -133,7 +133,7 @@
                     <li>For communicating with Docker swarm cluster, you need <br/>
                     <ul type="square">
                         <li>1. The swarm manager endpoint (For example, tcp://swarmmanager.example.com:2376)</li>
-                        <li>2. TLS certificates in case of cert based authentication with swarm manager.  
+                        <li>2. TLS certificates in case of cert based authentication with swarm manager. If you want to connect to Docker EE UCP (Universal Control Plane), certificates can be obtained from "User Profile" page by clicking on "Create a Client Bundle" button. 
                         </li>
                     </ul>
                 </li>
