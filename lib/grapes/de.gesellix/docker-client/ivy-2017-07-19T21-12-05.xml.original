@@ -4,12 +4,12 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>de.gesellix</groupId>
   <artifactId>docker-client</artifactId>
-  <version>2017-07-02T23-30-20</version>
+  <version>2017-07-19T21-12-05</version>
   <dependencies>
     <dependency>
       <groupId>de.gesellix</groupId>
       <artifactId>docker-engine</artifactId>
-      <version>2017-07-02T23-18-22</version>
+      <version>2017-07-19T21-00-26</version>
       <scope>compile</scope>
     </dependency>
     <dependency>

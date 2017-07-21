@@ -2,7 +2,7 @@
  * Docker API client
  */
 
-@Grab("de.gesellix:docker-client:2017-07-02T23-30-20")
+@Grab("de.gesellix:docker-client:2017-07-19T21-12-05")
 @Grab(group='ch.qos.logback', module='logback-classic', version='1.0.13')
 
 import de.gesellix.docker.client.image.ManageImage
@@ -130,7 +130,6 @@ public class DockerClient extends BaseClient {
                 logger INFO, "Service $serviceName started successfully."
             }else{
                 logger ERROR, "Service start timed out."
-                exit 1
             }
             
 
@@ -153,7 +152,6 @@ public class DockerClient extends BaseClient {
                 logger INFO, "Service $serviceName started successfully."
             }else{
                 logger ERROR, "Service start timed out."
-                exit 1
             }
         }
     }
