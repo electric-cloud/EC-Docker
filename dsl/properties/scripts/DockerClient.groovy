@@ -255,7 +255,12 @@ public class DockerClient extends BaseClient {
         if (container.memorySize) {
            reservation.MemoryBytes= convertMBsToBytes(container.memorySize.toFloat())
         }
-
+ 
+        
+        int replicas = args.defaultCapacity?args.defaultCapacity.toInteger():1
+        
+        int updateParallelism = args.minCapacity?args.minCapacity.toInteger():1
+        
         def hash=[
                     "name": serviceName,
                     "TaskTemplate": [
@@ -292,7 +297,15 @@ public class DockerClient extends BaseClient {
                                     portMapping.TargetPort=targetPort.toInteger()
                                     portMapping
                             }          
+                    ],
+                    "UpdateConfig": [
+                        "Parallelism" : updateParallelism
+                    ],
+                    "Mode": [
+                        "Replicated": [
+                            "Replicas": replicas
                         ]
+                    ]
                 ]
             
             def payload = deployedService
