@@ -2,9 +2,9 @@
 <ivy-module version="2.0" xmlns:m="http://ant.apache.org/ivy/maven">
 	<info organisation="de.gesellix"
 		module="docker-client"
-		revision="2017-06-25T15-38-14"
+		revision="2017-07-19T21-12-05"
 		status="release"
-		publication="20170625210818"
+		publication="20170720024210"
 	>
 		<description homepage="" />
 	</info>
@@ -25,7 +25,7 @@
 		<artifact name="docker-client" type="source" ext="jar" conf="sources" m:classifier="sources"/>
 	</publications>
 	<dependencies>
-		<dependency org="de.gesellix" name="docker-engine" rev="2017-06-25T15-12-31" force="true" conf="compile->compile(*),master(*);runtime->runtime(*)"/>
+		<dependency org="de.gesellix" name="docker-engine" rev="2017-07-19T21-00-26" force="true" conf="compile->compile(*),master(*);runtime->runtime(*)"/>
 		<dependency org="de.gesellix" name="docker-compose" rev="2017-06-24T14-17-28" force="true" conf="compile->compile(*),master(*);runtime->runtime(*)"/>
 		<dependency org="org.codehaus.groovy" name="groovy" rev="2.4.11" force="true" conf="compile->compile(*),master(*);runtime->runtime(*)"/>
 		<dependency org="org.codehaus.groovy" name="groovy-json" rev="2.4.11" force="true" conf="compile->compile(*),master(*);runtime->runtime(*)"/>

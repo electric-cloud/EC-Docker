@@ -2,9 +2,9 @@
 <ivy-module version="2.0" xmlns:m="http://ant.apache.org/ivy/maven">
 	<info organisation="de.gesellix"
 		module="docker-engine"
-		revision="2017-06-25T15-12-31"
+		revision="2017-07-19T21-00-26"
 		status="release"
-		publication="20170625204235"
+		publication="20170720023030"
 	>
 		<description homepage="" />
 	</info>
