@@ -32,7 +32,7 @@
     </formElement>
     <formElement>
         <type>entry</type>
-        <label>The Docker Endpoint:</label>
+        <label>Docker Endpoint:</label>
         <property>endpoint</property>
         <required>1</required>
         <documentation>The endpoint at which docker REST API will be reachable. Must be a IP address or a resolvable DNS name.</documentation>
@@ -76,7 +76,7 @@
         <uncheckedValue>false</uncheckedValue> 
         <initiallyChecked>0</initiallyChecked> 
         <value>true</value> 
-        <required>1</required>
+        <required>0</required>
     </formElement> 
     <formElement>
         <type>select</type>
