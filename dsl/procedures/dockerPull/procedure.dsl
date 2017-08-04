@@ -6,7 +6,7 @@ procedure 'runDockerPull',
 
 	step 'dockerPull',
     	  command: new File(pluginDir, 'dsl/procedures/dockerPull/steps/dockerPull.pl').text,
-    	  errorHandling: 'failProcedure',
+    	  errorHandling: 'abortProcedure',
     	  exclusiveMode: 'none',
     	  postProcessor: 'postp',
     	  releaseMode: 'none',

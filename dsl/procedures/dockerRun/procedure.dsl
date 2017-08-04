@@ -6,7 +6,7 @@ procedure 'runDockerRun',
 
 	step 'dockerRun',
     	  command: new File(pluginDir, 'dsl/procedures/dockerRun/steps/dockerRun.pl').text,
-    	  errorHandling: 'failProcedure',
+    	  errorHandling: 'abortProcedure',
     	  exclusiveMode: 'none',
     	  postProcessor: 'postp',
     	  releaseMode: 'none',
