@@ -33,10 +33,20 @@ def stepsWithAttachedCredentials = [
 project pluginName, {
 
 	ec_visibility = 'pickListOnly'
+	pluginType = 'Repository'
 
 	loadPluginProperties(pluginDir, pluginName)
 	loadProcedures(pluginDir, pluginKey, pluginName, pluginCategory)
 
+
+	//register ec_component plugin metadata
+	property 'ec_component_plugin', {
+		property 'operations', {
+			property 'Pull image', value: 'runDockerPull', {
+				description = 'This operation retrieves the content from the repository.'
+			}
+		}
+	}
 
 	//register container service plugin metadata
 	property 'ec_container_service_plugin', {
@@ -61,18 +71,6 @@ project pluginName, {
 				}
 				property 'parameterRefs', {
 					configuration = 'config'
-				}
-			}
-			property 'defineContainerMappings', {
-				property 'procedureName', value: 'Define Container'
-				property 'ui_formRefs', {
-					parameterForm = 'containerMappingsForm'
-				}
-			}
-			property 'defineServiceMappings', {
-				property 'procedureName', value: 'Define Service'
-				property 'ui_formRefs', {
-					parameterForm = 'serviceMappingsForm'
 				}
 			}
 			property 'deployService', {

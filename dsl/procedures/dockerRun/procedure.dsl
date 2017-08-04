@@ -1,11 +1,12 @@
 import java.io.File
 
-procedure 'Docker Run',
+procedure 'runDockerRun',
 	description: 'Performs a docker run', {
+	jobNameTemplate = 'docker-run-$[jobId]'
 
 	step 'dockerRun',
     	  command: new File(pluginDir, 'dsl/procedures/dockerRun/steps/dockerRun.pl').text,
-    	  errorHandling: 'failProcedure',
+    	  errorHandling: 'abortProcedure',
     	  exclusiveMode: 'none',
     	  postProcessor: 'postp',
     	  releaseMode: 'none',
