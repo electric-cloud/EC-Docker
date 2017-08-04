@@ -63,18 +63,6 @@ project pluginName, {
 					configuration = 'config'
 				}
 			}
-			property 'defineContainerMappings', {
-				property 'procedureName', value: 'Define Container'
-				property 'ui_formRefs', {
-					parameterForm = 'containerMappingsForm'
-				}
-			}
-			property 'defineServiceMappings', {
-				property 'procedureName', value: 'Define Service'
-				property 'ui_formRefs', {
-					parameterForm = 'serviceMappingsForm'
-				}
-			}
 			property 'deployService', {
 				property 'procedureName', value: 'Deploy Service'
 				property 'ui_formRefs', {
