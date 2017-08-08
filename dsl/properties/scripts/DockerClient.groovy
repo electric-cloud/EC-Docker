@@ -106,52 +106,77 @@ public class DockerClient extends BaseClient {
 
         String serviceName = formatName(serviceDetails.serviceName)
 
-        def deployedService = getService(clusterEndPoint, serviceName)
-        def deployedServiceSpec = deployedService?.Spec
-        def deployedServiceVersion = deployedService?.Version?.Index
-        
-        def (serviceDefinition,encodedAuthConfig) = buildServicePayload(serviceDetails, deployedServiceSpec)
+        if (dockerClient.info().content.Swarm.LocalNodeState == "inactive"){
+            // Given endpoint is not a Swarm manager. Deploy Flow service as a container.
+            def deployedContainer = getContainer(clusterEndPoint, serviceName)
+            def deployedContainerSpec = deployedContainer?.Spec
+            def deployedContainerVersion = deployedContainer?.Version?.Index
+            def (containerDefinition,encodedAuthConfig) = buildContainerPayload(serviceDetails, deployedContainer)
+               
+            if(deployedContainer){
 
-        if(deployedService){
-            logger INFO, "Updating deployed service $serviceName"
-
-            def response
-            if(encodedAuthConfig){
-                // For private docker registries 
-                // encodedAuthConfig will be passed as "X-Registry-Auth" header
-                response = dockerClient.updateService(serviceName, [version: deployedServiceVersion], serviceDefinition, [EncodedRegistryAuth: encodedAuthConfig])
-            } else {
-                response = dockerClient.updateService(serviceName, [version: deployedServiceVersion], serviceDefinition)
-            }
-
-            logger INFO, "Created Service $serviceName. Response: $response\nWaiting for service to start..."
-            def service = awaitServiceStarted(serviceName, 5000)
-            if(service){
-                logger INFO, "Service $serviceName started successfully."
+                def (imageName,tag) = getContainerImage(serviceDetails)
+                containerDefinition.Image = "${imageName}:${tag}"
+                def response = dockerClient.updateContainer(serviceName, containerDefinition)
+                logger INFO, "Updated Container $serviceName. Response: $response \n Restaring container for change to take effect."
+                response = dockerClient.restart(serviceName)
+                logger INFO, "Restarted Container $serviceName."
             }else{
-                logger ERROR, "Service start timed out."
+                
+                def (imageName,tag) = getContainerImage(serviceDetails)
+                def response = dockerClient.run(imageName, containerDefinition, tag, serviceName)
+                logger INFO, "Created Container $serviceName. Response: $response"
             }
+                  
+        }else{
+            // Given endpoint is a Swarm manager. Deploy Flow service as a swarm service.
+            def deployedService = getService(clusterEndPoint, serviceName)
+            def deployedServiceSpec = deployedService?.Spec
+            def deployedServiceVersion = deployedService?.Version?.Index
             
+            def (serviceDefinition,encodedAuthConfig) = buildServicePayload(serviceDetails, deployedServiceSpec)
 
-        } else {
+            if(deployedService){
+                logger INFO, "Updating deployed service $serviceName"
 
-            logger INFO, "Creating service $serviceName"
-            
-            def response
-            if(encodedAuthConfig){
-                // For private docker registries 
-                // encodedAuthConfig will be passed as "X-Registry-Auth" header
-                response = dockerClient.createService(serviceDefinition, [EncodedRegistryAuth: encodedAuthConfig])
+                def response
+                if(encodedAuthConfig){
+                    // For private docker registries 
+                    // encodedAuthConfig will be passed as "X-Registry-Auth" header
+                    response = dockerClient.updateService(serviceName, [version: deployedServiceVersion], serviceDefinition, [EncodedRegistryAuth: encodedAuthConfig])
+                } else {
+                    response = dockerClient.updateService(serviceName, [version: deployedServiceVersion], serviceDefinition)
+                }
+
+                logger INFO, "Created Service $serviceName. Response: $response\nWaiting for service to start..."
+                def service = awaitServiceStarted(serviceName, 5000)
+                if(service){
+                    logger INFO, "Service $serviceName started successfully."
+                }else{
+                    logger ERROR, "Service start timed out."
+                }
+                
+
             } else {
-                response = dockerClient.createService(serviceDefinition)
-            }
 
-            logger INFO, "Created Service $serviceName. Response: $response\nWaiting for service to start..."
-            def service = awaitServiceStarted(serviceName, 5000)
-            if(service){
-                logger INFO, "Service $serviceName started successfully."
-            }else{
-                logger ERROR, "Service start timed out."
+                logger INFO, "Creating service $serviceName"
+                
+                def response
+                if(encodedAuthConfig){
+                    // For private docker registries 
+                    // encodedAuthConfig will be passed as "X-Registry-Auth" header
+                    response = dockerClient.createService(serviceDefinition, [EncodedRegistryAuth: encodedAuthConfig])
+                } else {
+                    response = dockerClient.createService(serviceDefinition)
+                }
+
+                logger INFO, "Created Service $serviceName. Response: $response\nWaiting for service to start..."
+                def service = awaitServiceStarted(serviceName, 5000)
+                if(service){
+                    logger INFO, "Service $serviceName started successfully."
+                }else{
+                    logger ERROR, "Service start timed out."
+                }
             }
         }
     }
@@ -194,6 +219,23 @@ public class DockerClient extends BaseClient {
 
     }
 
+    /**
+     * Retrieves the container instance from docker engine.
+     * Returns null if no container instance by the given name is found.
+     */
+    def getContainer(String clusterEndPoint, String serviceName) {
+
+        if (OFFLINE) return null
+        
+        try{
+            def containerSpec = dockerClient.inspectContainer(serviceName).content
+            }catch(Exception e){
+                 logger INFO, "Container $serviceName not found."
+                 return null
+            }
+
+    }
+
      Object doHttpGet(String requestUrl, String requestUri, String accessToken, boolean failOnErrorCode = true) {
 
         doHttpRequest(GET,
@@ -201,6 +243,21 @@ public class DockerClient extends BaseClient {
                 requestUri,
                 ['Authorization' : accessToken],
                 failOnErrorCode)
+    }
+
+    def getContainerImage(Map args){
+        def container = args.container[0]
+
+        def imageName = "${container.imageName}"
+        def tag = "${container.imageVersion?:'latest'}"
+        //Prepend the registry to the imageName
+        //if it does not already include it.
+        if (container.registryUri) {
+            if (!imageName.startsWith("${container.registryUri}/")) {
+                imageName = "${container.registryUri}/$imageName"
+            }
+        }
+        return [imageName, tag]
     }
 
     def buildServicePayload(Map args, def deployedService){
@@ -352,6 +409,78 @@ public class DockerClient extends BaseClient {
             }
         }  
         return service
+    }
+
+    def buildContainerPayload(Map args, def deployedContainer){
+
+        def serviceName = formatName(args.serviceName)
+
+        def container = args.container[0]
+        def encodedAuthConfig
+
+        if(container.credentialName && container.registryUri){
+            EFClient efClient = new EFClient()
+            def cred = efClient.getCredentials(container.credentialName)
+            def authConfig = "{\"username\":\"${cred.userName}\",\"password\": \"${cred.password}\",\"serveraddress\": \"${container.registryUri}\"}"
+            encodedAuthConfig = authConfig.bytes.encodeBase64().toString()
+        }
+
+        def mounts = [:]
+        mounts= (parseJsonToList(container.volumeMounts)).collect { mount ->
+                                [
+                                    Source: formatName(mount.name),
+                                    Target: mount.mountPath
+                                ]
+                }
+
+        def env = [:]
+        env = container.environmentVariable?.collect { envVar ->
+               
+               "${envVar.environmentVariableName}=${envVar.value}"
+
+            }
+
+        def exposedPorts = [:]
+        def port
+        for (cPort in container.port){
+            port = "${cPort.containerPort}/tcp"
+            exposedPorts[port] = [:]
+        }
+
+        def portBindings = [:]
+        def targetPort
+        for (sPort in args.port ){
+            for (cPort in container.port){      
+
+                if (cPort.portName == sPort.subport) {
+                    targetPort = "${cPort.containerPort}/tcp"
+                    portBindings[targetPort] = [
+                            ["HostPort": "${sPort.listenerPort}"]
+                    ]      
+                }
+            }
+        }      
+
+        def hash=[
+
+                "Hostname": serviceName,
+                "Entrypoint": container.entryPoint?.split(','),
+                "Cmd": container.command?.split(','),
+                "Env": env,
+                "ExposedPorts": exposedPorts,
+                "HostConfig": [
+                        "PortBindings": portBindings
+                    ]
+            ]
+
+        def payload = deployedContainer
+        if (payload) {
+            payload = mergeObjs(payload, hash)
+        } else {
+            payload = hash
+        }
+        return [payload,encodedAuthConfig]
+       
     }
 
 }
