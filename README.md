@@ -9,9 +9,6 @@ Run dev/build.sh to compile the plugin
 
 `./dev/build.sh`
 
-## Tests 
-[TBD]
-
 ## Build And Upload ##
 0. Install git
    sudo apt-get install git
@@ -57,6 +54,3 @@ Run dev/build.sh to compile the plugin
 ## Required files: 
    If docker engine is running behind TLS enabled endpoint, then CA root cert, client private key and client certificate are required.
 
-## Detailed Info: 
-    
-  Wiki: http://wiki/display/ec/EC-Docker+integration+with+Docker+Swarm
