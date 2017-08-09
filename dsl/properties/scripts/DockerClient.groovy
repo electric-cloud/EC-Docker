@@ -461,6 +461,26 @@ public class DockerClient extends BaseClient {
             }
         }      
 
+        def nanoCPUs
+        if (container.cpuLimit) {
+           nanoCPUs = convertCpuToNanoCpu(container.cpuLimit.toFloat())
+        }
+
+        def memoryLimit
+        if (container.memoryLimit) {
+           memoryLimit = convertMBsToBytes(container.memoryLimit.toFloat())
+        }
+           
+        def cpuCount
+        if (container.cpuCount) {
+           cpuCount = container.cpuCount.toInteger()
+        }
+
+        def memoryReservation
+        if (container.memorySize) {
+           memoryReservation = convertMBsToBytes(container.memorySize.toFloat())
+        }
+
         def hash=[
 
                 "Hostname": serviceName,
@@ -469,7 +489,11 @@ public class DockerClient extends BaseClient {
                 "Env": env,
                 "ExposedPorts": exposedPorts,
                 "HostConfig": [
-                        "PortBindings": portBindings
+                        "PortBindings": portBindings,
+                        "Memory": memoryLimit,
+                        "MemoryReservation": memoryReservation,
+                        "NanoCPUs": nanoCPUs,
+                        "cpuCount": cpuCount
                     ]
             ]
 
