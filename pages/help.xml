@@ -11,10 +11,7 @@
 <!-- Enter the new plugin name in the following line. -->
 
     <title>ElectricFlow Plugin for Docker</title>
-    <link rel="stylesheet"
-          href="../../plugins/@PLUGIN_KEY@/pluginhelp.css"
-          type="text/css"
-          media="screen" />
+    <link rel="stylesheet" href="../../plugins/@PLUGIN_NAME@/pluginhelp.css" type="text/css" media="screen"/>
 </head>
 
 <body>
@@ -587,7 +584,16 @@
                 -->
         <h2>EC-Docker-1.2.0</h2>
         <ul>
-            <li>Added support for Docker swarm</li>
+            <li>Added support for deploying microservices modeled in ElectricFlow to Docker.</li>
+            <li>Following Docker environments are supported:
+                <ul>
+                    <li>Stand-alone Docker instances</li>
+                    <li>Docker Swarm</li>
+                    <li>Docker Enterprise Edition</li>
+                    <li>Windows Docker containers on Windows 2016</li>
+                </ul>
+            </li>
+            <li>Removed support for using EC-Docker as a 'component' plugin. Micro-services based applications should be modeled as applications with services. The services can then be deployed using the native ElectricFlow services deployment capability.</li>
         </ul>
 
         <h2>EC-Docker-1.0.1</h2>
