@@ -58,7 +58,7 @@
 				in <span class='required'>bold italics</span>.</p>
 
 		        <p>IMPORTANT: In the ElectricFlow UI, from the Home page, open the Main Menu, and
-				click <b>Admin</b> > <b>Plugins</b> to open the Plugin Manager.</p>
+				click <b>Administration</b> > <b>Plugins</b> to open the Plugin Manager.</p>
 
 		    <!-- The next section is required. -->
 
@@ -223,7 +223,7 @@
 
             <ol>
 
-            <li>In the Main Menu, click <b>Admin</b> > <b>Plugins</b> to open the Plugin Manager.</li>
+            <li>In the Main Menu, click <b>Administration</b> > <b>Plugins</b> to open the Plugin Manager.</li>
             <li>Click <b>EC-Docker</b>.</li>
             <li>Click <b>runDockerBuild</b>.</li>
             <li>Enter the following parameters:<br />
@@ -298,7 +298,7 @@
 
             <ol>
 
-            <li>In the Main Menu, click <b>Admin</b> > <b>Plugins</b> to open the Plugin Manager.</li>
+            <li>In the Main Menu, click <b>Administration</b> > <b>Plugins</b> to open the Plugin Manager.</li>
             <li>Click <b>EC-Docker</b>.</li>
             <li>Click <b>runDockerPull</b>.</li>
             <li>Enter the following parameters:<br />
@@ -377,7 +377,7 @@
 
             <ol>
 
-            <li>In the Main Menu, click <b>Admin</b> > <b>Plugins</b> to open the Plugin Manager.</li>
+            <li>In the Main Menu, click <b>Administration</b> > <b>Plugins</b> to open the Plugin Manager.</li>
             <li>Click <b>EC-Docker</b>.</li>
             <li>Click <b>runDockerRun</b>.</li>
             <li>Enter the following parameters:<br />
@@ -511,7 +511,7 @@
 
             <ol>
 
-            <li>In the Main Menu, click <b>Admin</b> > <b>Plugins</b> to open the Plugin Manager.</li>
+            <li>In the Main Menu, click <b>Administration</b> > <b>Plugins</b> to open the Plugin Manager.</li>
             <li>Click <b>EC-Docker</b>.</li>
             <li>Click <b>Discover</b>.</li>
             <li>Enter the following parameters:<br />
@@ -584,8 +584,7 @@
                 -->
         <h2>EC-Docker-1.2.0</h2>
         <ul>
-            <li>Added support for deploying microservices modeled in ElectricFlow to Docker.</li>
-            <li>Following Docker environments are supported:
+            <li>Added support for deploying micro-services modeled in ElectricFlow to Docker. Deploying micro-services to the following Docker environments are supported:
                 <ul>
                     <li>Stand-alone Docker instances</li>
                     <li>Docker Swarm</li>
