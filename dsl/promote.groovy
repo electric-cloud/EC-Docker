@@ -64,6 +64,18 @@ project pluginName, {
 					configuration = 'config'
 				}
 			}
+			property 'defineContainerMappings', {
+				property 'procedureName', value: 'Define Container'
+				property 'ui_formRefs', {
+					parameterForm = 'containerMappingsForm'
+				}
+			}
+			property 'defineServiceMappings', {
+				property 'procedureName', value: 'Define Service'
+				property 'ui_formRefs', {
+					parameterForm = 'serviceMappingsForm'
+				}
+			}
 			property 'deployService', {
 				property 'procedureName', value: 'Deploy Service'
 				property 'ui_formRefs', {
@@ -97,7 +109,12 @@ project pluginName, {
 		}
 	}
 
-	
+	procedure 'Define Container', {
+		containerMappingsForm = new File(pluginDir, 'dsl/procedures/defineContainer/containerMappingsForm.xml').text
+	}
+	procedure 'Define Service', {
+		serviceMappingsForm = new File(pluginDir, 'dsl/procedures/defineService/serviceMappingsForm.xml').text
+	}
 	// End-of container service plugin metadata
 }
 

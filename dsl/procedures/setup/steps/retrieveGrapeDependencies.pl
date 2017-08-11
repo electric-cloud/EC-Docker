@@ -21,7 +21,7 @@ retrieveGrapeDependencies.pl
 =head1 DESCRIPTION
 
 
-Retrieves artifacts published as artifact EC-Kubernetes-Grapes
+Retrieves artifacts published as artifact EC-Docker-Grapes
 to the grape root directory configured with ec-groovy.
 
 =head1 METHODS
@@ -43,7 +43,7 @@ sub main() {
     my $ec = ElectricCommander->new();
     $ec->abortOnError(1);
 
-    retrieveGrapeDependency($ec, 'com.electriccloud:EC-Kubernetes-Grapes:1.0.0');
+    retrieveGrapeDependency($ec, 'com.electriccloud:EC-Docker-Grapes:1.0.0');
     if ($::gAdditionalArtifactVersion ne '') {
         retrieveGrapeDependency($ec, $::gAdditionalArtifactVersion);
     }
