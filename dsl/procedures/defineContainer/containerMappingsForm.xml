@@ -18,9 +18,9 @@
 <editor>
     <formElement>
         <type>entry</type>
-        <label>Configuration:</label>
-        <property>config</property>
-        <required>1</required>
-        <documentation>The name of an existing configuration which holds all the connection information for a stand-alone Docker host or Docker Swarm manager.</documentation>
+        <label>Container Name Override:</label>
+        <property>containerNameOverride</property>
+        <required>0</required>
+        <documentation>Name to use for the container being deployed instead of the name of the container in the service in Deploy.</documentation>
     </formElement>
 </editor>

@@ -1,7 +1,7 @@
 import java.io.File
 
 procedure 'CreateConfiguration',
-        description: 'Creates a configuration for the Kubernetes cluster', {
+        description: 'Creates a configuration for a stand-alone Docker host or Docker Swarm manager', {
 
     step 'setup',
       subproject: '',

@@ -9,15 +9,13 @@ else
  DEPLOY=0
 fi
 
-rm ./out/EC-Kubernetes.jar
-rm ./EC-Kubernetes.zip
+rm ./EC-Docker.jar
 
-jar cvf  EC-Docker.jar dsl/ META-INF/ lib/
-#zip -r ./EC-Kubernetes.zip dsl/ META-INF/ pages/ lib/ htdocs/
+jar cvf ./EC-Docker.jar dsl/ META-INF/ pages/ lib/ htdocs/
 
 if [ $DEPLOY -eq 1 ]; then
   echo "Installing plugin ..."
   ectool --server localhost login admin changeme
-  ectool installPlugin ./out/EC-Kubernetes.jar --force 1
-  ectool promotePlugin EC-Kubernetes-1.0.0
+  ectool installPlugin ./EC-Docker.jar --force 1
+  ectool promotePlugin EC-Docker-1.2.0
 fi  
