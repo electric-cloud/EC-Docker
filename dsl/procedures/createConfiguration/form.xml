@@ -38,33 +38,28 @@
         <documentation>The endpoint at which docker REST API will be reachable. Must be a IP address or a resolvable DNS name.</documentation>
     </formElement>
     <formElement>
-        <type>credential</type>
+        <type>textarea</type>
         <label>CA Certificate:</label>
         <property>cacert</property>
         <required>0</required>
-        <passwordLabel>CA Cert:</passwordLabel>
-        <credentialType>key</credentialType>
-        <documentation>Certificate used to check authenticity of Docker server.</documentation>
-        <attachedAsParameterToStep>createAndAttachCredential,testConnection</attachedAsParameterToStep>
+        <documentation>CA Certificate used for authentication when communicating with a secure Docker end-point. Required if the plugin configuration is used for deploying services on a TLS-enabled Docker engine.</documentation>
     </formElement>
     <formElement>
-        <type>credential</type>
+        <type>textarea</type>
         <label>Client Certificate:</label>
         <property>cert</property>
         <required>0</required>
-        <passwordLabel>Certificate:</passwordLabel>
-        <credentialType>key</credentialType>
-        <documentation>Public key of key pair used by Docker client to authenticate itself with Docker server.</documentation>
-        <attachedAsParameterToStep>createAndAttachCredential,testConnection</attachedAsParameterToStep>
+        <documentation>Client certificate used for authentication when communicating with a secure Docker end-point. Required if the plugin configuration is used for deploying services on a TLS-enabled Docker engine.</documentation>
     </formElement>
     <formElement>
         <type>credential</type>
         <label>Client Private Key:</label>
-        <property>key</property>
+        <property>credential</property>
         <required>0</required>
+        <userNameLabel>Name:</userNameLabel>
         <passwordLabel>Private Key:</passwordLabel>
         <credentialType>key</credentialType>
-        <documentation>Private key of key pair used by Docker client to authenticate itself with Docker server.</documentation>
+        <documentation>Private key used by a Docker client for authentication when communicating with a secure Docker end-point. Required if the plugin configuration is used for deploying services on Docker.</documentation>
         <attachedAsParameterToStep>createAndAttachCredential,testConnection</attachedAsParameterToStep>
     </formElement>
     <formElement> 

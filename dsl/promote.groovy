@@ -27,6 +27,9 @@ def stepsWithAttachedCredentials = [
 		], [
 				procedureName: 'CreateConfiguration',
 				stepName: 'testConnection'
+		], [
+				procedureName: 'Populate Certs',
+				stepName: 'populateDockerClientCerts'
 		]
 		
 ]

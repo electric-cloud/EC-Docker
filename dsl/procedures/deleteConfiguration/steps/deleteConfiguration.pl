@@ -20,12 +20,5 @@ my $ec = new ElectricCommander();
 my $configName = "$[config]";
 
 $ec->deleteProperty("/myProject/ec_plugin_cfgs/$[config]");
-
-@credentials = ("cacert", "cert", "key");
-
-foreach $credential (@credentials)
-{
-	my $credName = $configName . "_" . $credential;
-	$ec->deleteCredential("$[/myProject/projectName]", $credName);
-}
+$ec->deleteCredential("$[/myProject/projectName]", $configName);
 exit 0;

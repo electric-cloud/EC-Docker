@@ -28,6 +28,6 @@
         <label>Service name:</label>
         <property>serviceName</property>
         <required>1</required>
-        <documentation>The name of docker swarm serviec on which cleanup procedure should be performed.</documentation>
+        <documentation>The name of the Docker service that needs to be undeployed.</documentation>
     </formElement>
 </editor>

@@ -21,6 +21,6 @@
         <label>Service Name Override:</label>
         <property>serviceNameOverride</property>
         <required>0</required>
-        <documentation>Name to use for the service being deployed instead of the name of the service in Deploy.</documentation>
+        <documentation>Name for the service in Docker. If no override value is specified here, the service name in ElectricFlow will be used to name the Docker service.</documentation>
     </formElement>
 </editor>

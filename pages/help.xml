@@ -291,7 +291,7 @@
 
             <h2>runDockerPull</h2>
 
-             <p>Use this procedure to make a Docker pull request to let others know aobut the changes you have pushed
+             <p>Use this procedure to make a Docker pull request to let others know about the changes you have pushed
              to the repository.</p>
 
             <h3>Input</h3>

@@ -21,7 +21,7 @@ public class DockerClient extends BaseClient {
         def certDir = "${homeDir}${pathSeparator}.docker${pathSeparator}cert"
         System.setProperty("docker.cert.path","${certDir}")
 
-        if (pluginConfig.credential_key.password){
+        if (pluginConfig.credential.password){
             // If docker client private key is provided in plugin config then enable TLS mode
             System.setProperty("docker.tls.verify", "1")
         }

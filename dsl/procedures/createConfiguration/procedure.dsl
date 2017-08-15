@@ -17,7 +17,7 @@ procedure 'CreateConfiguration',
     }
     
     step 'testConnection',
-            command: new File(pluginDir, 'dsl/procedures/createConfiguration/steps/testConnction.groovy').text,
+            command: new File(pluginDir, 'dsl/procedures/createConfiguration/steps/testConnection.groovy').text,
             errorHandling: 'abortProcedure',
             exclusiveMode: 'none',
             releaseMode: 'none',
