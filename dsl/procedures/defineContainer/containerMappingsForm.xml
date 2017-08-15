@@ -15,12 +15,4 @@
      limitations under the License.
 
 -->
-<editor>
-    <formElement>
-        <type>entry</type>
-        <label>Container Name Override:</label>
-        <property>containerNameOverride</property>
-        <required>0</required>
-        <documentation>Name to use for the container being deployed instead of the name of the container in the service in Deploy.</documentation>
-    </formElement>
-</editor>
+<editor/>
