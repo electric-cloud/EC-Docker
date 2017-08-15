@@ -1,7 +1,6 @@
 @Grab("de.gesellix:docker-client:2017-06-25T15-38-14")
 @Grab(group='ch.qos.logback', module='logback-classic', version='1.0.13')
 
-import de.gesellix.docker.client.image.ManageImage
 import de.gesellix.docker.client.DockerClientImpl
 
 $[/myProject/scripts/preamble]
@@ -18,17 +17,17 @@ if (efClient.toBoolean(actualParams.get('testConnection'))) {
 	{
 		certDir.mkdir() 
 	}
-	def cacert = efClient.getCredentials('cacert')
-    if (cacert.password){
+	def cacert = actualParams.get('cacert')
+    if (cacert){
     	File cacertFile = new File("${tempDir}/certs/ca.pem")
-		cacertFile.text = cacert.password
+		cacertFile.text = cacert
     }
-    def cert = efClient.getCredentials('cert')
-    if (cert.password){
+    def cert = actualParams.get('cert')
+    if (cert){
     	File certFile = new File("${tempDir}/certs/cert.pem")
-		certFile.text = cert.password
+		certFile.text = cert
     }
-    def key = efClient.getCredentials('key')
+    def key = efClient.getCredentials('credential')
     if (key.password){
     	File keyFile = new File("${tempDir}/certs/key.pem")
 		keyFile.text = key.password
@@ -36,10 +35,10 @@ if (efClient.toBoolean(actualParams.get('testConnection'))) {
 		System.setProperty("docker.cert.path","${tempDir}/certs")
     }
 
-    def endpoint = actualParams.get('endpoint')
-    dockerClient = new DockerClientImpl(endpoint)
+	def endpoint = actualParams.get('endpoint')
     try{
-    	def info = dockerClient.info().content
+		def dockerClient = new DockerClientImpl(endpoint)
+		dockerClient.info().content
     }catch(Exception e){
         e.printStackTrace()
     	efClient.handleConfigurationError("Error while connecting to docker endpoint ${endpoint} : ${e.getMessage()}")

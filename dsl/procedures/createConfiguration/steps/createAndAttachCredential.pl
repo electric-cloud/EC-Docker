@@ -30,86 +30,75 @@ $ec->abortOnError(0);
 
 my $configName = "$[/myJob/config]";
 
-@credentials = ("cacert", "cert", "key");
+my $xpath = $ec->getFullCredential("credential");
+my $errors = $ec->checkAllErrors($xpath);
+my $clientID = $xpath->findvalue("//userName");
 
-foreach $credential (@credentials)
-{
-    my $xpath = $ec->getFullCredential($credential);
-    my $errors = $ec->checkAllErrors($xpath);
-    my $clientID = $xpath->findvalue("//userName");
-    my $clientSecret = $xpath->findvalue("//password");
-    # Format for name of credential object is "pluginConfigName_credential"
-    # For e.g. If plugin configuration name is "dockerConfig"
-    # then "dockerConfig_cacert", "dockerConfig_cert", "dockerConfig_key"
-    # credential objects will be created.
-    my $credName = $configName . "_" . $credential;
-    my $projName = "$[/myProject/projectName]";
+my $clientSecret = $xpath->findvalue("//password");
+my $credName = $configName;
+my $projName = "$[/myProject/projectName]";
 
-    # Create credential
-    $ec->deleteCredential($projName, $credName);
-    $xpath = $ec->createCredential($projName, $credName, $clientID, $clientSecret);
-    $errors .= $ec->checkAllErrors($xpath);
+# Create credential
+$ec->deleteCredential($projName, $credName);
+$xpath = $ec->createCredential($projName, $credName, $clientID, $clientSecret);
+$errors .= $ec->checkAllErrors($xpath);
 
-    #Give config the credential's real name
-    my $configPath = "/projects/$projName/ec_plugin_cfgs/$configName";
-    $xpath = $ec->setProperty($configPath . "/credential_$credential", $credName);
-    $errors .= $ec->checkAllErrors($xpath);
+#Give config the credential's real name
+my $configPath = "/projects/$projName/ec_plugin_cfgs/$configName";
+$xpath = $ec->setProperty($configPath . "/credential", $credName);
+$errors .= $ec->checkAllErrors($xpath);
 
-    # Give job launcher full permissions on the credential
-    my $user = "$[/myJob/launchedByUser]";
-    $xpath = $ec->createAclEntry("user", $user,
-        {projectName => $projName,
-         credentialName => $credName,
-         readPrivilege => allow,
-         modifyPrivilege => allow,
-         executePrivilege => allow,
-         changePermissionsPrivilege => allow});
-    $errors .= $ec->checkAllErrors($xpath);
+# Give job launcher full permissions on the credential
+my $user = "$[/myJob/launchedByUser]";
+$xpath = $ec->createAclEntry("user", $user,
+    {projectName => $projName,
+     credentialName => $credName,
+     readPrivilege => allow,
+     modifyPrivilege => allow,
+     executePrivilege => allow,
+     changePermissionsPrivilege => allow});
+$errors .= $ec->checkAllErrors($xpath);
 
-    # Attach credential to steps that will need it
-    $xpath = $ec->attachCredential($projName, $credName,
-        {procedureName => "Check Cluster",
-         stepName => "checkCluster"});
-    $errors .= $ec->checkAllErrors($xpath);
+# Attach credential to steps that will need it
+$xpath = $ec->attachCredential($projName, $credName,
+    {procedureName => "Check Cluster",
+     stepName => "checkCluster"});
+$errors .= $ec->checkAllErrors($xpath);
 
-    $xpath = $ec->attachCredential($projName, $credName,
-        {procedureName => "Deploy Service",
-         stepName => "createOrUpdateDeployment"});
-    $errors .= $ec->checkAllErrors($xpath);
+$xpath = $ec->attachCredential($projName, $credName,
+    {procedureName => "Deploy Service",
+     stepName => "createOrUpdateDeployment"});
+$errors .= $ec->checkAllErrors($xpath);
 
-    $xpath = $ec->attachCredential($projName, $credName,
-        {procedureName => "Populate Certs",
-         stepName => "populateDockerClientCerts"});
-    $errors .= $ec->checkAllErrors($xpath);
+$xpath = $ec->attachCredential($projName, $credName,
+    {procedureName => "Populate Certs",
+     stepName => "populateDockerClientCerts"});
+$errors .= $ec->checkAllErrors($xpath);
 
-    $xpath = $ec->attachCredential($projName, $credName,
-        {procedureName => "Delete Service",
-         stepName => "cleanup"});
-    $errors .= $ec->checkAllErrors($xpath);
+$xpath = $ec->attachCredential($projName, $credName,
+    {procedureName => "Delete Service",
+     stepName => "cleanup"});
+$errors .= $ec->checkAllErrors($xpath);
 
-    $xpath = $ec->attachCredential($projName, $credName,
-        {procedureName => "CreateConfiguration",
-         stepName => "testConnection"});
-    $errors .= $ec->checkAllErrors($xpath);
+$xpath = $ec->attachCredential($projName, $credName,
+    {procedureName => "CreateConfiguration",
+     stepName => "testConnection"});
+$errors .= $ec->checkAllErrors($xpath);
 
 
 
-     if ("$errors" ne "") {
-        my $errMsg = "Error creating configuration credential: " . $errors;
-        $ec->setProperty("/myJob/configError", $errMsg);
-        print $errMsg;      
-        last;
-     }
-}
+ if ("$errors" ne "") {
+    my $errMsg = "Error creating configuration credential: " . $errors;
+    $ec->setProperty("/myJob/configError", $errMsg);
+    print $errMsg;
+    last;
+ }
 
 if ("$errors" ne "") {
-    foreach $credential (@credentials){
-        # Cleanup the partially created configuration we just created
-        my $configPath = "/projects/$projName/ec_plugin_cfgs/$configName";
-        $ec->deleteProperty($configPath);
+    # Cleanup the partially created configuration we just created
+    my $configPath = "/projects/$projName/ec_plugin_cfgs/$configName";
+    $ec->deleteProperty($configPath);
 
-        my $credName = $configName . "_" . $credential;
-        $ec->deleteCredential($projName, $credName);       
-    }
+    $ec->deleteCredential($projName, $credName);
     exit 1;
 }
