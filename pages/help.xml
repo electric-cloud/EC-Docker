@@ -83,9 +83,9 @@
 
                 <p>For more information about Docker, go to the <a href="http://www.docker.com/">Docker home page</a>.</p>
 
-                <p>Plugin also supports Docker engines in swarm mode. The cluster management and orchestration features embedded in the Docker Engine are built using SwarmKit. A swarm is a cluster of Docker engines, or nodes, where you deploy services. When you create a service, you specify which container image to use and which commands to execute inside running containers.</p>
+                <p>Plugin also supports Docker engines in Swarm mode. The cluster management and orchestration features embedded in the Docker Engine are built using SwarmKit. Docker Swarm is a cluster of Docker engines, or nodes, where you deploy services. When you create a service, you specify which container image to use and which commands to execute inside running containers.</p>
 
-                <p>More information about Docker swarm can be found at <a href="https://docs.docker.com/engine/swarm/key-concepts/">Docker swarm key concepts</a>.</p>
+                <p>More information about Docker Swarm can be found at <a href="https://docs.docker.com/engine/swarm/key-concepts/">Docker Swarm key concepts</a>.</p>
         <!-- This section is required. Replace the plugin name, the URL to the website with the new plugin information, and the name of the link. -->
 
 			
@@ -96,10 +96,9 @@
         How deep does our integration go? Why should I care?
         What general functionality does the plugin include?
 				What functionality does the plugin omit? -->
+            <p>Plugin deploys ElectricFlow service as a single container or as a Docker Swarm service based on whether given Docker endpoint is a stand-alone Docker engine or Docker Swarm cluster manager. Plugin checks type of Docker endpoint at runtime and takes decision to deploy correct type of workload (container or Docker Swarm service) accordingly.</p>
 
-
-            <p>Use this plugin with ElectricFlow to perform Docker build, pull, and run functions.</p>
-            <p>Plugin also supports deployment of multiple services to Docker swarm cluster. The TLS mutual authentication and encryption is supported between swarm manager and the Flow agent running the plugin.</p>
+            <p>The TLS mutual authentication and encryption is supported between Docker endpoint and the ElectricFlow agent.</p>
 
 
 		<h2>Integrated Version</h2>
@@ -107,10 +106,35 @@
 
 
             <p>This plugin was tested against Docker Engine 17.06.</p>
-
-        <h2>Prerequists for Docker swarm Procedures</h2>
-            <p>The swarm cluster must be already setup and swarm manager must be accessible over network.</p>
-            <p>In case of swarm manager supporting TLS based authentication, CA certificate (CA's public key), client's public and private keys are required. All three keys can be stored in plugin configuration.More information about how to setup TLS certificates on swarm cluster can be found <a href="https://github.com/docker/docker.github.io/blob/master/swarm/configure-tls.md">here</a>.</p>
+            <h2>Prerequisite for deploying ElectricFlow service on stand-alone Docker engine</h2>
+            <p>Docker engine daemon must listen on TCP socket. By default, daemon listens on Unix socket on linux/unix based OSs and on named pipe (npipe://) on windows. </p>
+            <p>To make above changes, </p>
+                <ol>
+                    <li>Add '{"hosts": ["tcp://IP:PORT"]}' entry in '/etc/docker/daemon.json' (on linux) and in 'C:\ProgramData\Docker\config\daemon.json' (on Windows) file .</li>
+                    <li>Restart Docker daemon</li>
+                </ol>
+        <h2>Prerequisite for deploying ElectricFlow service on Docker Swarm cluster</h2>
+            <p>Docker Swarm cluster must be already setup and Docker Swarm manager must be accessible over network.</p>
+        
+        <h2>Prerequisite for supporting TLS based authentication</h2>
+            <p>In case of Docker endpoint supporting TLS based authentication, CA certificate (CA's public key), client's public and private keys are required. All three keys can be stored in plugin configuration.
+                More information about how to setup TLS certificates on Docker endpoint can be found <a href="https://github.com/docker/docker.github.io/blob/master/swarm/configure-tls.md">here</a>.</p>
+                <p>If the Docker Swarm cluster is on Docker EE then client certificates can be obtained from UCP (Universal Control Plane) from "User Profile" page by clicking on "Create a Client Bundle". Bundle contains all the required certificates. </p>
+                <p>In case of stand-alone Docker engine and for Docker Swarm cluster on Docker CE, perform below steps to generate client side certificates using openssl utility:</p>
+                <p><b>Note:</b>If you already have access to a CA and certificates, you should skip this step 1.</p>
+                <p>Step 1: Setup CA server</p>
+                <ol>
+                    <li>openssl genrsa -out ca-priv-key.pem 2048</li>
+                    <li>openssl req -config /usr/lib/ssl/openssl.cnf -new -key ca-priv-key.pem -x509 -days 1825 -out ca.pem</li>
+                </ol>
+                <p>Step 2: Generete client side certificates</p>
+                    <ol>
+                        <li>openssl genrsa -out key.pem 2048</li>
+                        <li>openssl req -subj "/CN=client" -new -key key.pem -out client.csr</li>
+                        <li>openssl x509 -req -days 1825 -in client.csr -CA ca.pem -CAkey ca-priv-key.pem -CAcreateserial -out cert.pem -extensions v3_req -extfile /usr/lib/ssl/openssl.cnf</li>
+                    </ol>
+                    
+                <p>If TLS support is not enabled on Docker endpoint then leave "CA Certificate", "Client Certificate" and "Client Private Key" input parameters on plugin configuration page empty. Plugin will establish simple HTTP connection with such Docker endpoint.</p>
 
 	
     <h1 id="setupconfig">Plugin Configuration</h1>
@@ -127,10 +151,10 @@
                     <li>Click <b>Configure</b> to open the
                     Docker Configurations page.</li>
                     <li>Click <b>Create Configuration</b>.</li>
-                    <li>For communicating with Docker swarm cluster, you need <br/>
+                    <li>For communicating with Docker host, you need <br/>
                     <ul type="square">
-                        <li>1. The swarm manager endpoint (For example, tcp://swarmmanager.example.com:2376)</li>
-                        <li>2. TLS certificates in case of cert based authentication with swarm manager. If you want to connect to Docker EE UCP (Universal Control Plane), certificates can be obtained from "User Profile" page by clicking on "Create a Client Bundle" button. 
+                        <li>1. Docker endpoint (For example, tcp://swarmmanager.example.com:2376)</li>
+                        <li>2. TLS certificates in case of cert based authentication with Docker endpoint.
                         </li>
                     </ul>
                 </li>
@@ -146,7 +170,7 @@
      <p>Please note that some of names given in ElectricFlow UI will be modified to comply with the naming conventions of Docker. Specifically characters such as "space , _ " will be converted to "-". Such parameters are marked with an asterisk (*).</p>
      <h2>Check Cluster</h2>
 
-			<p>The procedure checks if the cluster exists and is reachable with provided details.</p>
+			<p>The procedure checks if Docker endpoint reachable with provided details.</p>
 
 			<h3>Check Cluster Parameters</h3>
                 <table class="grid">
@@ -167,7 +191,7 @@
             </div>  
             <div id="DeployService">
                 <h2>Deploy Service</h2>
-                <p>This procedure deploys a service and application to a already provisioned cluster</p>
+                <p>This procedure deploys container on stand-alone Docker engine or Docker Swarm service on already setup Docker Swarm cluster</p>
                 <h3>Depoy Service Parameters</h3>
                 <table class="grid">
                     <thead>
