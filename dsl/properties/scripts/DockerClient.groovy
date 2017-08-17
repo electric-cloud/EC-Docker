@@ -84,8 +84,12 @@ public class DockerClient extends BaseClient {
                 clusterOrEnvProjectName,
                 environmentName)
 
-        createOrUpdateService(clusterEndpoint, serviceDetails)
-
+        if(serviceDetails.container.size() > 1){
+            efClient.handleProcedureError("Services in Docker do not support multiple container images within one service. ${serviceDetails.container.size()} container definitions were found in the ElectricFlow service definition for '${serviceName}'.")
+        }else{
+            createOrUpdateService(clusterEndpoint, serviceDetails)
+        }
+        
         /*
         
         def serviceEndpoint = getDeployedServiceEndpoint(clusterEndpoint, namespace, serviceDetails, accessToken)
