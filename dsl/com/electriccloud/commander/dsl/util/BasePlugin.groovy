@@ -1,6 +1,6 @@
 package com.electriccloud.commander.dsl.util
 
-import groovy.io.FileType
+import groovy.json.JsonOutput
 import groovy.util.XmlSlurper
 import java.io.File
 
@@ -26,7 +26,8 @@ abstract class BasePlugin extends DslDelegatingScript {
 				description: propDescription
 	}
 
-	def setupPluginMetadata(String pluginDir, String pluginKey, String pluginName, String pluginCategory) {
+	def setupPluginMetadata(String pluginDir, String pluginKey, String pluginName, List stepsWithAttachedCredentials) {
+	    String pluginCategory = determinePluginCategory(pluginDir)
 		getProcedures(pluginName).each { proc ->
 
 			def addStepPicker = shouldAddStepPicker(pluginName, proc.procedureName)
@@ -36,9 +37,13 @@ abstract class BasePlugin extends DslDelegatingScript {
 				def description = proc.description
 				stepPicker (label, pluginKey, proc.procedureName, pluginCategory, description)
 			}
-
+			if (proc.procedureName == 'CreateConfiguration' && stepsWithAttachedCredentials) {
+				//Store the list of steps that require credentials to be attached as a procedure property
+				procedure proc.procedureName, {
+					property 'ec_stepsWithAttachedCredentials', value: JsonOutput.toJson(stepsWithAttachedCredentials)
+		        }
+			}
 		}
-
 		// configure the plugin icon if is exists
 		setPluginIconIfIconExists(pluginDir, pluginName)
 	}
@@ -62,7 +67,7 @@ abstract class BasePlugin extends DslDelegatingScript {
 		}
 	}
 
-	def cleanup(String pluginKey, String pluginName, String pluginCategory) {
+	def cleanup(String pluginKey, String pluginName) {
 		getProcedures(pluginName).each { proc ->
 
 			def addStepPicker = shouldAddStepPicker(pluginName, proc.procedureName)
@@ -77,6 +82,12 @@ abstract class BasePlugin extends DslDelegatingScript {
 			}
 
 		}
+	}
+
+	def determinePluginCategory(String pluginDir) {
+		File pluginXml = new File("$pluginDir/META-INF", 'plugin.xml')
+		def pluginRoot = new XmlSlurper().parseText(pluginXml.text)
+		pluginRoot.category?: 'Utilities'
 	}
 
 	def shouldAddStepPicker(def pluginName, def procedureName) {
@@ -121,7 +132,7 @@ abstract class BasePlugin extends DslDelegatingScript {
 		}
 	}
 
-	def loadProcedures(String pluginDir, String pluginKey, String pluginName, String pluginCategory) {
+	def loadProcedures(String pluginDir, String pluginKey, String pluginName, List stepsWithAttachedCredentials) {
 
 		// Loop over the sub-directories in the procedures directory
 		// and evaluate procedures if a procedure.dsl file exists
@@ -146,7 +157,7 @@ abstract class BasePlugin extends DslDelegatingScript {
 		}
 
 		// plugin boiler-plate
-		setupPluginMetadata(pluginDir, pluginKey, pluginName, pluginCategory)
+		setupPluginMetadata(pluginDir, pluginKey, pluginName, stepsWithAttachedCredentials)
 	}
 
 	def getProcedureDSLFile(File procedureDir) {

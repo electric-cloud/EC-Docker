@@ -22,9 +22,12 @@ def stepsWithAttachedCredentials = [
 				procedureName: 'Deploy Service',
 				stepName: 'createOrUpdateDeployment'
 		], [
-				procedureName: 'Delete Service',
+				procedureName: 'Remove Docker Service',
 				stepName: 'cleanup'
 		], [
+				procedureName: 'Undeploy Service',
+				stepName: 'undeployService'
+		],[
 				procedureName: 'CreateConfiguration',
 				stepName: 'testConnection'
 		], [
@@ -36,10 +39,9 @@ def stepsWithAttachedCredentials = [
 project pluginName, {
 
 	ec_visibility = 'pickListOnly'
-	pluginType = 'Repository'
 
 	loadPluginProperties(pluginDir, pluginName)
-	loadProcedures(pluginDir, pluginKey, pluginName, pluginCategory)
+	loadProcedures(pluginDir, pluginKey, pluginName, stepsWithAttachedCredentials)
 
 
 	//register container service plugin metadata
@@ -57,7 +59,7 @@ project pluginName, {
 					configuration = 'config'
 				}
 			}
-			
+
 			property 'createConfiguration', {
 				property 'procedureName', value: 'CreateConfiguration'
 				property 'ui_formRefs', {
