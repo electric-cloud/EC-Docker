@@ -425,13 +425,20 @@ public class DockerClient extends BaseClient {
             encodedAuthConfig = authConfig.bytes.encodeBase64().toString()
         }
 
-        def mounts = [:]
-        mounts= (parseJsonToList(container.volumeMounts)).collect { mount ->
-                                [
-                                    Source: formatName(mount.name),
-                                    Target: mount.mountPath
-                                ]
+        def binds = []
+        def volumes = [:]
+        for(mount in parseJsonToList(container.volumeMounts)){
+            for(svcMount in parseJsonToList(args.volumes)){
+                if(mount.name==svcMount.name){
+                    if(svcMount.hostPath){
+                        binds << "${svcMount.hostPath}:${mount.mountPath}"
+                    }else{
+                        binds << "${formatName(mount.name)}:${mount.mountPath}"
+                    }                 
                 }
+            }
+            volumes[mount.mountPath] = [:]
+        }
 
         def env = [:]
         env = container.environmentVariable?.collect { envVar ->
@@ -488,7 +495,9 @@ public class DockerClient extends BaseClient {
                 "Cmd": container.command?.split(','),
                 "Env": env,
                 "ExposedPorts": exposedPorts,
+                "Volumes": volumes,
                 "HostConfig": [
+                        "Binds": binds,
                         "PortBindings": portBindings,
                         "Memory": memoryLimit,
                         "MemoryReservation": memoryReservation,
@@ -496,7 +505,7 @@ public class DockerClient extends BaseClient {
                         "cpuCount": cpuCount
                     ]
             ]
-
+        
         def payload = deployedContainer
         if (payload) {
             payload = mergeObjs(payload, hash)
