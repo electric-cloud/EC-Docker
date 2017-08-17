@@ -5,21 +5,50 @@
 @Grab("de.gesellix:docker-client:2017-07-19T21-12-05")
 @Grab(group='ch.qos.logback', module='logback-classic', version='1.0.13')
 
-import de.gesellix.docker.client.image.ManageImage
 import de.gesellix.docker.client.DockerClientImpl
 
 public class DockerClient extends BaseClient {
 
     def dockerClient
     def pluginConfig
+    def certificatesDir
 
-    DockerClient(def pluginConfiguration){
+    DockerClient(def pluginConfiguration, boolean setupCertificates = false){
 
-        pluginConfig = pluginConfiguration
-        def homeDir = System.getProperty('user.home')
-        def pathSeparator = File.separator
-        def certDir = "${homeDir}${pathSeparator}.docker${pathSeparator}cert"
-        System.setProperty("docker.cert.path","${certDir}")
+        this.pluginConfig = pluginConfiguration
+        if (setupCertificates) {
+            def pathSeparator = File.separator
+            def uniqueName = System.currentTimeMillis()
+            def homeDir = System.getProperty('user.home')
+
+            this.certificatesDir = "${homeDir}${pathSeparator}.docker${pathSeparator}cert${pathSeparator}${uniqueName}"
+            File dir = new File(this.certificatesDir)
+            dir.mkdirs()
+
+            if (pluginConfig.cacert) {
+                File cacertFile = new File("${this.certificatesDir}${pathSeparator}ca.pem")
+                cacertFile.text = pluginConfig.cacert
+            }
+
+            if (pluginConfig.cert) {
+                File clientcertFile = new File("${this.certificatesDir}${pathSeparator}cert.pem")
+                clientcertFile.text = pluginConfig.cert
+            }
+
+            if (pluginConfig.credential?.password) {
+                File clientkeyFile = new File("${this.certificatesDir}${pathSeparator}key.pem")
+                clientkeyFile.text = pluginConfig.credential.password
+            }
+
+            System.setProperty("docker.cert.path","${this.certificatesDir}")
+
+        } else {
+            //TODO: remove this block once all usage is switch to setupCertificates=true
+            def homeDir = System.getProperty('user.home')
+            def pathSeparator = File.separator
+            def certDir = "${homeDir}${pathSeparator}.docker${pathSeparator}cert"
+            System.setProperty("docker.cert.path","${certDir}")
+        }
 
         if (pluginConfig.credential.password){
             // If docker client private key is provided in plugin config then enable TLS mode
@@ -106,15 +135,85 @@ public class DockerClient extends BaseClient {
         */
     }
 
+    def cleanupDirs() {
+        logger DEBUG, "Cleaning up certificate dir: '${this.certificatesDir}'"
+        if (this.certificatesDir) {
+            def dir = new File(this.certificatesDir)
+            if (dir.exists() && dir.isDirectory()) {
+                def result = dir.deleteDir()
+                logger DEBUG, "Dir: '${dir.absolutePath}' deleted: $result"
+            }
+        }
+    }
+
+    def undeployService(
+            EFClient efClient,
+            String clusterEndpoint,
+            String serviceName,
+            String serviceProjectName,
+            String applicationName,
+            String applicationRevisionId,
+            String clusterName,
+            String envProjectName,
+            String environmentName){
+
+
+        logger INFO, "Undeploying ElectricFlow service: ${serviceName} in service project:${serviceProjectName} application:${applicationName} cluster:${clusterName} environment project:${envProjectName} environment name:${environmentName} cluster endpoint:${clusterEndpoint}"
+
+        def serviceDetails = efClient.getServiceDeploymentDetails(
+                serviceName,
+                serviceProjectName,
+                applicationName,
+                applicationRevisionId,
+                clusterName,
+                envProjectName,
+                environmentName)
+
+        if (OFFLINE) return null
+
+        String deployedServiceName = getServiceNameToUseForDeployment(serviceDetails)
+        undeployDockerService(deployedServiceName)
+
+    }
+
+    def undeployDockerService(def deployedServiceName) {
+        if (standAloneDockerHost()) {
+            logger INFO, "Removing container '$deployedServiceName' from standalone Docker host"
+            //check if container exists, if found, stop and remove it
+            def deployedContainerId = getContainerId(deployedServiceName)
+            if (deployedContainerId) {
+                dockerClient.stop(deployedContainerId)
+                dockerClient.wait(deployedContainerId)
+                dockerClient.rm(deployedContainerId)
+            } else {
+                logger INFO, "Nothing to do as no container named '$deployedServiceName' found on the standalone Docker host."
+            }
+        } else {
+            //It is a Docker swarm cluster end-point.
+            //Check if service exists
+            logger INFO, "Undeploying service '$deployedServiceName' from Docker Swarm cluster"
+            def deployedService = getService(deployedServiceName)
+            if (deployedService) {
+                deleteService(deployedServiceName)
+            } else {
+                logger INFO, "Nothing to do as no service named '$deployedServiceName' found on the Docker Swarm cluster."
+            }
+        }
+    }
+
+    boolean standAloneDockerHost() {
+        dockerClient.info().content.Swarm.LocalNodeState == "inactive"
+    }
+
     def createOrUpdateService(String clusterEndPoint,  def serviceDetails) {
 
         if (OFFLINE) return null
 
-        String serviceName = formatName(getServiceParameter(serviceDetails, "serviceNameOverride", serviceDetails.serviceName))
+        String serviceName = getServiceNameToUseForDeployment(serviceDetails)
 
-        if (dockerClient.info().content.Swarm.LocalNodeState == "inactive"){
+        if (standAloneDockerHost()){
             // Given endpoint is not a Swarm manager. Deploy Flow service as a container.
-            def deployedContainer = getContainer(clusterEndPoint, serviceName)
+            def deployedContainer = getContainer(serviceName)
             def deployedContainerSpec = deployedContainer?.Spec
             def deployedContainerVersion = deployedContainer?.Version?.Index
             def (containerDefinition,encodedAuthConfig) = buildContainerPayload(serviceDetails, deployedContainer)
@@ -136,7 +235,7 @@ public class DockerClient extends BaseClient {
                   
         }else{
             // Given endpoint is a Swarm manager. Deploy Flow service as a swarm service.
-            def deployedService = getService(clusterEndPoint, serviceName)
+            def deployedService = getService(serviceName)
             def deployedServiceSpec = deployedService?.Spec
             def deployedServiceVersion = deployedService?.Version?.Index
             
@@ -212,7 +311,7 @@ public class DockerClient extends BaseClient {
      * Retrieves the Service instance from docker swarm cluster.
      * Returns null if no Service instance by the given name is found.
      */
-    def getService(String clusterEndPoint, String serviceName) {
+    def getService(String serviceName) {
 
         if (OFFLINE) return null
         
@@ -229,7 +328,7 @@ public class DockerClient extends BaseClient {
      * Retrieves the container instance from docker engine.
      * Returns null if no container instance by the given name is found.
      */
-    def getContainer(String clusterEndPoint, String serviceName) {
+    def getContainer(String serviceName) {
 
         if (OFFLINE) return null
         
@@ -240,6 +339,16 @@ public class DockerClient extends BaseClient {
                  return null
             }
 
+    }
+
+    /**
+     * Retrieves the container id from docker engine.
+     * Returns null if no container instance by the given name is found.
+     */
+    def getContainerId(String serviceName) {
+
+        def containers = dockerClient.ps([name:serviceName]).content
+        containers?.find{it}?.Id
     }
 
      Object doHttpGet(String requestUrl, String requestUri, String accessToken, boolean failOnErrorCode = true) {
@@ -268,7 +377,7 @@ public class DockerClient extends BaseClient {
 
     def buildServicePayload(Map args, def deployedService){
 
-        String serviceName = formatName(getServiceParameter(args, "serviceNameOverride", args.serviceName))
+        String serviceName = getServiceNameToUseForDeployment(args)
 
         def container = args.container[0]
         def imageName = "${container.imageName}:${container.imageVersion?:'latest'}"
@@ -389,8 +498,8 @@ public class DockerClient extends BaseClient {
         return mbs * 1048576 as int
     }
 
-    def deleteService(String clusterEndPoint,  def serviceName) {
-        serviceName = formatName(serviceName)
+    def deleteService(def serviceName) {
+
         def response = dockerClient.rmService(serviceName)
         logger INFO, "Deleted Service $serviceName. Response: $response\nWaiting for service cleanup..."
         def service = awaitServiceRemoved(serviceName, 5000)
@@ -420,7 +529,7 @@ public class DockerClient extends BaseClient {
 
     def buildContainerPayload(Map args, def deployedContainer){
 
-        String serviceName = formatName(getServiceParameter(args, "serviceNameOverride", args.serviceName))
+        String serviceName = getServiceNameToUseForDeployment(args)
 
         def container = args.container[0]
         def encodedAuthConfig
@@ -520,6 +629,10 @@ public class DockerClient extends BaseClient {
         }?.parameterValue
 
         return result != null ? result : defaultValue
+    }
+
+    def getServiceNameToUseForDeployment (def serviceDetails) {
+        formatName(getServiceParameter(serviceDetails, "serviceNameOverride", serviceDetails.serviceName))
     }
 }
  
