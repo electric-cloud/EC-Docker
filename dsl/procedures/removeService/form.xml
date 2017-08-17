@@ -21,11 +21,11 @@
         <label>Configuration:</label>
         <property>config</property>
         <required>1</required>
-        <documentation>The name of an existing configuration which holds all the connection information for the docker swarm cluster.</documentation>
+        <documentation>The name of an existing configuration which holds all the connection information for communicating with a stand-alone Docker host or a Docker Swarm cluster.</documentation>
     </formElement> 
     <formElement>
         <type>entry</type>
-        <label>Service name:</label>
+        <label>Service name in Docker:</label>
         <property>serviceName</property>
         <required>1</required>
         <documentation>The name of the Docker service that needs to be undeployed.</documentation>

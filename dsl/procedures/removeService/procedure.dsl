@@ -1,7 +1,7 @@
 import java.io.File
 
-procedure 'Deploy Service',
-	description: 'Deploys or updates a service on a stand-alone Docker host or a Docker Swarm cluster', {
+procedure 'Remove Docker Service',
+  description: 'Removes service deployed on a stand-alone Docker host or a Docker Swarm cluster.', {
 
 	step 'setup',
       subproject: '',
@@ -15,14 +15,15 @@ procedure 'Deploy Service',
 
     	  actualParameter 'additionalArtifactVersion', ''
     }
- 
-	step 'createOrUpdateDeployment',
-	  command: new File(pluginDir, 'dsl/procedures/deployService/steps/createOrUpdateDeployment.groovy').text,
+
+	step 'cleanup',
+	  command: new File(pluginDir, 'dsl/procedures/removeService/steps/removeService.groovy').text,
 	  errorHandling: 'failProcedure',
 	  exclusiveMode: 'none',
 	  postProcessor: 'postp',
 	  releaseMode: 'none',
 	  shell: 'ec-groovy',
 	  timeLimitUnits: 'minutes'
-	
+
 }
+  

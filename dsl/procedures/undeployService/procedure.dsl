@@ -1,7 +1,7 @@
 import java.io.File
 
-procedure 'Delete Service',
-  description: 'Deletes a Docker Swarm service.', {
+procedure 'Undeploy Service',
+	description: 'Undeploys a previously deployed service on a stand-alone Docker host or a Docker Swarm cluster', {
 
 	step 'setup',
       subproject: '',
@@ -16,8 +16,8 @@ procedure 'Delete Service',
     	  actualParameter 'additionalArtifactVersion', ''
     }
 
-	step 'cleanup',
-	  command: new File(pluginDir, 'dsl/procedures/deleteServices/steps/deleteServices.groovy').text,
+	step 'undeployService',
+	  command: new File(pluginDir, 'dsl/procedures/undeployService/steps/undeployService.groovy').text,
 	  errorHandling: 'failProcedure',
 	  exclusiveMode: 'none',
 	  postProcessor: 'postp',
@@ -26,4 +26,3 @@ procedure 'Delete Service',
 	  timeLimitUnits: 'minutes'
 
 }
-  

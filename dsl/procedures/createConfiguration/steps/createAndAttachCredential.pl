@@ -18,6 +18,7 @@
 # createAndAttachCredential.pl
 ##########################
 use ElectricCommander;
+use JSON;
 
 use constant {
 	SUCCESS => 0,
@@ -28,14 +29,13 @@ use constant {
 my $ec = new ElectricCommander();
 $ec->abortOnError(0);
 
-my $configName = "$[/myJob/config]";
+my $credName = "$[/myJob/config]";
 
 my $xpath = $ec->getFullCredential("credential");
 my $errors = $ec->checkAllErrors($xpath);
 my $clientID = $xpath->findvalue("//userName");
-
 my $clientSecret = $xpath->findvalue("//password");
-my $credName = $configName;
+
 my $projName = "$[/myProject/projectName]";
 
 # Create credential
@@ -43,8 +43,8 @@ $ec->deleteCredential($projName, $credName);
 $xpath = $ec->createCredential($projName, $credName, $clientID, $clientSecret);
 $errors .= $ec->checkAllErrors($xpath);
 
-#Give config the credential's real name
-my $configPath = "/projects/$projName/ec_plugin_cfgs/$configName";
+# Give config the credential's real name
+my $configPath = "/projects/$projName/ec_plugin_cfgs/$credName";
 $xpath = $ec->setProperty($configPath . "/credential", $credName);
 $errors .= $ec->checkAllErrors($xpath);
 
@@ -60,45 +60,25 @@ $xpath = $ec->createAclEntry("user", $user,
 $errors .= $ec->checkAllErrors($xpath);
 
 # Attach credential to steps that will need it
-$xpath = $ec->attachCredential($projName, $credName,
-    {procedureName => "Check Cluster",
-     stepName => "checkCluster"});
-$errors .= $ec->checkAllErrors($xpath);
-
-$xpath = $ec->attachCredential($projName, $credName,
-    {procedureName => "Deploy Service",
-     stepName => "createOrUpdateDeployment"});
-$errors .= $ec->checkAllErrors($xpath);
-
-$xpath = $ec->attachCredential($projName, $credName,
-    {procedureName => "Populate Certs",
-     stepName => "populateDockerClientCerts"});
-$errors .= $ec->checkAllErrors($xpath);
-
-$xpath = $ec->attachCredential($projName, $credName,
-    {procedureName => "Delete Service",
-     stepName => "cleanup"});
-$errors .= $ec->checkAllErrors($xpath);
-
-$xpath = $ec->attachCredential($projName, $credName,
-    {procedureName => "CreateConfiguration",
-     stepName => "testConnection"});
-$errors .= $ec->checkAllErrors($xpath);
-
-
-
- if ("$errors" ne "") {
-    my $errMsg = "Error creating configuration credential: " . $errors;
-    $ec->setProperty("/myJob/configError", $errMsg);
-    print $errMsg;
-    last;
- }
+my $stepsJSON = $ec->getPropertyValue("/projects/$projName/procedures/CreateConfiguration/ec_stepsWithAttachedCredentials");
+if (defined $stepsJSON && "$stepsJSON" ne "") {
+	#parse as json
+	my $steps = from_json($stepsJSON);
+    foreach my $step( @$steps ) { 
+		print "Attaching credential to procedure " . $step->{procedureName} . " at step " . $step->{stepName} . "\n";
+		my $apath = $ec->attachCredential($projName, $credName,
+										{procedureName => $step->{procedureName},
+										 stepName => $step->{stepName}});
+		$errors .= $ec->checkAllErrors($apath);
+	}
+}
 
 if ("$errors" ne "") {
     # Cleanup the partially created configuration we just created
-    my $configPath = "/projects/$projName/ec_plugin_cfgs/$configName";
     $ec->deleteProperty($configPath);
-
     $ec->deleteCredential($projName, $credName);
+    my $errMsg = "Error creating configuration credential: " . $errors;
+    $ec->setProperty("/myJob/configError", $errMsg);
+    print $errMsg;
     exit 1;
 }
