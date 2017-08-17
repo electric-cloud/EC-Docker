@@ -21,7 +21,7 @@
         <label>Configuration:</label>
         <property>config</property>
         <required>1</required>
-        <documentation>The name of an existing configuration which holds all the connection information for communicating with a stand-alone Docker host or a Docker Swarm cluster..</documentation>
+        <documentation>The name of an existing configuration which holds all the connection information for communicating with a stand-alone Docker host or a Docker Swarm cluster.</documentation>
     </formElement> 
     <formElement>
         <type>entry</type>
