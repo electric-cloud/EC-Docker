@@ -83,9 +83,9 @@
 
                 <p>For more information about Docker, go to the <a href="http://www.docker.com/">Docker home page</a>.</p>
 
-                <p>Plugin also supports Docker engines in swarm mode. The cluster management and orchestration features embedded in the Docker Engine are built using SwarmKit. A swarm is a cluster of Docker engines, or nodes, where you deploy services. When you create a service, you specify which container image to use and which commands to execute inside running containers.</p>
+                <p>Plugin also supports Docker engines in Swarm mode. The cluster management and orchestration features embedded in the Docker Engine are built using SwarmKit. Docker Swarm is a cluster of Docker engines, or nodes, where you deploy services. When you create a service, you specify which container image to use and which commands to execute inside running containers.</p>
 
-                <p>More information about Docker swarm can be found at <a href="https://docs.docker.com/engine/swarm/key-concepts/">Docker swarm key concepts</a>.</p>
+                <p>More information about Docker Swarm can be found at <a href="https://docs.docker.com/engine/swarm/key-concepts/">Docker Swarm key concepts</a>.</p>
         <!-- This section is required. Replace the plugin name, the URL to the website with the new plugin information, and the name of the link. -->
 
 			
@@ -96,7 +96,7 @@
         How deep does our integration go? Why should I care?
         What general functionality does the plugin include?
 				What functionality does the plugin omit? -->
-            <p>Plugin deploys ElectricFlow service as a single container or as a Docker swarm service based on whether given Docker endpoint is a stand-alone docker engine or swarm cluster manager. Plugin checks type of Docker endpoint at runtime and takes decision to deploy correct type of workload (container or swarm service) accordingly.</p>
+            <p>Plugin deploys ElectricFlow service as a single container or as a Docker Swarm service based on whether given Docker endpoint is a stand-alone Docker engine or Docker Swarm cluster manager. Plugin checks type of Docker endpoint at runtime and takes decision to deploy correct type of workload (container or Docker Swarm service) accordingly.</p>
 
             <p>The TLS mutual authentication and encryption is supported between Docker endpoint and the ElectricFlow agent.</p>
 
@@ -106,21 +106,21 @@
 
 
             <p>This plugin was tested against Docker Engine 17.06.</p>
-            <h2>Prerequists for deploying ElectricFlow service on stand-alone Docker engine</h2>
+            <h2>Prerequisite for deploying ElectricFlow service on stand-alone Docker engine</h2>
             <p>Docker engine daemon must listen on TCP socket. By default, daemon listens on Unix socket on linux/unix based OSs and on named pipe (npipe://) on windows. </p>
             <p>To make above changes, </p>
                 <ol>
                     <li>Add '{"hosts": ["tcp://IP:PORT"]}' entry in '/etc/docker/daemon.json' (on linux) and in 'C:\ProgramData\Docker\config\daemon.json' (on Windows) file .</li>
                     <li>Restart Docker daemon</li>
                 </ol>
-        <h2>Prerequists for deploying ElectricFlow service on Docker swarm cluster</h2>
-            <p>The swarm cluster must be already setup and swarm manager must be accessible over network.</p>
+        <h2>Prerequisite for deploying ElectricFlow service on Docker Swarm cluster</h2>
+            <p>Docker Swarm cluster must be already setup and Docker Swarm manager must be accessible over network.</p>
         
-        <h2>Prerequists for supporting TLS based authentication</h2>
+        <h2>Prerequisite for supporting TLS based authentication</h2>
             <p>In case of Docker endpoint supporting TLS based authentication, CA certificate (CA's public key), client's public and private keys are required. All three keys can be stored in plugin configuration.
                 More information about how to setup TLS certificates on Docker endpoint can be found <a href="https://github.com/docker/docker.github.io/blob/master/swarm/configure-tls.md">here</a>.</p>
-                <p>If the swarm cluster is on Docker EE then client certificates can be obtained from UCP (Universal Control Plane) from "User Profile" page by clicking on "Create a Client Bundle". Bundle contains all the required certificates. </p>
-                <p>In case of stand-alone docker engine and for swarm cluster on Docker CE, perform bellow steps to generate client side certificates using openssl utility:</p>
+                <p>If the Docker Swarm cluster is on Docker EE then client certificates can be obtained from UCP (Universal Control Plane) from "User Profile" page by clicking on "Create a Client Bundle". Bundle contains all the required certificates. </p>
+                <p>In case of stand-alone Docker engine and for Docker Swarm cluster on Docker CE, perform below steps to generate client side certificates using openssl utility:</p>
                 <p><b>Note:</b>If you already have access to a CA and certificates, you should skip this step 1.</p>
                 <p>Step 1: Setup CA server</p>
                 <ol>
@@ -191,7 +191,7 @@
             </div>  
             <div id="DeployService">
                 <h2>Deploy Service</h2>
-                <p>This procedure deploys container on stand-alone Docker engine or Docker swarm service to a already setup swarm cluster</p>
+                <p>This procedure deploys container on stand-alone Docker engine or Docker Swarm service on already setup Docker Swarm cluster</p>
                 <h3>Depoy Service Parameters</h3>
                 <table class="grid">
                     <thead>
