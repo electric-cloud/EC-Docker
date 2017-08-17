@@ -24,6 +24,8 @@ public class DockerClient extends BaseClient {
         if (pluginConfig.credential.password){
             // If docker client private key is provided in plugin config then enable TLS mode
             System.setProperty("docker.tls.verify", "1")
+        }else{
+            System.setProperty("docker.tls.verify", "")
         }
         dockerClient = new DockerClientImpl(pluginConfig.endpoint)
         

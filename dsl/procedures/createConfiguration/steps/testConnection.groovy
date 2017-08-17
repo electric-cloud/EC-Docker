@@ -33,6 +33,8 @@ if (efClient.toBoolean(actualParams.get('testConnection'))) {
 		keyFile.text = key.password
 		System.setProperty("docker.tls.verify", "1")
 		System.setProperty("docker.cert.path","${tempDir}/certs")
+    }else{
+        System.setProperty("docker.tls.verify", "")
     }
 
 	def endpoint = actualParams.get('endpoint')
