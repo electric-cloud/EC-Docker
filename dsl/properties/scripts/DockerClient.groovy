@@ -108,7 +108,7 @@ public class DockerClient extends BaseClient {
 
         if (OFFLINE) return null
 
-        String serviceName = formatName(serviceDetails.serviceName)
+        String serviceName = formatName(getServiceParameter(serviceDetails, "serviceNameOverride", serviceDetails.serviceName))
 
         if (dockerClient.info().content.Swarm.LocalNodeState == "inactive"){
             // Given endpoint is not a Swarm manager. Deploy Flow service as a container.
@@ -266,7 +266,8 @@ public class DockerClient extends BaseClient {
 
     def buildServicePayload(Map args, def deployedService){
 
-        def serviceName = formatName(args.serviceName)
+        String serviceName = formatName(getServiceParameter(args, "serviceNameOverride", args.serviceName))
+
         def container = args.container[0]
         def imageName = "${container.imageName}:${container.imageVersion?:'latest'}"
         def encodedAuthConfig
@@ -417,7 +418,7 @@ public class DockerClient extends BaseClient {
 
     def buildContainerPayload(Map args, def deployedContainer){
 
-        def serviceName = formatName(args.serviceName)
+        String serviceName = formatName(getServiceParameter(args, "serviceNameOverride", args.serviceName))
 
         def container = args.container[0]
         def encodedAuthConfig
@@ -511,5 +512,12 @@ public class DockerClient extends BaseClient {
        
     }
 
+    def getServiceParameter(Map args, String parameterName, def defaultValue = null) {
+        def result = args.parameterDetail?.find {
+            it.parameterName == parameterName
+        }?.parameterValue
+
+        return result != null ? result : defaultValue
+    }
 }
  
