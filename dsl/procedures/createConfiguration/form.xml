@@ -35,7 +35,7 @@
         <label>Docker Endpoint:</label>
         <property>endpoint</property>
         <required>1</required>
-        <documentation>The endpoint at which docker REST API will be reachable. Must be a IP address or a resolvable DNS name.</documentation>
+        <documentation>The endpoint at which Docker REST API will be reachable. Must be a IP address or a resolvable DNS name.</documentation>
     </formElement>
     <formElement>
         <type>textarea</type>
@@ -65,7 +65,7 @@
     <formElement> 
         <label>Test Connection:</label>    
         <property>testConnection</property> 
-        <documentation>Check this checkbox to verify connectivity to docker swarm manager.</documentation> 
+        <documentation>Check this checkbox to verify connectivity to the Docker endpoint.</documentation>
         <type>checkbox</type>   
         <checkedValue>true</checkedValue> 
         <uncheckedValue>false</uncheckedValue> 

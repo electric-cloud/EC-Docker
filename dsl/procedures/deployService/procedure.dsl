@@ -1,7 +1,7 @@
 import java.io.File
 
 procedure 'Deploy Service',
-	description: 'Creates or updates a Docker Swarm service.', {
+	description: 'Deploys or updates a service on a stand-alone Docker host or a Docker Swarm cluster', {
 
 	step 'setup',
       subproject: '',

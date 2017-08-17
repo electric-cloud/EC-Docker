@@ -8,8 +8,5 @@ def serviceName = '$[serviceName]'
 EFClient efClient = new EFClient()
 def pluginConfig = efClient.getConfigValues('ec_plugin_cfgs', configName, pluginProjectName)
 
-DockerClient dockerClient = new DockerClient(pluginConfig)
-
-String clusterEndpoint = pluginConfig.clusterEndpoint
-
-dockerClient.deleteService(clusterEndpoint,serviceName)
+DockerClient dockerClient = new DockerClient(pluginConfig, /*setupCertificates*/ true)
+dockerClient.undeployDockerService(serviceName)

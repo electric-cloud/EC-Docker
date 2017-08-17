@@ -1,7 +1,7 @@
 import java.io.File
 
-procedure 'Delete Service',
-  description: 'Deletes a Docker Swarm service.', {
+procedure 'Remove Docker Service',
+  description: 'Removes service deployed on a stand-alone Docker host or a Docker Swarm cluster.', {
 
 	step 'setup',
       subproject: '',
@@ -17,7 +17,7 @@ procedure 'Delete Service',
     }
 
 	step 'cleanup',
-	  command: new File(pluginDir, 'dsl/procedures/deleteServices/steps/deleteServices.groovy').text,
+	  command: new File(pluginDir, 'dsl/procedures/removeService/steps/removeService.groovy').text,
 	  errorHandling: 'failProcedure',
 	  exclusiveMode: 'none',
 	  postProcessor: 'postp',
