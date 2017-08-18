@@ -2,7 +2,7 @@
  * Docker API client
  */
 
-@Grab("de.gesellix:docker-client:2017-07-19T21-12-05")
+@Grab("de.gesellix:docker-client:2017-08-10T22-04-09")
 @Grab(group='ch.qos.logback', module='logback-classic', version='1.0.13')
 
 import de.gesellix.docker.client.DockerClientImpl
@@ -229,7 +229,7 @@ public class DockerClient extends BaseClient {
             }else{
                 
                 def (imageName,tag) = getContainerImage(serviceDetails)
-                def response = dockerClient.run(imageName, containerDefinition, tag, serviceName)
+                def response = dockerClient.run(imageName, containerDefinition, tag, serviceName, encodedAuthConfig)
                 logger INFO, "Created Container $serviceName. Response: $response"
             }
                   

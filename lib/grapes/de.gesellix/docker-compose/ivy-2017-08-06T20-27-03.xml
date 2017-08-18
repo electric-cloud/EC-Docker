@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ivy-module version="2.0" xmlns:m="http://ant.apache.org/ivy/maven">
 	<info organisation="de.gesellix"
-		module="docker-engine"
-		revision="2017-07-19T21-00-26"
+		module="docker-compose"
+		revision="2017-08-06T20-27-03"
 		status="release"
-		publication="20170720023030"
+		publication="20170807015707"
 	>
 		<description homepage="" />
 	</info>
@@ -21,18 +21,17 @@
 		<conf name="optional" visibility="public" description="contains all optional dependencies"/>
 	</configurations>
 	<publications>
-		<artifact name="docker-engine" type="jar" ext="jar" conf="master"/>
-		<artifact name="docker-engine" type="source" ext="jar" conf="sources" m:classifier="sources"/>
+		<artifact name="docker-compose" type="jar" ext="jar" conf="master"/>
+		<artifact name="docker-compose" type="source" ext="jar" conf="sources" m:classifier="sources"/>
 	</publications>
 	<dependencies>
-		<dependency org="org.codehaus.groovy" name="groovy" rev="2.4.11" force="true" conf="compile->compile(*),master(*);runtime->runtime(*)"/>
-		<dependency org="org.codehaus.groovy" name="groovy-json" rev="2.4.11" force="true" conf="compile->compile(*),master(*);runtime->runtime(*)"/>
 		<dependency org="org.jetbrains.kotlin" name="kotlin-stdlib-jre8" rev="1.1.3" force="true" conf="compile->compile(*),master(*);runtime->runtime(*)"/>
+		<dependency org="org.jetbrains.kotlin" name="kotlin-reflect" rev="1.1.3" force="true" conf="compile->compile(*),master(*);runtime->runtime(*)"/>
+		<dependency org="io.github.microutils" name="kotlin-logging" rev="1.4.6" force="true" conf="compile->compile(*),master(*);runtime->runtime(*)"/>
 		<dependency org="org.slf4j" name="slf4j-api" rev="1.7.25" force="true" conf="compile->compile(*),master(*);runtime->runtime(*)"/>
-		<dependency org="com.squareup.okio" name="okio" rev="1.13.0" force="true" conf="compile->compile(*),master(*);runtime->runtime(*)"/>
-		<dependency org="com.squareup.okhttp3" name="okhttp" rev="3.8.1" force="true" conf="compile->compile(*),master(*);runtime->runtime(*)"/>
-		<dependency org="org.apache.commons" name="commons-compress" rev="1.14" force="true" conf="compile->compile(*),master(*);runtime->runtime(*)"/>
-		<dependency org="de.gesellix" name="docker-filesocket" rev="2017-06-24T14-21-18" force="true" conf="compile->compile(*),master(*);runtime->runtime(*)"/>
-		<dependency org="org.bouncycastle" name="bcpkix-jdk15on" rev="1.57" force="true" conf="compile->compile(*),master(*);runtime->runtime(*)"/>
+		<dependency org="org.yaml" name="snakeyaml" rev="1.18" force="true" conf="compile->compile(*),master(*);runtime->runtime(*)"/>
+		<dependency org="com.squareup.moshi" name="moshi" rev="1.5.0" force="true" conf="compile->compile(*),master(*);runtime->runtime(*)"/>
+		<dependency org="com.squareup.moshi" name="moshi-kotlin" rev="1.5.0" force="true" conf="compile->compile(*),master(*);runtime->runtime(*)"/>
+		<dependency org="com.google.re2j" name="re2j" rev="1.1" force="true" conf="compile->compile(*),master(*);runtime->runtime(*)"/>
 	</dependencies>
 </ivy-module>
