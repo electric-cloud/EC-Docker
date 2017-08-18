@@ -4,7 +4,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>de.gesellix</groupId>
   <artifactId>docker-compose</artifactId>
-  <version>2017-06-24T14-17-28</version>
+  <version>2017-08-06T20-27-03</version>
   <dependencies>
     <dependency>
       <groupId>org.jetbrains.kotlin</groupId>
@@ -21,7 +21,7 @@
     <dependency>
       <groupId>io.github.microutils</groupId>
       <artifactId>kotlin-logging</artifactId>
-      <version>1.4.5</version>
+      <version>1.4.6</version>
       <scope>compile</scope>
     </dependency>
     <dependency>
