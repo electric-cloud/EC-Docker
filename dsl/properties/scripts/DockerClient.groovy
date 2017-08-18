@@ -398,14 +398,26 @@ public class DockerClient extends BaseClient {
             encodedAuthConfig = authConfig.bytes.encodeBase64().toString()
         }
 
-        def mounts = [:]
-        mounts= (parseJsonToList(container.volumeMounts)).collect { mount ->
-                                    [
+        def mounts = []
+        for(mount in parseJsonToList(container.volumeMounts)){
+            for(svcMount in parseJsonToList(args.volumes)){
+                if(mount.name==svcMount.name){
+                    if(svcMount.hostPath){
+                        mounts << [
+                                        Source: svcMount.hostPath,
+                                        Target: mount.mountPath,
+                                        Type: "bind"
+                                  ]
+                    }else{
+                        mounts << [
                                         Source: formatName(mount.name),
-                                        Target: mount.mountPath
-                                    ]
-
-                    }
+                                        Target: mount.mountPath,
+                                        Type: "volume"
+                                  ]
+                    }                 
+                }
+            }
+        }
 
         def env = [:]
         env = container.environmentVariable?.collect { envVar ->
