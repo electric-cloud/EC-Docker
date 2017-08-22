@@ -2,19 +2,6 @@ import java.io.File
 
 procedure 'CreateConfiguration',
         description: 'Creates a configuration for a stand-alone Docker host or Docker Swarm manager', {
-
-    step 'setup',
-      subproject: '',
-      subprocedure: 'Setup',
-      command: null,
-      errorHandling: 'failProcedure',
-      exclusiveMode: 'none',
-      postProcessor: 'postp',
-      releaseMode: 'none',
-      timeLimitUnits: 'minutes', {
-
-          actualParameter 'additionalArtifactVersion', ''
-    }
     
     step 'testConnection',
             command: new File(pluginDir, 'dsl/procedures/createConfiguration/steps/testConnection.groovy').text,

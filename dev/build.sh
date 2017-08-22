@@ -11,7 +11,7 @@ fi
 
 rm ./EC-Docker.jar
 
-jar cvf ./EC-Docker.jar dsl/ META-INF/ pages/ lib/ htdocs/
+jar cvf ./EC-Docker.jar dsl/ META-INF/ pages/ htdocs/
 
 if [ $DEPLOY -eq 1 ]; then
   echo "Installing plugin ..."

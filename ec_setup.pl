@@ -57,33 +57,6 @@ $logfile .= $dslReponse->findnodes_as_string("/");
 
 my $errorMessage = $commander->getError();
 if ( !$errorMessage ) {
-
-    # This is here because we cannot do publishArtifactVersion in dsl today
-
-    # delete artifact if it exists first
-    $commander->deleteArtifactVersion("com.electriccloud:EC-Docker-Grapes:1.0.0");
-
-    if ( $promoteAction eq "promote" ) {
-
-        #publish jars to the repo server if the plugin project was created successfully
-        my $am = new ElectricCommander::ArtifactManagement($commander);
-        my $artifactVersion = $am->publish(
-            {   groupId         => "com.electriccloud",
-                artifactKey     => "EC-Docker-Grapes",
-                version         => "1.0.0",
-                includePatterns => "**",
-                fromDirectory   => "$pluginDir/lib/grapes",
-                description => "JARs that EC-DockerSwarm plugin procedures depend on"
-            }
-        );
-
-        # Print out the xml of the published artifactVersion.
-        $logfile .= $artifactVersion->xml() . "\n";
-
-        if ( $artifactVersion->diagnostics() ) {
-            $logfile .= "\nDetails:\n" . $artifactVersion->diagnostics();
-        }
-    }
 }
 # Create output property for plugin setup debug logs
 my $nowString = localtime;
