@@ -200,7 +200,7 @@ abstract class BasePlugin extends DslDelegatingScript {
 				formalParameter "$formElement.property",
 						defaultValue: formElement.value,
 						required: formElement.required,
-						description: formElement.description,
+						description: formElement.documentation,
 						type: formElement.type,
 						label: formElement.label
 
