@@ -36,6 +36,8 @@
     				<ul>
     				<li><a href="#ProvisionCluster">Check Cluster</a></li>
     				<li><a href="#DeployService">Deploy Service</a></li>
+                    <li><a href="#UndeployService">Undeploy Service</a></li>
+                    <li><a href="#RemoveDockerService">Remove Docker Service</a></li>
                     <li><a href="#runDockerBuild">runDockerBuild</a></li>
                     <li><a href="#runDockerPull">runDockerPull</a></li>
                     <li><a href="#runDockerRun">runDockerRun</a></li>
@@ -192,7 +194,7 @@
             <div id="DeployService">
                 <h2>Deploy Service</h2>
                 <p>This procedure deploys container on stand-alone Docker engine or Docker Swarm service on already setup Docker Swarm cluster</p>
-                <h3>Depoy Service Parameters</h3>
+                <h3>Deploy Service Parameters</h3>
                 <table class="grid">
                     <thead>
                         <tr>
@@ -231,7 +233,89 @@
                         </tr>
                     </tbody>
                 </table>
-            </div>   
+            </div>
+            <div id="UndeployService">
+                <h2>Undeploy Service</h2>
+                <p>Undeploys a previously deployed service on a stand-alone Docker host or a Docker Swarm cluster</p>
+
+                <h3>Undeploy Service Parameters</h3>
+                <table class="grid">
+                    <thead>
+                        <tr>
+                            <th>Parameter</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+
+                        <tr>
+                            <td>Application Name</td>
+                            <td>The name of the application that the service belongs to. Not applicable for a top-level service.</td>
+                        </tr>
+
+                        <tr>
+                            <td>Application Revision ID</td>
+                            <td>Revision Id of the application version that the service belongs to.</td>
+                        </tr>
+
+                        <tr>
+                            <td>Cluster Name</td>
+                            <td>The name of the cluster in the environment on which the service was previously deployed. If not specified, the application tier mapping will be used to find the cluster name.</td>
+                        </tr>
+
+                        <tr>
+                            <td class="required">Environment Name</td>
+                            <td>The name of the environment that the cluster belongs to.</td>
+                        </tr>
+
+                        <tr>
+                            <td>Environment Project Name</td>
+                            <td>The name of the project that the environment belongs to. If not specified, the environment is assumed to be in the same project as the service.</td>
+                        </tr>
+
+                        <tr>
+                            <td class="required">Service Name*</td>
+                            <td>The name of the service in Deploy that encapsulates the service that was previously deployed on a stand-alone Docker host or a Docker Swarm cluster.</td>
+                        </tr>
+
+                        <tr>
+                            <td class="required">Project Name</td>
+                            <td>The name of the project that the service belongs to. In case of an application-level service it also owns the application.</td>
+                        </tr>
+
+                    </tbody>
+                </table>
+
+            </div>
+            <div id="RemoveDockerService">
+                <h2>Remove Docker Service</h2>
+                <p>Removes service deployed on a stand-alone Docker host or a Docker Swarm cluster.</p>
+
+                <h3>Remove Docker Service Parameters</h3>
+                <table class="grid">
+                    <thead>
+                        <tr>
+                            <th>Parameter</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+
+                        <tr>
+                            <td class="required">Configuration</td>
+                            <td>The name of an existing configuration which holds all the connection information for communicating with a stand-alone Docker host or a Docker Swarm cluster.</td>
+                        </tr>
+
+                        <tr>
+                            <td class="required">Service name in Docker</td>
+                            <td>The name of the Docker service that needs to be undeployed.</td>
+                        </tr>
+
+                    </tbody>
+                </table>
+
+            </div>
+
 
             <div class="procedure" id="runDockerBuild">
 
@@ -242,6 +326,7 @@
             <p>Use this procedure to build a Docker image. Docker can build images automatically from a source
 
             repository using the instructions in a Dockerfile.</p>
+            <p><b>Note:</b> This procedure does not use the plugin configuration to connect to a Docker host. It uses the Docker command line <i>docker</i> on the resource that the procedure step is running on to interact with the Docker engine. The procedure expects any required Docker client config files to be available in the default location at $HOME/.docker on the resource.</p>
 
             <h3>Input</h3>
 
@@ -317,6 +402,8 @@
 
              <p>Use this procedure to make a Docker pull request to let others know about the changes you have pushed
              to the repository.</p>
+
+             <p><b>Note:</b> This procedure does not use the plugin configuration to connect to a Docker host. It uses the Docker command line <i>docker</i> on the resource that the procedure step is running on to interact with the Docker engine. The procedure expects any required Docker client config files to be available in the default location at $HOME/.docker on the resource.</p>
 
             <h3>Input</h3>
 
@@ -396,6 +483,7 @@
              <p>Use this procedure to run a process in an isolated container. Docker runs the process
              in its own file system, network, and  isolated process tree. Starting with an image, Docker runs
              the process to create a container.</p>
+             <p><b>Note:</b> This procedure does not use the plugin configuration to connect to a Docker host. It uses the Docker command line <i>docker</i> on the resource that the procedure step is running on to interact with the Docker engine. The procedure expects any required Docker client config files to be available in the default location at $HOME/.docker on the resource.</p>
 
             <h3>Input</h3>
 
@@ -616,6 +704,8 @@
                     <li>Windows Docker containers on Windows 2016</li>
                 </ul>
             </li>
+            <li>Added procedure <i>Undeploy Service</i> to undeploy a previously deployed service.</li>
+            <li>Added procedure <i>Remove Docker Service</i> to remove a service running on a stand-alone Docker host or a Docker Swarm cluster.</li>
             <li>Removed support for using EC-Docker as a 'component' plugin. Micro-services based applications should be modeled as applications with services. The services can then be deployed using the native ElectricFlow services deployment capability.</li>
         </ul>
 

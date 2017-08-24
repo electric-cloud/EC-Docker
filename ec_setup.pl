@@ -73,7 +73,7 @@ if ( !$errorMessage ) {
                 version         => "1.0.0",
                 includePatterns => "**",
                 fromDirectory   => "$pluginDir/lib/grapes",
-                description => "JARs that EC-DockerSwarm plugin procedures depend on"
+                description => "JARs that EC-Docker plugin procedures depend on"
             }
         );
 
