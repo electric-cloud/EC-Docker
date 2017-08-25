@@ -2,7 +2,7 @@
  * Docker API client
  */
 
-@Grab("de.gesellix:docker-client:2017-08-10T22-04-09")
+@Grab("de.gesellix:docker-client:2017-08-17T20-47-30")
 @Grab(group='ch.qos.logback', module='logback-classic', version='1.0.13')
 
 import de.gesellix.docker.client.DockerClientImpl
