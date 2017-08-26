@@ -4,7 +4,7 @@
 		module="xml-resolver"
 		revision="1.2"
 		status="release"
-		publication="20061222053752"
+		publication="20080831044501"
 	>
 		<description homepage="http://xml.apache.org/commons/components/resolver/">
 		xml-commons provides an Apache-hosted set of DOM, SAX, and 

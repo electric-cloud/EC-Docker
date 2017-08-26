@@ -72,7 +72,7 @@ if ( !$errorMessage ) {
                 artifactKey     => "EC-Docker-Grapes",
                 version         => "1.0.1",
                 includePatterns => "**",
-                fromDirectory   => "$pluginDir/lib/grapes",
+                fromDirectory   => "$pluginDir/lib",
                 description => "JARs that EC-Docker plugin procedures depend on"
             }
         );

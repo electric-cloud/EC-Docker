@@ -80,7 +80,7 @@
                         artifactKey     =&gt; &quot;EC-Docker-Grapes&quot;,
                         version         =&gt; &quot;1.0.1&quot;,
                         includePatterns =&gt; &quot;**&quot;,
-                        fromDirectory   =&gt; &quot;$pluginDir/lib/grapes&quot;,
+                        fromDirectory   =&gt; &quot;$pluginDir/lib&quot;,
                         description =&gt; &quot;JARs that EC-Docker plugin procedures depend on&quot;
                     });
 

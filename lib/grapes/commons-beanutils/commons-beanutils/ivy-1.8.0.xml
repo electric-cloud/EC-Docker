@@ -4,7 +4,7 @@
 		module="commons-beanutils"
 		revision="1.8.0"
 		status="release"
-		publication="20080828092124"
+		publication="20170627130528"
 	>
 		<description homepage="http://commons.apache.org/beanutils/">
 		BeanUtils provides an easy-to-use but flexible wrapper around reflection and introspection.

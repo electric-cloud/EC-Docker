@@ -4,7 +4,7 @@
 		module="http-builder"
 		revision="0.7.1"
 		status="release"
-		publication="20140225103908"
+		publication="20140225103900"
 	>
 		<license name="The Apache Software License, Version 2.0" url="http://www.apache.org/licenses/LICENSE-2.0.txt" />
 		<description homepage="http://groovy.codehaus.org/modules/http-builder/">

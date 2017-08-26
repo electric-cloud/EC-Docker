@@ -4,6 +4,7 @@
 
 @Grab("de.gesellix:docker-client:2017-08-17T20-47-30")
 @Grab(group='ch.qos.logback', module='logback-classic', version='1.0.13')
+@GrabExclude(group='org.codehaus.groovy', module='groovy', version='2.4.11')
 
 import de.gesellix.docker.client.DockerClientImpl
 
