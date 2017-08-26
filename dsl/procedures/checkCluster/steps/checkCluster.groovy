@@ -6,6 +6,9 @@ def configName = '$[config]'
 
 EFClient efClient = new EFClient()
 def pluginConfig = efClient.getConfigValues('ec_plugin_cfgs', configName, pluginProjectName)
-DockerClient dockerClient = new DockerClient(pluginConfig)
 
-dockerClient.checkHealth()
+def result = DockerClient.checkConnection(pluginConfig)
+if (!result.success) {
+    def endpoint = pluginConfig.get('endpoint')
+    efClient.handleProcedureError("Connection check for Docker endpoint '${endpoint}' failed: ${result.text}")
+}

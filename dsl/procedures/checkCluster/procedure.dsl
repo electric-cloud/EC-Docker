@@ -1,7 +1,7 @@
 import java.io.File
 
 procedure 'Check Cluster', 
-	description: 'Checks that a docker endpoint (engine/swamr manager) exists and is reachable over REST API.', {
+	description: 'Checks that the Docker endpoint specified in the plugin configuration is reachable', {
 
 	step 'setup',
       subproject: '',
@@ -14,19 +14,6 @@ procedure 'Check Cluster',
       timeLimitUnits: 'minutes', {
 
     	  actualParameter 'additionalArtifactVersion', ''
-    }
-
-    step 'setupCerts',
-      subproject: '',
-      subprocedure: 'Populate Certs',
-      command: null,
-      errorHandling: 'failProcedure',
-      exclusiveMode: 'none',
-      postProcessor: 'postp',
-      releaseMode: 'none',
-      timeLimitUnits: 'minutes', {
-
-        actualParameter 'config', '$[config]'
     }
 
 	step 'checkCluster',

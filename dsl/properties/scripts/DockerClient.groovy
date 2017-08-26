@@ -13,42 +13,38 @@ public class DockerClient extends BaseClient {
     def pluginConfig
     def certificatesDir
 
-    DockerClient(def pluginConfiguration, boolean setupCertificates = false){
+    DockerClient(def pluginConfiguration){
 
         this.pluginConfig = pluginConfiguration
-        if (setupCertificates) {
-            def pathSeparator = File.separator
-            def uniqueName = System.currentTimeMillis()
-            def homeDir = System.getProperty('user.home')
 
-            this.certificatesDir = "${homeDir}${pathSeparator}.docker${pathSeparator}cert${pathSeparator}${uniqueName}"
-            File dir = new File(this.certificatesDir)
-            dir.mkdirs()
+        def pathSeparator = File.separator
+        def uniqueName = System.currentTimeMillis()
+        def homeDir = System.getProperty('user.home')
 
-            if (pluginConfig.cacert) {
-                File cacertFile = new File("${this.certificatesDir}${pathSeparator}ca.pem")
-                cacertFile.text = pluginConfig.cacert
-            }
+        this.certificatesDir = "${homeDir}${pathSeparator}.docker${pathSeparator}cert${pathSeparator}${uniqueName}"
+        File dir = new File(this.certificatesDir)
+        dir.mkdirs()
+        dir.deleteOnExit()
 
-            if (pluginConfig.cert) {
-                File clientcertFile = new File("${this.certificatesDir}${pathSeparator}cert.pem")
-                clientcertFile.text = pluginConfig.cert
-            }
-
-            if (pluginConfig.credential?.password) {
-                File clientkeyFile = new File("${this.certificatesDir}${pathSeparator}key.pem")
-                clientkeyFile.text = pluginConfig.credential.password
-            }
-
-            System.setProperty("docker.cert.path","${this.certificatesDir}")
-
-        } else {
-            //TODO: remove this block once all usage is switch to setupCertificates=true
-            def homeDir = System.getProperty('user.home')
-            def pathSeparator = File.separator
-            def certDir = "${homeDir}${pathSeparator}.docker${pathSeparator}cert"
-            System.setProperty("docker.cert.path","${certDir}")
+        if (pluginConfig.cacert) {
+            File cacertFile = new File("${this.certificatesDir}${pathSeparator}ca.pem")
+            cacertFile.text = pluginConfig.cacert
+            cacertFile.deleteOnExit()
         }
+
+        if (pluginConfig.cert) {
+            File clientcertFile = new File("${this.certificatesDir}${pathSeparator}cert.pem")
+            clientcertFile.text = pluginConfig.cert
+            clientcertFile.deleteOnExit()
+        }
+
+        if (pluginConfig.credential?.password) {
+            File clientkeyFile = new File("${this.certificatesDir}${pathSeparator}key.pem")
+            clientkeyFile.text = pluginConfig.credential.password
+            clientkeyFile.deleteOnExit()
+        }
+
+        System.setProperty("docker.cert.path","${this.certificatesDir}")
 
         if (pluginConfig.credential.password){
             // If docker client private key is provided in plugin config then enable TLS mode
@@ -62,24 +58,51 @@ public class DockerClient extends BaseClient {
     }
 
 
-   /*   Function exits with return value 1 if docker endpoint specified
-    *   in plugin configuration is not reachable. In case of swarm mode,
-    *   whether the endpoint is swarm manager and is in active state or
-    *   not is checked.
-    */
-    def checkHealth(){
-
-
-            try{
-                def info = dockerClient.info().content
-                logger DEBUG, "${info}"
-
-            }catch(Exception e){
-                    // Given node is not a swarm manager
-                    logger ERROR, "${e}"
-                    logger ERROR, "${pluginConfig.endpoint} is not Swarm Manager. Exiting.."
-                    exit 1
+    /**
+     * Checks connection to the docker end-point, whether stand-alone
+     * or Swarm.
+     * Returns response object with following attributes:
+     * o success: true|false
+     * o code: success or error code from the DockerClient.
+     * o text: success or error message.
+     * Use the code and text for information/debugging purposes as
+     * these may not be set by the DockerClient.
+     */
+    def checkConnection(){
+        try{
+            def status = dockerClient.info()?.status
+            logger INFO, "DockerClient status: ${status}"
+            if (status instanceof de.gesellix.docker.engine.EngineResponseStatus) {
+                [
+                        success: status.success,
+                        code: status.code,
+                        text: status.text
+                ]
+            } else {
+                [
+                        success: false,
+                        text: "unknown reason"
+                ]
             }
+        } catch(Exception e){
+            [
+                    success: false,
+                    text: "${e}"
+            ]
+        }
+    }
+
+    def static checkConnection(def pluginParams) {
+
+        try {
+            DockerClient dockerClient = new DockerClient(pluginParams)
+            dockerClient.checkConnection()
+        } catch(Exception e){
+            [
+                    success: false,
+                    text: "${e}"
+            ]
+        }
     }
 
      def getPluginConfig(EFClient efClient, String clusterName, String clusterOrEnvProjectName, String environmentName) {
@@ -134,17 +157,6 @@ public class DockerClient extends BaseClient {
             }
         }
         */
-    }
-
-    def cleanupDirs() {
-        logger DEBUG, "Cleaning up certificate dir: '${this.certificatesDir}'"
-        if (this.certificatesDir) {
-            def dir = new File(this.certificatesDir)
-            if (dir.exists() && dir.isDirectory()) {
-                def result = dir.deleteDir()
-                logger DEBUG, "Dir: '${dir.absolutePath}' deleted: $result"
-            }
-        }
     }
 
     def undeployService(

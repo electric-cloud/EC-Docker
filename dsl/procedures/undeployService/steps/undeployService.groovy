@@ -31,23 +31,18 @@ def clusterParameters = efClient.getProvisionClusterParameters(clusterName, envP
 
 def pluginConfig = efClient.getConfigValues('ec_plugin_cfgs', clusterParameters.config, pluginProjectName)
 
-DockerClient dockerClient
-try {
-	dockerClient = new DockerClient(pluginConfig, /*setupCertificates*/ true)
+DockerClient dockerClient = new DockerClient(pluginConfig)
 
-	def clusterEndpoint = pluginConfig.endpoint
+def clusterEndpoint = pluginConfig.endpoint
 
-	dockerClient.undeployService(
-			efClient,
-			clusterEndpoint,
-			serviceName,
-			serviceProjectName,
-			applicationName,
-			applicationRevisionId,
-			clusterName,
-			envProjectName,
-			environmentName)
+dockerClient.undeployService(
+		efClient,
+		clusterEndpoint,
+		serviceName,
+		serviceProjectName,
+		applicationName,
+		applicationRevisionId,
+		clusterName,
+		envProjectName,
+		environmentName)
 
-} finally {
-	dockerClient?.cleanupDirs()
-}
