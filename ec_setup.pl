@@ -61,7 +61,7 @@ if ( !$errorMessage ) {
     # This is here because we cannot do publishArtifactVersion in dsl today
 
     # delete artifact if it exists first
-    $commander->deleteArtifactVersion("com.electriccloud:EC-Docker-Grapes:1.0.0");
+    $commander->deleteArtifactVersion("com.electriccloud:EC-Docker-Grapes:1.0.1");
 
     if ( $promoteAction eq "promote" ) {
 
@@ -70,7 +70,7 @@ if ( !$errorMessage ) {
         my $artifactVersion = $am->publish(
             {   groupId         => "com.electriccloud",
                 artifactKey     => "EC-Docker-Grapes",
-                version         => "1.0.0",
+                version         => "1.0.1",
                 includePatterns => "**",
                 fromDirectory   => "$pluginDir/lib/grapes",
                 description => "JARs that EC-Docker plugin procedures depend on"
