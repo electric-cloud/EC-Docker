@@ -1,7 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ivy-module version="2.0" xmlns:m="http://ant.apache.org/ivy/maven">
-	<info organisation="de.gesellix" module="docker-compose" revision="2017-08-13T22-45-16" status="release" publication="20170813154520">
-		<description homepage=""/>
+	<info organisation="de.gesellix"
+		module="docker-compose"
+		revision="2017-08-13T22-45-16"
+		status="release"
+		publication="20170813154520"
+	>
+		<description homepage="" />
 	</info>
 	<configurations>
 		<conf name="default" visibility="public" description="runtime dependencies and master artifact can be used with this conf" extends="runtime,master"/>

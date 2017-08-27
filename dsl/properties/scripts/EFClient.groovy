@@ -13,6 +13,12 @@ public class EFClient extends BaseClient {
         url
     }
 
+    Object doHttpDelete(String requestUri, boolean failOnErrorCode = true, def query = null) {
+        def sessionId = System.getenv('COMMANDER_SESSIONID')
+        doHttpRequest(DELETE, getServerUrl(), requestUri, ['Cookie': "sessionId=$sessionId"],
+                failOnErrorCode, /*requestBody*/ null, query)
+    }
+
     Object doHttpGet(String requestUri, boolean failOnErrorCode = true, def query = null) {
         def sessionId = System.getenv('COMMANDER_SESSIONID')
         doHttpRequest(GET, getServerUrl(), requestUri, ['Cookie': "sessionId=$sessionId"],
@@ -22,6 +28,17 @@ public class EFClient extends BaseClient {
     Object doHttpPost(String requestUri, Object requestBody, boolean failOnErrorCode = true, def query = null) {
         def sessionId = System.getenv('COMMANDER_SESSIONID')
         doHttpRequest(POST, getServerUrl(), requestUri, ['Cookie': "sessionId=$sessionId"], failOnErrorCode, requestBody, query)
+    }
+
+    def getApplication(def projectName, def applicationName) {
+
+        def result = doHttpGet("/rest/v1.0/projects/$projectName/applications/$applicationName", /*failOnErrorCode*/ false)
+        result.data
+    }
+
+    def deleteApplication(def projectName, def applicationName) {
+
+        doHttpDelete("/rest/v1.0/projects/$projectName/applications/$applicationName")
     }
 
     def getConfigValues(def configPropertySheet, def config, def pluginProjectName) {
@@ -173,6 +190,62 @@ public class EFClient extends BaseClient {
         ]
 
         doHttpPost("/rest/v1.0/properties", /* request body */ payload)
+    }
+
+
+    def evalDsl(String dslStr) {
+        // Run the dsl in the context of a job-step by default
+        def jobStepId = '$[/myJobStep/jobStepId]'
+        def payload = [:]
+        payload << [
+                dsl: dslStr,
+                jobStepId: jobStepId
+        ]
+
+        doHttpPost("/rest/v1.0/server/dsl", /* request body */ payload)
+    }
+
+    def buildApplicationDsl(def projectName, def applicationName, def composeConfig) {
+
+        def servicesDsl = ''
+        composeConfig.services.each { name, serviceConfig ->
+            def serviceDsl = buildServiceDsl(name, serviceConfig)
+            servicesDsl += "\n$serviceDsl"
+        }
+
+        """
+        application '$applicationName', projectName: '$projectName', {
+            $servicesDsl
+        }
+        """.toString()
+    }
+
+    def buildServiceDsl(def name, def serviceConfig) {
+
+        String[] imageInfo = serviceConfig.image?.split(':')
+        def image = ''
+        def version = ''
+        if (imageInfo && imageInfo.length > 0) {
+            image = imageInfo[0]
+            if (imageInfo.length > 1) {
+                version = imageInfo[1]
+            }
+        }
+
+        def command = serviceConfig.command?.parts?.join(',') ?: ''
+        def entrypoint = serviceConfig.entrypoint?:''
+
+        """
+        service '$name', {
+
+            container '$name', {
+              command = '$command'
+              entryPoint = '$entrypoint'
+              imageName = '$image'
+              imageVersion = '$version'
+            }
+        }
+        """.toString()
     }
 }
 
