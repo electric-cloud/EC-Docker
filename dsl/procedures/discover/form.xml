@@ -29,13 +29,23 @@
         <label>Project:</label>
         <property>project</property>
         <required>1</required>
-        <documentation>Name of the project in which application would be created</documentation>
+        <documentation>Name of the project in which application would be created.</documentation>
     </formElement>
     <formElement>
         <type>entry</type>
         <label>Application:</label>
         <property>application</property>
         <required>1</required>
-        <documentation>Name of the application created as part of discovery</documentation>
+        <documentation>Name of the application to be created as part of discovery.</documentation>
+    </formElement>
+    <formElement>
+        <type>checkbox</type>
+        <label>Recreate application:</label>
+        <property>recreate_application</property>
+        <required>0</required>
+        <documentation>Whether the application should be deleted if it already exists before recreating it based on the Docker Compose file content. If not checked, and the application already exists, the application will not be modified.</documentation>
+        <checkedValue>1</checkedValue>
+        <uncheckedValue>0</uncheckedValue>
+        <initiallyChecked>0</initiallyChecked>
     </formElement>
 </editor>

@@ -7,6 +7,8 @@
 @GrabExclude(group='org.codehaus.groovy', module='groovy', version='2.4.11')
 
 import de.gesellix.docker.client.DockerClientImpl
+import de.gesellix.docker.compose.ComposeFileReader
+import de.gesellix.docker.compose.types.ComposeConfig
 
 public class DockerClient extends BaseClient {
 
@@ -688,6 +690,17 @@ public class DockerClient extends BaseClient {
 
     def getServiceNameToUseForDeployment (def serviceDetails) {
         formatName(getServiceParameter(serviceDetails, "serviceNameOverride", serviceDetails.serviceName))
+    }
+
+    static def readCompose(String filePath) {
+
+        File composeFile = new File(filePath)
+        def composeStream = new FileInputStream(composeFile)
+        String workingDir = composeFile.parent
+        ComposeFileReader composeFileReader = new ComposeFileReader()
+        ComposeConfig composeConfig = composeFileReader.load(composeStream, workingDir, System.getenv())
+        logger INFO, "composeContent: $composeConfig}"
+        composeConfig
     }
 }
  

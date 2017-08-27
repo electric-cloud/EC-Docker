@@ -649,7 +649,12 @@
 
                     <tr>
                         <td class='required'>Application</td>
-                        <td>Name of the application created as part of discovery.</td>
+                        <td>Name of the application to be created as part of discovery.</td>
+                    </tr>
+
+                    <tr>
+                        <td>Recreate application</td>
+                        <td>Whether the application should be deleted if it already exists before recreating it based on the Docker Compose file content. If not checked, and the application already exists, the application will not be modified.</td>
                     </tr>
                 </tbody>
             </table>

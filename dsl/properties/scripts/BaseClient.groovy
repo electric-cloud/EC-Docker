@@ -122,7 +122,7 @@ public class BaseClient {
         System.exit(-1)
     }
 
-    def logger(Integer level, def message) {
+    def static logger(Integer level, def message) {
         if ( level >= logLevel ) {
             println message
         }
