@@ -193,7 +193,7 @@
             </div>  
             <div id="DeployService">
                 <h2>Deploy Service</h2>
-                <p>This procedure deploys container on stand-alone Docker engine or Docker Swarm service on already setup Docker Swarm cluster</p>
+                <p>This procedure deploys container on stand-alone Docker engine or Docker Swarm service on already setup Docker Swarm cluster. In case of Docker Swarm service, plugin also creates overlay network with name "&lt;flow_application_name&gt;-default" if it does not exists already. Name / type of the network can be overridden in service mapping override page. Type of Docker networks supported are "Overlay" and "Ingress". </p>
                 <h3>Deploy Service Parameters</h3>
                 <table class="grid">
                     <thead>

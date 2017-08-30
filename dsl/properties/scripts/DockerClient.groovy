@@ -221,11 +221,46 @@ public class DockerClient extends BaseClient {
         dockerClient.info().content.Swarm.LocalNodeState == "inactive"
     }
 
+    def createNetwork(def serviceDetails){
+
+        String networkName = getNetworkName(serviceDetails)
+        String networkType = getNetworkType(serviceDetails)
+
+        if(!findNetwork(networkName)){
+
+            logger INFO, "Creating $networkName $networkType network."
+
+            def ingress
+
+            if(networkType == "ingress"){
+                ingress = true
+            }else{
+                ingress = false
+            }
+
+            def payload = [
+                    Driver: "overlay",
+                    "IPAM": [
+                            "Driver": "default"
+                    ],
+                    "Ingress" : ingress,
+                    "Scope": "swarm"
+            ]
+
+            def response = dockerClient.createNetwork(networkName, payload)
+            logger INFO, "Created network $networkName."
+        } else {
+            logger INFO, "Network $networkName already exists."
+        }
+    }
+
     def createOrUpdateService(String clusterEndPoint,  def serviceDetails) {
 
         if (OFFLINE) return null
 
         String serviceName = getServiceNameToUseForDeployment(serviceDetails)
+        
+        createNetwork(serviceDetails)
 
         if (standAloneDockerHost()){
             // Given endpoint is not a Swarm manager. Deploy Flow service as a container.
@@ -310,6 +345,10 @@ public class DockerClient extends BaseClient {
             }
         }  
         return service
+    }
+
+    def findNetwork(name){
+        return dockerClient.networks().content.find { it.Name == name }
     }
 
     def findService(name) {
@@ -456,6 +495,8 @@ public class DockerClient extends BaseClient {
         
         int updateParallelism = args.minCapacity?args.minCapacity.toInteger():1
         
+        String networkName = getNetworkName(args)
+
         def hash=[
                     "name": serviceName,
                     "TaskTemplate": [
@@ -473,6 +514,11 @@ public class DockerClient extends BaseClient {
                             "Limits":limits,
                             "Reservation":reservation
                         ]
+                    ],
+                    "Networks": [
+                        [
+                            "Target": networkName
+                        ]  
                     ],
                     "EndpointSpec": [
                         "ports" : args.port.collect { servicePort ->
@@ -692,6 +738,7 @@ public class DockerClient extends BaseClient {
         formatName(getServiceParameter(serviceDetails, "serviceNameOverride", serviceDetails.serviceName))
     }
 
+
     static def readCompose(String filePath) {
 
         File composeFile = new File(filePath)
@@ -701,6 +748,13 @@ public class DockerClient extends BaseClient {
         ComposeConfig composeConfig = composeFileReader.load(composeStream, workingDir, System.getenv())
         logger INFO, "composeContent: $composeConfig}"
         composeConfig
+
+    def getNetworkName(def serviceDetails){
+        formatName(getServiceParameter(serviceDetails, "networkName", serviceDetails.applicationName + "_default"))
+    }
+
+    def getNetworkType(def serviceDetails){
+        getServiceParameter(serviceDetails, "networkType", "overlay")
     }
 }
  
