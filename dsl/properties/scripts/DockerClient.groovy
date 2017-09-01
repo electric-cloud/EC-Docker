@@ -259,8 +259,10 @@ public class DockerClient extends BaseClient {
         if (OFFLINE) return null
 
         String serviceName = getServiceNameToUseForDeployment(serviceDetails)
-        
-        createNetwork(serviceDetails)
+        String networkName = getNetworkName(serviceDetails)
+        if(networkName!=null){
+            createNetwork(serviceDetails)
+        }
 
         if (standAloneDockerHost()){
             // Given endpoint is not a Swarm manager. Deploy Flow service as a container.
@@ -347,13 +349,13 @@ public class DockerClient extends BaseClient {
         return service
     }
 
-    def findNetwork(name){
-        return dockerClient.networks().content.find { it.Name == name }
-    }
-
     def findService(name) {
         def services = dockerClient.services().content
         return services.find { it.Spec.Name == name }
+    }
+
+    def findNetwork(name){
+        return dockerClient.networks().content.find { it.Name == name }
     }
 
     /**
@@ -515,11 +517,7 @@ public class DockerClient extends BaseClient {
                             "Reservation":reservation
                         ]
                     ],
-                    "Networks": [
-                        [
-                            "Target": networkName
-                        ]  
-                    ],
+                   
                     "EndpointSpec": [
                         "ports" : args.port.collect { servicePort ->
                                     
@@ -549,6 +547,15 @@ public class DockerClient extends BaseClient {
                     ]
                 ]
             
+            if(networkName!=null){
+               
+                hash["Networks"] = [
+                                        [
+                                            "Target": networkName
+                                        ]  
+                                   ]
+            }
+
             def payload = deployedService
             if (payload) {
                 payload = mergeObjs(payload, hash)
@@ -738,7 +745,6 @@ public class DockerClient extends BaseClient {
         formatName(getServiceParameter(serviceDetails, "serviceNameOverride", serviceDetails.serviceName))
     }
 
-
     static def readCompose(String filePath) {
 
         File composeFile = new File(filePath)
@@ -748,13 +754,18 @@ public class DockerClient extends BaseClient {
         ComposeConfig composeConfig = composeFileReader.load(composeStream, workingDir, System.getenv())
         logger INFO, "composeContent: $composeConfig}"
         composeConfig
+    }
 
     def getNetworkName(def serviceDetails){
-        formatName(getServiceParameter(serviceDetails, "networkName", serviceDetails.applicationName + "_default"))
+
+        def networkName = getServiceParameter(serviceDetails, "networkName")
+        if(networkName!=null){
+            networkName = formatName(networkName)
+        }
+        networkName
     }
 
     def getNetworkType(def serviceDetails){
         getServiceParameter(serviceDetails, "networkType", "overlay")
     }
 }
- 
