@@ -85,14 +85,18 @@
         <property>networkType</property>
         <value>2</value>
         <option>
-            <name>Ingress</name>
+            <name>Ingress (Swarm Mode)</name>
             <value>ingress</value>
         </option>
         <option>
-            <name>Overlay</name>
+            <name>Overlay (Swarm Mode)</name>
             <value>overlay</value>
         </option>
-        <documentation>Type of network to create for application.</documentation>
+        <option>
+            <name>Bridge (Docker Engine Mode)</name>
+            <value>bridge</value>
+        </option>
+        <documentation>Type of network to create for application. Select "Ingress" or "Overlay" for Swarm mode,  "Bridge" for standalone Docker engine.</documentation>
         <required>0</required>
     </formElement>
 </editor>

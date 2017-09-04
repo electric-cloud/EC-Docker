@@ -193,7 +193,7 @@
             </div>  
             <div id="DeployService">
                 <h2>Deploy Service</h2>
-                <p>This procedure deploys container on stand-alone Docker engine or Docker Swarm service on already setup Docker Swarm cluster. In case of Docker Swarm service, plugin also creates overlay network if specified in service mapping override page. Type of Docker networks supported are "Overlay" and "Ingress". If no network name is specified, plugin deploys service in default Ingress network.</p>
+                <p>This procedure deploys container on stand-alone Docker engine or Docker Swarm service on already setup Docker Swarm cluster. In case of Docker Swarm service, plugin also creates overlay network if specified in service mapping override page. Type of Docker networks supported are "Overlay" and "Ingress". If no network name is specified, plugin deploys service in default Ingress network. In case of standalone Docker engine, plugin deploys container in default bridge (docker0) network. Default bridge network does not support service discovery. If this feature is needed then user must provide custom network name and network type as "Bridge" in service mapping override page. With these details, plugin creates user defined bridge network and deploys container within this network. For more info on docker networking, see <a href="https://docs.docker.com/engine/userguide/networking/">here</a></p>
                 <h3>Deploy Service Parameters</h3>
                 <table class="grid">
                     <thead>

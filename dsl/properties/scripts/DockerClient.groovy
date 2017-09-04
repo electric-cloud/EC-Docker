@@ -238,13 +238,23 @@ public class DockerClient extends BaseClient {
                 ingress = false
             }
 
+            def driver, scope
+
+            if(networkType == "bridge"){
+                driver = "bridge"
+                scope = "local"
+            }else{
+                driver = "overlay"
+                scope = "swarm"
+            }
+
             def payload = [
-                    Driver: "overlay",
+                    Driver: driver,
                     "IPAM": [
                             "Driver": "default"
                     ],
                     "Ingress" : ingress,
-                    "Scope": "swarm"
+                    "Scope": scope
             ]
 
             def response = dockerClient.createNetwork(networkName, payload)
@@ -711,6 +721,8 @@ public class DockerClient extends BaseClient {
            memoryReservation = convertMBsToBytes(container.memorySize.toFloat())
         }
 
+        String networkName = getNetworkName(args)
+
         def hash=[
 
                 "Hostname": serviceName,
@@ -729,6 +741,14 @@ public class DockerClient extends BaseClient {
                     ]
             ]
         
+        if(networkName!=null){
+            hash["NetworkingConfig"] = [
+                "EndpointsConfig": [
+                    (networkName): [:]
+                ]
+            ]            
+        }
+
         return [hash,encodedAuthConfig]
        
     }
