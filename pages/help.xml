@@ -699,6 +699,14 @@
                 and so on.
                 - Descriptions of new features or functionality supported by the plugin.
                 -->
+        <h2>EC-Docker-1.2.1</h2>
+        <ul>
+            <li>Added support for Docker network creation</li>
+                <ul>
+                    <li>For Stand-alone Docker instances, <i>Deploy Service</i> procedure creates a user defined bridge network if network name given in service mapping page. Procedure uses this network to deploy containers.</li>
+                    <li>For Docker Swarm instances, <i>Deploy Service</i> procedure creates a user defined overlay network if network name given in service mapping page. Procedure uses this network to deploy Docker Swarm services.</li>
+                </ul>
+        </ul>
         <h2>EC-Docker-1.2.0</h2>
         <ul>
             <li>Added support for deploying micro-services modeled in ElectricFlow to Docker. Deploying micro-services to the following Docker environments are supported:
