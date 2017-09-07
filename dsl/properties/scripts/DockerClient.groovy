@@ -55,9 +55,9 @@ public class DockerClient extends BaseClient {
         }else{
             System.setProperty("docker.tls.verify", "")
         }
-        
+
         dockerClient = new DockerClientImpl(pluginConfig.endpoint)
-        
+
     }
 
 
@@ -132,7 +132,7 @@ public class DockerClient extends BaseClient {
             String environmentName,
             String resultsPropertySheet){
 
-       
+
         def serviceDetails = efClient.getServiceDeploymentDetails(
                 serviceName,
                 serviceProjectName,
@@ -147,9 +147,22 @@ public class DockerClient extends BaseClient {
         }else{
             createOrUpdateService(clusterEndpoint, serviceDetails)
         }
-        
+
+
+        def uri = new URI(clusterEndpoint)
+        def serviceEndpoint = "http://${uri.host}"
+
+        if (serviceEndpoint) {
+            serviceDetails.port?.each { port ->
+
+                String portName = port.subport
+                String url = "${serviceEndpoint}:${port.listenerPort}"
+                efClient.createProperty("${resultsPropertySheet}/${serviceName}/${portName}/url", url)
+                println "Saved $url under ${resultsPropertySheet}/${serviceName}/${portName}/url"
+            }
+        }
         /*
-        
+
         def serviceEndpoint = getDeployedServiceEndpoint(clusterEndpoint, namespace, serviceDetails, accessToken)
 
         if (serviceEndpoint) {
@@ -289,13 +302,13 @@ public class DockerClient extends BaseClient {
                 def response = dockerClient.run(imageName, containerDefinition, tag, serviceName, encodedAuthConfig)
                 logger INFO, "Created Container $serviceName. Response: $response"
             }
-                  
+
         }else{
             // Given endpoint is a Swarm manager. Deploy Flow service as a swarm service.
             def deployedService = getService(serviceName)
             def deployedServiceSpec = deployedService?.Spec
             def deployedServiceVersion = deployedService?.Version?.Index
-            
+
             def (serviceDefinition,encodedAuthConfig) = buildServicePayload(serviceDetails, deployedServiceSpec)
 
             if(deployedService){
@@ -303,7 +316,7 @@ public class DockerClient extends BaseClient {
 
                 def response
                 if(encodedAuthConfig){
-                    // For private docker registries 
+                    // For private docker registries
                     // encodedAuthConfig will be passed as "X-Registry-Auth" header
                     response = dockerClient.updateService(serviceName, [version: deployedServiceVersion], serviceDefinition, [EncodedRegistryAuth: encodedAuthConfig])
                 } else {
@@ -317,15 +330,15 @@ public class DockerClient extends BaseClient {
                 }else{
                     logger ERROR, "Service start timed out."
                 }
-                
+
 
             } else {
 
                 logger INFO, "Creating service $serviceName"
-                
+
                 def response
                 if(encodedAuthConfig){
-                    // For private docker registries 
+                    // For private docker registries
                     // encodedAuthConfig will be passed as "X-Registry-Auth" header
                     response = dockerClient.createService(serviceDefinition, [EncodedRegistryAuth: encodedAuthConfig])
                 } else {
@@ -345,7 +358,7 @@ public class DockerClient extends BaseClient {
 
     def awaitServiceStarted(def name,def timeout) {
         def service = null
-        def timespent = 0 
+        def timespent = 0
         while (service == null && timespent<timeout) {
             service = findService(name)
             if (service) {
@@ -355,7 +368,7 @@ public class DockerClient extends BaseClient {
                 sleep(1000)
                 timespent += 1000
             }
-        }  
+        }
         return service
     }
 
@@ -375,7 +388,7 @@ public class DockerClient extends BaseClient {
     def getService(String serviceName) {
 
         if (OFFLINE) return null
-        
+
         try{
             def serviceSpec = dockerClient.inspectService(serviceName).content
             }catch(Exception e){
@@ -392,7 +405,7 @@ public class DockerClient extends BaseClient {
     def getContainer(String serviceName) {
 
         if (OFFLINE) return null
-        
+
         try{
             def containerSpec = dockerClient.inspectContainer(serviceName).content
             }catch(Exception e){
@@ -475,14 +488,14 @@ public class DockerClient extends BaseClient {
                                         Target: mount.mountPath,
                                         Type: "volume"
                                   ]
-                    }                 
+                    }
                 }
             }
         }
 
         def env = [:]
         env = container.environmentVariable?.collect { envVar ->
-                   
+
                    "${envVar.environmentVariableName}=${envVar.value}"
 
                 }
@@ -493,7 +506,7 @@ public class DockerClient extends BaseClient {
         if (container.memoryLimit) {
            limits.MemoryBytes= convertMBsToBytes(container.memoryLimit.toFloat())
         }
-           
+
         def reservation = [:]
         if (container.cpuCount) {
            reservation.NanoCPUs= convertCpuToNanoCpu(container.cpuCount.toFloat())
@@ -501,12 +514,12 @@ public class DockerClient extends BaseClient {
         if (container.memorySize) {
            reservation.MemoryBytes= convertMBsToBytes(container.memorySize.toFloat())
         }
- 
-        
+
+
         int replicas = args.defaultCapacity?args.defaultCapacity.toInteger():1
-        
+
         int updateParallelism = args.minCapacity?args.minCapacity.toInteger():1
-        
+
         String networkName = getNetworkName(args)
 
         def hash=[
@@ -522,15 +535,15 @@ public class DockerClient extends BaseClient {
 
                         ],
                         "Resources":[
-           
+
                             "Limits":limits,
                             "Reservation":reservation
                         ]
                     ],
-                   
+
                     "EndpointSpec": [
                         "ports" : args.port.collect { servicePort ->
-                                    
+
                                     def targetPort
 
                                     for (containerPort in container.port) {
@@ -539,13 +552,13 @@ public class DockerClient extends BaseClient {
                                             targetPort = containerPort.containerPort
                                             break
                                         }
-                                    }      
-                                    
+                                    }
+
                                     def portMapping = [:]
                                     portMapping.PublishedPort=servicePort.listenerPort.toInteger()
                                     portMapping.TargetPort=targetPort.toInteger()
                                     portMapping
-                            }          
+                            }
                     ],
                     "UpdateConfig": [
                         "Parallelism" : updateParallelism
@@ -556,13 +569,13 @@ public class DockerClient extends BaseClient {
                         ]
                     ]
                 ]
-            
+
             if(networkName!=null){
-               
+
                 hash["Networks"] = [
                                         [
                                             "Target": networkName
-                                        ]  
+                                        ]
                                    ]
             }
 
@@ -598,7 +611,7 @@ public class DockerClient extends BaseClient {
 
     def awaitServiceRemoved(def name,def timeout) {
         def service = findService(name)
-        def timespent = 0 
+        def timespent = 0
         while (service != null && timespent<timeout) {
             service = findService(name)
             if (service == null) {
@@ -608,7 +621,7 @@ public class DockerClient extends BaseClient {
                 sleep(1000)
                 timespent += 1000
             }
-        }  
+        }
         return service
     }
 
@@ -625,7 +638,7 @@ public class DockerClient extends BaseClient {
         if (container.memoryLimit) {
            memoryLimit = convertMBsToBytes(container.memoryLimit.toFloat())
         }
-           
+
         def cpuCount
         if (container.cpuCount) {
            cpuCount = container.cpuCount.toInteger()
@@ -640,7 +653,7 @@ public class DockerClient extends BaseClient {
                     "Memory": memoryLimit,
                     "MemoryReservation": memoryReservation,
                     "NanoCPUs": nanoCPUs,
-                    "cpuCount": cpuCount      
+                    "cpuCount": cpuCount
                 ]
     }
 
@@ -667,7 +680,7 @@ public class DockerClient extends BaseClient {
                         binds << "${svcMount.hostPath}:${mount.mountPath}"
                     }else{
                         binds << "${formatName(mount.name)}:${mount.mountPath}"
-                    }                 
+                    }
                 }
             }
             volumes[mount.mountPath] = [:]
@@ -675,7 +688,7 @@ public class DockerClient extends BaseClient {
 
         def env = [:]
         env = container.environmentVariable?.collect { envVar ->
-               
+
                "${envVar.environmentVariableName}=${envVar.value}"
 
             }
@@ -690,16 +703,16 @@ public class DockerClient extends BaseClient {
         def portBindings = [:]
         def targetPort
         for (sPort in args.port ){
-            for (cPort in container.port){      
+            for (cPort in container.port){
 
                 if (cPort.portName == sPort.subport) {
                     targetPort = "${cPort.containerPort}/tcp"
                     portBindings[targetPort] = [
                             ["HostPort": "${sPort.listenerPort}"]
-                    ]      
+                    ]
                 }
             }
-        }      
+        }
 
         def nanoCPUs
         if (container.cpuLimit) {
@@ -710,7 +723,7 @@ public class DockerClient extends BaseClient {
         if (container.memoryLimit) {
            memoryLimit = convertMBsToBytes(container.memoryLimit.toFloat())
         }
-           
+
         def cpuCount
         if (container.cpuCount) {
            cpuCount = container.cpuCount.toInteger()
@@ -740,17 +753,17 @@ public class DockerClient extends BaseClient {
                         "cpuCount": cpuCount
                     ]
             ]
-        
+
         if(networkName!=null){
             hash["NetworkingConfig"] = [
                 "EndpointsConfig": [
                     (networkName): [:]
                 ]
-            ]            
+            ]
         }
 
         return [hash,encodedAuthConfig]
-       
+
     }
 
     def getServiceParameter(Map args, String parameterName, def defaultValue = null) {
