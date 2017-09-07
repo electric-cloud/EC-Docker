@@ -142,7 +142,8 @@ public class EFClient extends BaseClient {
                 clusterName: clusterName,
                 clusterProjectName: clusterProjectName,
                 environmentName: environmentName,
-                applicationEntityRevisionId: applicationRevisionId
+                applicationEntityRevisionId: applicationRevisionId,
+                jobStepId: System.getenv('COMMANDER_JOBSTEPID')
         ]
         def result = doHttpGet("/rest/v1.0/$partialUri", /*failOnErrorCode*/ true, queryArgs)
 
