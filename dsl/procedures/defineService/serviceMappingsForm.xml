@@ -23,4 +23,31 @@
         <required>0</required>
         <documentation>Name for the service in Docker. If no override value is specified here, the service name in ElectricFlow will be used to name the Docker service.</documentation>
     </formElement>
+    <formElement>
+        <type>entry</type>
+        <label>Network Name:</label>
+        <property>networkName</property>
+        <required>0</required>
+        <documentation>Name of the network to create for application.</documentation>
+    </formElement>
+    <formElement>
+        <type>select</type>
+        <label>Network Type:</label>
+        <property>networkType</property>
+        <value>2</value>
+        <option>
+            <name>Ingress (Swarm Mode)</name>
+            <value>ingress</value>
+        </option>
+        <option>
+            <name>Overlay (Swarm Mode)</name>
+            <value>overlay</value>
+        </option>
+        <option>
+            <name>Bridge (Docker Engine Mode)</name>
+            <value>bridge</value>
+        </option>
+        <documentation>Type of network to create for application. Select "Ingress" or "Overlay" for Swarm mode,  "Bridge" for standalone Docker engine.</documentation>
+        <required>0</required>
+    </formElement>
 </editor>

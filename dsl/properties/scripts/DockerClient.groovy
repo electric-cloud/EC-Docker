@@ -221,11 +221,58 @@ public class DockerClient extends BaseClient {
         dockerClient.info().content.Swarm.LocalNodeState == "inactive"
     }
 
+    def createNetwork(def serviceDetails){
+
+        String networkName = getNetworkName(serviceDetails)
+        String networkType = getNetworkType(serviceDetails)
+
+        if(!findNetwork(networkName)){
+
+            logger INFO, "Creating $networkName $networkType network."
+
+            def ingress
+
+            if(networkType == "ingress"){
+                ingress = true
+            }else{
+                ingress = false
+            }
+
+            def driver, scope
+
+            if(networkType == "bridge"){
+                driver = "bridge"
+                scope = "local"
+            }else{
+                driver = "overlay"
+                scope = "swarm"
+            }
+
+            def payload = [
+                    Driver: driver,
+                    "IPAM": [
+                            "Driver": "default"
+                    ],
+                    "Ingress" : ingress,
+                    "Scope": scope
+            ]
+
+            def response = dockerClient.createNetwork(networkName, payload)
+            logger INFO, "Created network $networkName."
+        } else {
+            logger INFO, "Network $networkName already exists."
+        }
+    }
+
     def createOrUpdateService(String clusterEndPoint,  def serviceDetails) {
 
         if (OFFLINE) return null
 
         String serviceName = getServiceNameToUseForDeployment(serviceDetails)
+        String networkName = getNetworkName(serviceDetails)
+        if(networkName!=null){
+            createNetwork(serviceDetails)
+        }
 
         if (standAloneDockerHost()){
             // Given endpoint is not a Swarm manager. Deploy Flow service as a container.
@@ -315,6 +362,10 @@ public class DockerClient extends BaseClient {
     def findService(name) {
         def services = dockerClient.services().content
         return services.find { it.Spec.Name == name }
+    }
+
+    def findNetwork(name){
+        return dockerClient.networks().content.find { it.Name == name }
     }
 
     /**
@@ -456,6 +507,8 @@ public class DockerClient extends BaseClient {
         
         int updateParallelism = args.minCapacity?args.minCapacity.toInteger():1
         
+        String networkName = getNetworkName(args)
+
         def hash=[
                     "name": serviceName,
                     "TaskTemplate": [
@@ -474,6 +527,7 @@ public class DockerClient extends BaseClient {
                             "Reservation":reservation
                         ]
                     ],
+                   
                     "EndpointSpec": [
                         "ports" : args.port.collect { servicePort ->
                                     
@@ -503,6 +557,15 @@ public class DockerClient extends BaseClient {
                     ]
                 ]
             
+            if(networkName!=null){
+               
+                hash["Networks"] = [
+                                        [
+                                            "Target": networkName
+                                        ]  
+                                   ]
+            }
+
             def payload = deployedService
             if (payload) {
                 payload = mergeObjs(payload, hash)
@@ -658,6 +721,8 @@ public class DockerClient extends BaseClient {
            memoryReservation = convertMBsToBytes(container.memorySize.toFloat())
         }
 
+        String networkName = getNetworkName(args)
+
         def hash=[
 
                 "Hostname": serviceName,
@@ -676,6 +741,14 @@ public class DockerClient extends BaseClient {
                     ]
             ]
         
+        if(networkName!=null){
+            hash["NetworkingConfig"] = [
+                "EndpointsConfig": [
+                    (networkName): [:]
+                ]
+            ]            
+        }
+
         return [hash,encodedAuthConfig]
        
     }
@@ -702,5 +775,17 @@ public class DockerClient extends BaseClient {
         logger INFO, "composeContent: $composeConfig}"
         composeConfig
     }
+
+    def getNetworkName(def serviceDetails){
+
+        def networkName = getServiceParameter(serviceDetails, "networkName")
+        if(networkName!=null){
+            networkName = formatName(networkName)
+        }
+        networkName
+    }
+
+    def getNetworkType(def serviceDetails){
+        getServiceParameter(serviceDetails, "networkType", "overlay")
+    }
 }
- 

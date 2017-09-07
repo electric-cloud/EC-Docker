@@ -72,4 +72,31 @@
         <required>0</required>
         <documentation>Name to use for the service being deployed instead of the name of the service in Deploy.</documentation>
     </formElement>
+    <formElement>
+        <type>entry</type>
+        <label>Network Name:</label>
+        <property>networkName</property>
+        <required>0</required>
+        <documentation>Name of the network to create for application.</documentation>
+    </formElement>
+    <formElement>
+        <type>select</type>
+        <label>Network Type:</label>
+        <property>networkType</property>
+        <value>2</value>
+        <option>
+            <name>Ingress (Swarm Mode)</name>
+            <value>ingress</value>
+        </option>
+        <option>
+            <name>Overlay (Swarm Mode)</name>
+            <value>overlay</value>
+        </option>
+        <option>
+            <name>Bridge (Docker Engine Mode)</name>
+            <value>bridge</value>
+        </option>
+        <documentation>Type of network to create for application. Select "Ingress" or "Overlay" for Swarm mode,  "Bridge" for standalone Docker engine.</documentation>
+        <required>0</required>
+    </formElement>
 </editor>
