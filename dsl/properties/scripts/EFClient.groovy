@@ -238,8 +238,9 @@ public class EFClient extends BaseClient {
         def defaultCapacity = serviceConfig.deploy?.replicas
        
         // Volumes
-        def serviceVolumes = ""
-        def containerVolumes = ""
+        // Initial empty json volume spec
+        def serviceVolumes = null
+        def containerVolumes = null
         if(serviceConfig.volumes){
             def serviceVolumesList = []
             def containerVolumesList = []
@@ -307,21 +308,94 @@ public class EFClient extends BaseClient {
             }
         }
 
+        // ENV variables
+        def envVars = ""
+        //if(serviceConfig.environment.entries.size()>0){
+            serviceConfig.environment.entries.each{key, value ->
+                envVars += """
+                environmentVariable '$key', {
+                    type = 'string'
+                    value = '$value'
+                }""".toString()
+            }
+            
+        //}
+
+        // update config
+        def minCapacity = serviceConfig.deploy?.updateConfig?.parallelism
+
+        // Limits and reservations
+        def memoryLimit = convertToMBs(serviceConfig.deploy?.resources?.limits?.memory)
+        def memorySize = convertToMBs(serviceConfig.deploy?.resources?.reservations?.memory)
+        def cpuLimit = serviceConfig.deploy?.resources?.limits?.nanoCpus
+        def cpuCount = serviceConfig.deploy?.resources?.reservations?.nanoCpus
+
         def dsl = """
         service '$name', {
             defaultCapacity = '$defaultCapacity'
             volume = $serviceVolumes
+            minCapacity = '$minCapacity'
             container '$name', {
               command = '$command'
               entryPoint = '$entrypoint'
               imageName = '$image'
               imageVersion = '$version'
+              memoryLimit = '$memoryLimit'
+              memorySize = '$memorySize'
+              cpuLimit = '$cpuLimit'
+              cpuCount = '$cpuCount'
               volumeMount = $containerVolumes
               $containerPort
+              $envVars
             }
             $servicePort
         }
         """.toString()
+    }
+
+    /* Function to convert B, KB, MB, GB to MB. 
+     * Defaults to 1 MB if less that 1 MB
+     */
+
+    def convertToMBs(String memory){
+
+        def memoryInMBs = null
+        if(memory != null){
+            def suffix = memory[-1]
+            def floatMemory
+            if(!suffix.isNumber()){
+                floatMemory = Float.parseFloat(memory.substring(0, memory.length()-1))
+               
+                switch (suffix){
+
+                    case ['B', 'b']:
+                        // Round off to 1 MB. Minimum size supported by Flow UI is 1 MB
+                        memoryInMBs = "1"
+                        break
+                    case ['K', 'k']:
+                        // Round off to 1 MB. Minimum size supported by Flow UI is 1 MB
+                        memoryInMBs = "1"
+                        break
+                    case ['M', 'm']:
+                        memoryInMBs = Integer.toString(floatMemory as int)
+                        break
+                    case ['G', 'g']:
+                        memoryInMBs = Integer.toString(floatMemory * 1000 as int)
+                        break
+                }
+            }else{
+                // If no memory unit defined in compose file then Default is B(byte)
+                floatMemory = Float.parseFloat(memory)
+               
+                if((floatMemory * 0.000001) < 1){
+                    // less than 1 MB.. defaulting to 1 MB
+                    memoryInMBs = "1"
+                }else{
+                    memoryInMBs = Integer.toString(floatMemory * 0.000001 as int)
+                }          
+            }
+        }
+        memoryInMBs
     }
 }
 
