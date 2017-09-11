@@ -238,8 +238,9 @@ public class EFClient extends BaseClient {
         def defaultCapacity = serviceConfig.deploy?.replicas
        
         // Volumes
-        def serviceVolumes = ""
-        def containerVolumes = ""
+        // Initial empty json volume spec
+        def serviceVolumes = "'{}'"
+        def containerVolumes = "'{}'"
         if(serviceConfig.volumes){
             def serviceVolumesList = []
             def containerVolumesList = []
@@ -307,6 +308,20 @@ public class EFClient extends BaseClient {
             }
         }
 
+        // ENV variables
+
+        def envVars = ""
+        //if(serviceConfig.environment.entries.size()>0){
+            serviceConfig.environment.entries.each{key, value ->
+                envVars += """
+                environmentVariable '$key', {
+                    type = 'string'
+                    value = '$value'
+                }""".toString()
+            }
+            
+        //}
+
         def dsl = """
         service '$name', {
             defaultCapacity = '$defaultCapacity'
@@ -318,6 +333,7 @@ public class EFClient extends BaseClient {
               imageVersion = '$version'
               volumeMount = $containerVolumes
               $containerPort
+              $envVars
             }
             $servicePort
         }
