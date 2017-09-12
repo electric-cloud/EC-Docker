@@ -142,7 +142,8 @@ public class EFClient extends BaseClient {
                 clusterName: clusterName,
                 clusterProjectName: clusterProjectName,
                 environmentName: environmentName,
-                applicationEntityRevisionId: applicationRevisionId
+                applicationEntityRevisionId: applicationRevisionId,
+                jobStepId: System.getenv('COMMANDER_JOBSTEPID')
         ]
         def result = doHttpGet("/rest/v1.0/$partialUri", /*failOnErrorCode*/ true, queryArgs)
 
@@ -209,7 +210,7 @@ public class EFClient extends BaseClient {
 
         def servicesDsl = ''
         composeConfig.services.each { name, serviceConfig ->
-            def serviceDsl = buildServiceDsl(name, serviceConfig)
+            def serviceDsl = buildServiceDsl(name, projectName, applicationName, serviceConfig)
             servicesDsl += "\n$serviceDsl"
         }
 
@@ -220,7 +221,7 @@ public class EFClient extends BaseClient {
         """.toString()
     }
 
-    def buildServiceDsl(def name, def serviceConfig) {
+    def buildServiceDsl(def name, def projectName, def applicationName, def serviceConfig) {
 
         String[] imageInfo = serviceConfig.image?.split(':')
         def image = ''
@@ -234,16 +235,107 @@ public class EFClient extends BaseClient {
 
         def command = serviceConfig.command?.parts?.join(',') ?: ''
         def entrypoint = serviceConfig.entrypoint?:''
+        def defaultCapacity = serviceConfig.deploy?.replicas
+       
+        // Volumes
+        // Initial empty json volume spec
+        def serviceVolumes = "'{}'"
+        def containerVolumes = "'{}'"
+        if(serviceConfig.volumes){
+            def serviceVolumesList = []
+            def containerVolumesList = []
+            def counter = 0
+            for(volume in serviceConfig.volumes){
 
-        """
+                def volumeName, hostPath
+                if(volume.type == "volume"){
+                    volumeName = volume.source
+                    hostPath = ""
+                }else{
+                    // bind volume type
+                    volumeName = "${name}_volume_${counter}"
+                    hostPath = volume.source
+                }
+
+                serviceVolumesList << """
+                {
+                    \"name\": \"${volumeName}\",
+                    \"hostPath\": \"${hostPath}\" 
+                }""".toString()   
+
+                containerVolumesList << """
+                {
+                    \"name\": \"${volumeName}\",
+                    \"mountPath\": \"${volume.target}\" 
+                }""".toString()   
+                counter++
+            }
+            serviceVolumes = "'''[" + serviceVolumesList.join(",") + "\n]'''"
+            containerVolumes = "'''[" + containerVolumesList.join(",") + "\n]'''"
+        }
+
+        // port config
+        def containerPort = ""
+        def servicePort = ""
+        if(serviceConfig.ports){
+            // Append port config
+            int counter = 0
+            for (portConfig in serviceConfig.ports.portConfigs){
+                def targetPort = portConfig?.target
+                def publishedPort = portConfig?.published 
+
+                containerPort +=  """
+                    port '${name}_containerPort_${counter}', {
+                        applicationName = '$applicationName'
+                        containerName = '$name'
+                        containerPort = '$targetPort'
+                        projectName = '$projectName'
+                        serviceName = '$name'
+                    }
+                """.toString()
+
+                servicePort +=  """
+                port '${name}_servicePort_${counter}', {
+                      applicationName = '$applicationName'
+                      listenerPort = '$publishedPort'
+                      projectName = '$projectName'
+                      serviceName = '$name'
+                      subcontainer = '$name'
+                      subport = '${name}_containerPort_${counter}'
+                }
+                """.toString()
+                counter++
+            }
+        }
+
+        // ENV variables
+
+        def envVars = ""
+        //if(serviceConfig.environment.entries.size()>0){
+            serviceConfig.environment.entries.each{key, value ->
+                envVars += """
+                environmentVariable '$key', {
+                    type = 'string'
+                    value = '$value'
+                }""".toString()
+            }
+            
+        //}
+
+        def dsl = """
         service '$name', {
-
+            defaultCapacity = '$defaultCapacity'
+            volume = $serviceVolumes
             container '$name', {
               command = '$command'
               entryPoint = '$entrypoint'
               imageName = '$image'
               imageVersion = '$version'
+              volumeMount = $containerVolumes
+              $containerPort
+              $envVars
             }
+            $servicePort
         }
         """.toString()
     }
