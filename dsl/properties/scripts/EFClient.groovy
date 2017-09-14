@@ -209,16 +209,53 @@ public class EFClient extends BaseClient {
     def buildApplicationDsl(def projectName, def applicationName, def composeConfig) {
 
         def servicesDsl = ''
+        def processesDsl = ''
+        def dependenciesDsl = ''
         composeConfig.services.each { name, serviceConfig ->
-            def serviceDsl = buildServiceDsl(name, projectName, applicationName, serviceConfig)
-            servicesDsl += "\n$serviceDsl"
+            servicesDsl += buildServiceDsl(name, projectName, applicationName, serviceConfig)
+            processesDsl +=  buildProcessDsl(name, projectName, applicationName, serviceConfig)
+            dependenciesDsl += buildProcessDependencyDsl(name, serviceConfig)
         }
 
         """
         application '$applicationName', projectName: '$projectName', {
-            $servicesDsl
+        $servicesDsl
+
+            process 'Deploy', {
+                applicationName = '$applicationName'
+                processType = 'OTHER'
+                projectName = '$projectName'
+                $processesDsl
+                $dependenciesDsl
+            }
         }
         """.toString()
+    }
+
+    def buildProcessDsl(def name, def projectName, def applicationName, def serviceConfig) {
+              
+        def dsl = """
+            processStep '$name', {
+              dependencyJoinType = 'and'
+              errorHandling = 'failProcedure'
+              processStepType = 'service'
+              projectName = '$projectName'
+              subcomponentApplicationName = '$applicationName'
+              subservice = '$name'
+            }""".toString()
+    }
+
+    def buildProcessDependencyDsl(def name, def serviceConfig){
+        def processDependency = ''
+        
+        serviceConfig.dependsOn.each{ dependency ->
+
+            processDependency += """
+            processDependency '$dependency', targetProcessStepName: '$name', {
+               branchType = 'ALWAYS'
+            }""".toString()
+        }
+        processDependency
     }
 
     def buildServiceDsl(def name, def projectName, def applicationName, def serviceConfig) {
@@ -233,8 +270,8 @@ public class EFClient extends BaseClient {
             }
         }
 
-        def command = serviceConfig.command?.parts?.join(',') ?: ''
-        def entrypoint = serviceConfig.entrypoint?:''
+        def command = serviceConfig.command?.parts?.join(',') ?:null
+        def entrypoint = serviceConfig.entrypoint?:null
         def defaultCapacity = serviceConfig.deploy?.replicas
        
         // Volumes
