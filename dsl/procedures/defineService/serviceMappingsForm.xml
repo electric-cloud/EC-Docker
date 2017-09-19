@@ -25,29 +25,23 @@
     </formElement>
     <formElement>
         <type>entry</type>
-        <label>Network Name:</label>
-        <property>networkName</property>
+        <label>Networks:</label>
+        <property>networkList</property>
         <required>0</required>
-        <documentation>Name of the network to create for application.</documentation>
+        <documentation>Comma separated (CSV) list of networks to create for application.For example, net1, net2</documentation>
     </formElement>
     <formElement>
-        <type>select</type>
-        <label>Network Type:</label>
-        <property>networkType</property>
-        <value>2</value>
-        <option>
-            <name>Ingress (Swarm Mode)</name>
-            <value>ingress</value>
-        </option>
-        <option>
-            <name>Overlay (Swarm Mode)</name>
-            <value>overlay</value>
-        </option>
-        <option>
-            <name>Bridge (Docker Engine Mode)</name>
-            <value>bridge</value>
-        </option>
-        <documentation>Type of network to create for application. Select "Ingress" or "Overlay" for Swarm mode,  "Bridge" for standalone Docker engine.</documentation>
+        <type>entry</type>
+        <label>Subnets:</label>
+        <property>subnetList</property>
         <required>0</required>
+        <documentation>Comma separated (CSV) list of subnets for networks mentioned in 'Networks' field. Multiple subnets for same network must be separated by '|' (pipe). For example, 10.200.1.0/24|10.200.2.0/24, 192.168.10.0/24. To use default values for any network in list skip it using commas like ,,192.168.10.0/24</documentation>
+    </formElement>
+    <formElement>
+        <type>entry</type>
+        <label>Gateways:</label>
+        <property>gatewayList</property>
+        <required>0</required>
+        <documentation>Comma separated (CSV) list of gateways for networks mentioned in 'Networks' field. Multiple gateways for same network must be separated by '|' (pipe). For example, 10.200.1.1|10.200.2.1, 192.168.10.1. To use default values for any network in list skip it using commas like ,,192.168.10.1</documentation>
     </formElement>
 </editor>
