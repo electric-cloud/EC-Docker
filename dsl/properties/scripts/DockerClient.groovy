@@ -223,56 +223,110 @@ public class DockerClient extends BaseClient {
 
     def createNetwork(def serviceDetails){
 
-        String networkName = getNetworkName(serviceDetails)
-        String networkType = getNetworkType(serviceDetails)
+        def networkList = getNetworkList(serviceDetails)
+        def subnetList = getServiceParameter(serviceDetails, "subnetList", "").split(",")
+        def gatewayList = getServiceParameter(serviceDetails, "gatewayList", "").split(",")     
 
-        if(!findNetwork(networkName)){
+        // For each network in list
+        for(int i=0; i<networkList.size(); i++){
 
-            logger INFO, "Creating $networkName $networkType network."
+            def networkName = networkList[i]
 
-            def ingress
+            if(!findNetwork(networkName)){
 
-            if(networkType == "ingress"){
-                ingress = true
-            }else{
-                ingress = false
+                // If network does not exists already, create one.
+                logger INFO, "Creating $networkName network."
+
+                def config = []
+                def payload 
+                try{
+                    def subnets = subnetList[i].split("\\|")
+                    def gateways = gatewayList[i].split("\\|")
+        
+                    for(int j=0;j<subnets.size();j++){
+
+                        def networkConfig = [:]
+                        try{
+
+                            if(subnets[j] != ""){
+                                networkConfig["Subnet"] = subnets[j]
+                            } 
+
+                            if(gateways[j] != ""){
+                                networkConfig["Gateway"] = gateways[j]
+                            }
+
+                            // If atleast one of the config parameter is given
+                            // then add them to network config. Adding an empty
+                            // value causes docker to pick empty values and
+                            // prevents it from supplying default values.
+                            if(subnets[j] != "" || gateways[j] != ""){
+                                config << networkConfig
+                            }
+                        }catch(ArrayIndexOutOfBoundsException e){
+
+                            // If gateway not defined for a given subnet
+                            config << [
+                                "Subnet":subnets[j]
+                            ]
+                        }   
+                    }
+
+                    }catch(ArrayIndexOutOfBoundsException e){
+
+                        // if no subnet and gateway provided for last network in list
+                        // no action required. 
+                    }
+
+                if (standAloneDockerHost()){
+                   
+                    // Create user defined bridge network
+                    payload = [
+                            Driver: "bridge",
+                            "IPAM": [
+                                    "Driver": "default"
+                            ],
+                            "Scope": "local"
+                    ] 
+
+                    // Add config parameter only if it is defined
+                    if(config.size()!=0){
+                        payload["IPAM"]["Config"] = config
+                    }
+                }else{
+
+                    // Create user defined overlay network
+                    payload = [
+                            Driver: "overlay",
+                            "IPAM": [
+                                    "Driver": "default"
+                            ],
+                            "Scope": "swarm"
+                    ]   
+
+                    // Add config parameter only if it is defined
+                    if(config.size()!=0){
+                        payload["IPAM"]["Config"] = config
+                    }
+                }
+
+                def response = dockerClient.createNetwork(networkName, payload)
+                logger INFO, "Created network $networkName."
+            } else {
+
+                logger INFO, "Network $networkName already exists."
             }
-
-            def driver, scope
-
-            if(networkType == "bridge"){
-                driver = "bridge"
-                scope = "local"
-            }else{
-                driver = "overlay"
-                scope = "swarm"
-            }
-
-            def payload = [
-                    Driver: driver,
-                    "IPAM": [
-                            "Driver": "default"
-                    ],
-                    "Ingress" : ingress,
-                    "Scope": scope
-            ]
-
-            def response = dockerClient.createNetwork(networkName, payload)
-            logger INFO, "Created network $networkName."
-        } else {
-            logger INFO, "Network $networkName already exists."
         }
     }
 
     def createOrUpdateService(String clusterEndPoint,  def serviceDetails) {
 
         if (OFFLINE) return null
-
+        
         String serviceName = getServiceNameToUseForDeployment(serviceDetails)
-        String networkName = getNetworkName(serviceDetails)
-        if(networkName!=null){
-            createNetwork(serviceDetails)
-        }
+       
+        // Create network if does not exists
+        createNetwork(serviceDetails)
 
         if (standAloneDockerHost()){
             // Given endpoint is not a Swarm manager. Deploy Flow service as a container.
@@ -288,6 +342,7 @@ public class DockerClient extends BaseClient {
                 def (imageName,tag) = getContainerImage(serviceDetails)
                 def response = dockerClient.run(imageName, containerDefinition, tag, serviceName, encodedAuthConfig)
                 logger INFO, "Created Container $serviceName. Response: $response"
+                attachAdditionalNetworks(serviceName, serviceDetails)
             }
                   
         }else{
@@ -507,7 +562,7 @@ public class DockerClient extends BaseClient {
         
         int updateParallelism = args.minCapacity?args.minCapacity.toInteger():1
         
-        String networkName = getNetworkName(args)
+        def networkList = getNetworkList(args)
 
         def hash=[
                     "name": serviceName,
@@ -557,13 +612,14 @@ public class DockerClient extends BaseClient {
                     ]
                 ]
             
-            if(networkName!=null){
-               
-                hash["Networks"] = [
-                                        [
-                                            "Target": networkName
-                                        ]  
-                                   ]
+            if(networkList.size()>0){
+                def networks = []
+                for(network in networkList){
+                    networks << [
+                                    "Target": network
+                                ] 
+                }
+                hash["TaskTemplate"]["Networks"] = networks
             }
 
             def payload = deployedService
@@ -721,7 +777,7 @@ public class DockerClient extends BaseClient {
            memoryReservation = convertMBsToBytes(container.memorySize.toFloat())
         }
 
-        String networkName = getNetworkName(args)
+        def networkList = getNetworkList(args)
 
         def hash=[
 
@@ -741,16 +797,19 @@ public class DockerClient extends BaseClient {
                     ]
             ]
         
-        if(networkName!=null){
+        // Deploy the container in first network in the list
+        // Later connect it to rest of the networks.
+        // Refer: https://github.com/moby/moby/issues/29265
+        if(networkList.size()>0){
+
             hash["NetworkingConfig"] = [
                 "EndpointsConfig": [
-                    (networkName): [:]
+                    (networkList[0]): [:]
                 ]
-            ]            
+            ]           
         }
 
-        return [hash,encodedAuthConfig]
-       
+        return [hash,encodedAuthConfig]    
     }
 
     def getServiceParameter(Map args, String parameterName, def defaultValue = null) {
@@ -776,16 +835,20 @@ public class DockerClient extends BaseClient {
         composeConfig
     }
 
-    def getNetworkName(def serviceDetails){
-
-        def networkName = getServiceParameter(serviceDetails, "networkName")
-        if(networkName!=null){
-            networkName = formatName(networkName)
+    def getNetworkList(def serviceDetails){
+        def formattedNetworkList = []
+        def networkList = getServiceParameter(serviceDetails, "networkList", "").split(",")
+        for(network in networkList){
+            formattedNetworkList << formatName(network)
         }
-        networkName
+        formattedNetworkList
     }
+    
+    def attachAdditionalNetworks(def container, def serviceDetails){
+        def networkList = getNetworkList(serviceDetails)
 
-    def getNetworkType(def serviceDetails){
-        getServiceParameter(serviceDetails, "networkType", "overlay")
+        for(int i=1;i<networkList.size();i++){
+            dockerClient.connectNetwork(networkList[i], container)
+        }  
     }
 }

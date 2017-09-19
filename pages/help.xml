@@ -193,7 +193,35 @@
             </div>  
             <div id="DeployService">
                 <h2>Deploy Service</h2>
-                <p>This procedure deploys container on stand-alone Docker engine or Docker Swarm service on already setup Docker Swarm cluster. In case of Docker Swarm service, plugin also creates overlay network if specified in service mapping override page. Type of Docker networks supported are "Overlay" and "Ingress". If no network name is specified, plugin deploys service in default Ingress network. In case of standalone Docker engine, plugin deploys container in default bridge (docker0) network. Default bridge network does not support service discovery. If this feature is needed then user must provide custom network name and network type as "Bridge" in service mapping override page. With these details, plugin creates user defined bridge network and deploys container within this network. For more info on docker networking, see <a href="https://docs.docker.com/engine/userguide/networking/">here</a></p>
+                <p>This procedure deploys container on stand-alone Docker engine or Docker Swarm service on already setup Docker Swarm cluster.</p>
+                <p>
+                    User can provide comma separate list of networks to which deploy a container or a swarm service in service mapping override page. If network does not exists already then procedure creates one with provided subnet and gateway. If no subnet and gateway is specified, Docker uses default values. Each of use defined network can have multiple subnets and gateways. In that case, multiple subnets/gateways must be separated by '|'(pipe). If Docker endpoint is stand-alone Docker engine then user define <b>"bridge"</b> network is create. If Docker endpoint is Docker swarm cluster then user defined <b>"overlay"</b> network is created.
+                </p>
+                <p>
+                    For example, 
+                    <table class="grid">
+                    <thead>
+                        <tr>
+                            <td>Networks:</td>
+                            <td>bridge, net1, net2</td>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Subnets:</td>
+                            <td>,10.200.1.0/24|10.200.2.0/24,198.168.10.0/24</td>
+                        </tr>
+                        <tr>
+                            <td>Gateways:</td>
+                            <td>,10.200.1.1|10.200.2.1,198.168.10.1</td>
+                        </tr>
+                    </tbody>
+                </table>
+                    In this example, container gets attached to bridge, net1 and net2 networks. "bridge" network is already created by Docker and no need to specify subnet/gateway for it. "net1" and "net2" are user defined networks. "net1" have two subnets i.e. 10.200.1.0/24(Gateway:10.200.1.1) and 10.200.2.0/24(Gateway:10.200.2.1) while "net2" have single subnet i.e. 198.168.10.0/24(Gateway:198.168.10.1). 
+                </p>
+                <p>
+                    For more information on docker networking, see <a href="https://docs.docker.com/engine/userguide/networking/">here</a>
+                </p>
                 <h3>Deploy Service Parameters</h3>
                 <table class="grid">
                     <thead>
