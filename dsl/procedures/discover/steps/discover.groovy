@@ -9,7 +9,7 @@ def recreateApplication = '$[recreate_application]'
 EFClient efClient = new EFClient()
 def app = efClient.getApplication(projectName, applicationName)
 if (app) {
-    if (recreateApplication) {
+    if (recreateApplication.toBoolean()) {
         efClient.deleteApplication(projectName, applicationName)
     } else {
         println "Application $applicationName already exists"
