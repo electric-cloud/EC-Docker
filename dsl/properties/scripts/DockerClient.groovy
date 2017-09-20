@@ -839,7 +839,9 @@ public class DockerClient extends BaseClient {
         def formattedNetworkList = []
         def networkList = getServiceParameter(serviceDetails, "networkList", "").split(",")
         for(network in networkList){
-            formattedNetworkList << formatName(network)
+            if(network != ""){
+                formattedNetworkList << formatName(network)
+            }
         }
         formattedNetworkList
     }
@@ -851,4 +853,110 @@ public class DockerClient extends BaseClient {
             dockerClient.connectNetwork(networkList[i], container)
         }  
     }
-}
+
+    def createIngress(def subnetList,
+                         def gatewayList,
+                         def enableIpv6,
+                         def attachable,
+                         def mtu,
+                         def labels){
+
+        if(!standAloneDockerHost()){
+
+            def networkName = "ingress"
+
+            if(!findNetwork(networkName)){
+
+                def payload = buildNetworkPayload(subnetList,
+                                  gatewayList,
+                                  enableIpv6,
+                                  attachable,
+                                  mtu,
+                                  labels)
+                dockerClient.createNetwork(networkName, payload)
+            }else{
+                logger ERROR, "Ingress network already exists"
+            }
+            
+        }else{
+            logger ERROR, "Can not create ingress network on stand-alone Docker engine."
+        }
+    }
+
+    def buildNetworkPayload( def subnetList,
+                             def gatewayList,
+                             def enableIpv6,
+                             def attachable,
+                             def mtu,
+                             def labels){
+
+        def config = []
+       
+        for(int i=0;i<subnetList.size();i++){
+
+            def networkConfig = [:]
+            try{
+
+                if(subnetList[i] != ""){
+                    networkConfig["Subnet"] = subnetList[i]
+                } 
+
+                if(gatewayList[i] != ""){
+                    networkConfig["Gateway"] = gatewayList[i]
+                }
+
+                // If atleast one of the config parameter is given
+                // then add them to network config. Adding an empty
+                // value causes docker to pick empty values and
+                // prevents it from supplying default values.
+                if(subnetList[i] != "" || gatewayList[i] != ""){
+                    config << networkConfig
+                }
+            }catch(ArrayIndexOutOfBoundsException e){
+
+                // If gateway not defined for a given subnet
+                config << [
+                    "Subnet":subnetList[i]
+                ]
+            }   
+        }
+
+        // Parse labels string to map
+        def labelsMap = [:]
+        def labelsList = labels.split(",")
+
+        for(label in labelsList){
+            if(label!=""){
+                 def key = label.split("=")[0]
+                 def value = label.split("=")[1]
+                 labelsMap[(key)] = value
+            }
+        }
+
+         def payload  = [
+                    Driver: "overlay",
+                    "IPAM": [
+                            "Driver": "default"
+                    ],
+                    "Scope": "swarm",
+                    "Internal": "false".toBoolean(),
+                    "EnableIPv6": enableIpv6.toBoolean(),
+                    "Attachable": attachable.toBoolean(),
+                    "Options":[
+                        "com.docker.network.mtu": mtu
+                    ],
+                    "Labels":labelsMap
+                ]  
+
+        // Add config parameter only if it is defined
+        if(config.size()!=0){
+            payload["IPAM"]["Config"] = config
+        } 
+
+        payload
+    }
+
+    def deleteNetwork(def networkName){
+        dockerClient.rmNetwork(networkName)
+    }
+}   
