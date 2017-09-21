@@ -854,28 +854,25 @@ public class DockerClient extends BaseClient {
         }  
     }
 
-    def createIngress(def subnetList,
+    def createIngress(def networkName,
+                         def subnetList,
                          def gatewayList,
                          def enableIpv6,
-                         def attachable,
                          def mtu,
                          def labels){
 
         if(!standAloneDockerHost()){
-
-            def networkName = "ingress"
 
             if(!findNetwork(networkName)){
 
                 def payload = buildNetworkPayload(subnetList,
                                   gatewayList,
                                   enableIpv6,
-                                  attachable,
                                   mtu,
                                   labels)
                 dockerClient.createNetwork(networkName, payload)
             }else{
-                logger ERROR, "Ingress network already exists"
+                logger ERROR, "${networkName} network already exists"
             }
             
         }else{
@@ -886,7 +883,6 @@ public class DockerClient extends BaseClient {
     def buildNetworkPayload( def subnetList,
                              def gatewayList,
                              def enableIpv6,
-                             def attachable,
                              def mtu,
                              def labels){
 
@@ -939,9 +935,9 @@ public class DockerClient extends BaseClient {
                             "Driver": "default"
                     ],
                     "Scope": "swarm",
+                    "Ingress": true,
                     "Internal": "false".toBoolean(),
                     "EnableIPv6": enableIpv6.toBoolean(),
-                    "Attachable": attachable.toBoolean(),
                     "Options":[
                         "com.docker.network.mtu": mtu
                     ],
