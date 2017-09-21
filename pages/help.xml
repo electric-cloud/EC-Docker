@@ -345,6 +345,113 @@
             </div>
 
 
+            <div id="Create Ingress">
+                <h2>Create Ingress Network</h2>
+                <p>Creates ingress network on Docker Swarm cluster with given list of subnets and gateways.</p>
+
+                <h3>Create Ingress Network Parameters</h3>
+                <table class="grid">
+                    <thead>
+                        <tr>
+                            <th>Parameter</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="required">Project Name</td>
+                            <td>The name of the project that the service belongs to. In case of an application-level service it also owns the application.</td>
+                        </tr>
+                        <tr>
+                            <td class="required">Environment Name</td>
+                            <td>The name of the environment that the cluster belongs to.</td>
+                        </tr>
+
+                        <tr>
+                            <td>Environment Project Name</td>
+                            <td>The name of the project that the environment belongs to. If not specified, the environment is assumed to be in the same project as the service.</td>
+                        </tr>
+                        <tr>
+                            <td>Cluster Name</td>
+                            <td>The name of the cluster in the environment on which the service was previously deployed. If not specified, the application tier mapping will be used to find the cluster name.</td>
+                        </tr>
+
+                        <tr>
+                            <td>Subnets</td>
+                            <td>Comma separated (CSV) list of subnets to create in ingress network.</td>
+                        </tr>
+
+                        <tr>
+                            <td>Gateways</td>
+                            <td>Comma separated (CSV) list of gateways for subnets mentioned in "Subnets" field.</td>
+                        </tr>
+
+                        <tr>
+                            <td>Enable IPv6</td>
+                            <td>Enable IPv6 on the network</td>
+                        </tr>
+
+                        <tr>
+                            <td>Attachable</td>
+                            <td>Globally scoped network is manually attachable by regular containers from workers in swarm mode.</td>
+                        </tr>
+                        
+                        <tr>
+                            <td>MTU</td>
+                            <td>MTU to set to ingress network</td>
+                        </tr>
+
+                        <tr>
+                            <td>Labels</td>
+                            <td>Comma separated list of key=value pairs to assign to ingress network.</td>
+                        </tr>
+                        
+                    </tbody>
+                </table>
+
+            </div>
+
+            <div id="Delete Network">
+                <h2>Delete Network</h2>
+                <p>Deletes Docker network with given name. Ensure that no container/Swarm service is running before deleting the network.</p>
+
+                <h3>Delete Network Parameters</h3>
+                <table class="grid">
+                    <thead>
+                        <tr>
+                            <th>Parameter</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="required">Project Name</td>
+                            <td>The name of the project that the service belongs to. In case of an application-level service it also owns the application.</td>
+                        </tr>
+                        <tr>
+                            <td class="required">Environment Name</td>
+                            <td>The name of the environment that the cluster belongs to.</td>
+                        </tr>
+
+                        <tr>
+                            <td>Environment Project Name</td>
+                            <td>The name of the project that the environment belongs to. If not specified, the environment is assumed to be in the same project as the service.</td>
+                        </tr>
+                        <tr>
+                            <td>Cluster Name</td>
+                            <td>The name of the cluster in the environment on which the service was previously deployed. If not specified, the application tier mapping will be used to find the cluster name.</td>
+                        </tr>
+
+                        <tr>
+                            <td>Network Name</td>
+                            <td>Name of the network to delete.</td>
+                        </tr>
+                        
+                    </tbody>
+                </table>
+
+            </div>
+
             <div class="procedure" id="runDockerBuild">
 
      <a name='runDockerBuild' id="runDockerBuild"></a>

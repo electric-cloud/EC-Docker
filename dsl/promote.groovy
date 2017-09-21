@@ -33,6 +33,12 @@ def stepsWithAttachedCredentials = [
 		], [
 				procedureName: 'Populate Certs',
 				stepName: 'populateDockerClientCerts'
+		], [
+				procedureName: 'Create Ingress',
+				stepName: 'createIngress'
+		], [
+				procedureName: 'Delete Network',
+				stepName: 'deleteNetwork'
 		]
 		
 ]

@@ -1,0 +1,72 @@
+<!--
+
+     Copyright 2016 Electric Cloud, Inc.
+
+     Licensed under the Apache License, Version 2.0 (the "License");
+     you may not use this file except in compliance with the License.
+     You may obtain a copy of the License at
+
+         http://www.apache.org/licenses/LICENSE-2.0
+
+     Unless required by applicable law or agreed to in writing, software
+     distributed under the License is distributed on an "AS IS" BASIS,
+     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+     See the License for the specific language governing permissions and
+     limitations under the License.
+
+-->
+<editor>
+    <formElement>
+        <type>entry</type>
+        <label>Configuration:</label>
+        <property>pluginConfig</property>
+        <required>1</required>
+        <documentation>Name of plugin configuration to use.</documentation>
+    </formElement>
+     <formElement>
+        <type>entry</type>
+        <label>Name:</label>
+        <property>networkName</property>
+        <required>1</required>
+        <documentation>Name of ingress network to create.</documentation>
+    </formElement>
+    <formElement>
+        <type>entry</type>
+        <label>Subnets:</label>
+        <property>subnetList</property>
+        <required>0</required>
+        <documentation>Comma separated (CSV) list of subnets to create in ingress network. </documentation>
+    </formElement>
+    <formElement>
+        <type>entry</type>
+        <label>Gateways:</label>
+        <property>gatewayList</property>
+        <required>0</required>
+        <documentation>Comma separated (CSV) list of gateways for subnets mentioned in "Subnets" field.</documentation>
+    </formElement>
+    <formElement> 
+        <label>Enable IPv6:</label>    
+        <property>enableIpv6</property> 
+        <documentation>Enable IPv6 on the network</documentation>
+        <type>checkbox</type>   
+        <checkedValue>true</checkedValue> 
+        <uncheckedValue>false</uncheckedValue> 
+        <initiallyChecked>0</initiallyChecked> 
+        <value>true</value> 
+        <required>0</required>
+    </formElement>
+    <formElement>
+        <type>entry</type>
+        <label>MTU:</label>
+        <property>mtu</property>
+        <required>0</required>
+        <documentation>MTU to set to ingress network</documentation>
+    </formElement>
+    <formElement>
+        <type>entry</type>
+        <label>Labels:</label>
+        <property>labels</property>
+        <required>0</required>
+        <documentation>Comma separated list of key=value pairs to assign to ingress network.</documentation>
+    </formElement>
+</editor>
