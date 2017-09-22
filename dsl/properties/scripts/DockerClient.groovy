@@ -335,11 +335,20 @@ public class DockerClient extends BaseClient {
             if(deployedContainer){
                 logger INFO, "Updating container $serviceName. Update of only following parameters is supported: \"Minimum CPU requested\", \"Maximum CPU allowed\", \"MemoryMemory\", \"Limit\"."
                 def updateContainerDefinition = buildUpdateContainerPayload(serviceDetails)
-                def response = dockerClient.updateContainer(serviceName, updateContainerDefinition)
-                logger INFO, "Updated Container $serviceName. Response: $response"
-            }else{
+                if (updateContainerDefinition) {
+                    logger INFO, "Payload to update container $serviceName:\n $updateContainerDefinition"
+                    def response = dockerClient.updateContainer(serviceName, updateContainerDefinition)
+                    logger INFO, "Updated Container $serviceName. Response: $response"
+                } else {
+                    logger INFO, "Nothing to update for the container $serviceName - None of the updateable parameters where specified."
+                }
+                //TODO: attach container to networks if not already attached.
+                //attachAdditionalNetworks(serviceName, serviceDetails)
+
+            } else {
                 def (containerDefinition,encodedAuthConfig) = buildContainerPayload(serviceDetails)
                 def (imageName,tag) = getContainerImage(serviceDetails)
+                logger INFO, "Payload to create container $serviceName:\n $containerDefinition \n with image: $imageName, tag: $tag"
                 def response = dockerClient.run(imageName, containerDefinition, tag, serviceName, encodedAuthConfig)
                 logger INFO, "Created Container $serviceName. Response: $response"
                 attachAdditionalNetworks(serviceName, serviceDetails)
@@ -507,11 +516,8 @@ public class DockerClient extends BaseClient {
             }
         }
 
-        if(container.credentialName && container.registryUri){
-            EFClient efClient = new EFClient()
-            def cred = efClient.getCredentials(container.credentialName)
-            def authConfig = "{\"username\":\"${cred.userName}\",\"password\": \"${cred.password}\",\"serveraddress\": \"${container.registryUri}\"}"
-            encodedAuthConfig = authConfig.bytes.encodeBase64().toString()
+        if(container.credentialName){
+            encodedAuthConfig = buildAuthConfig(container)
         }
 
         def mounts = []
@@ -668,36 +674,44 @@ public class DockerClient extends BaseClient {
         return service
     }
 
+    def buildAuthConfig(def container) {
+        EFClient efClient = new EFClient()
+        def cred = efClient.getCredentials(container.credentialName)
+        def authConfig = [ username: cred.userName,
+                           password: cred.password]
+        if (container.registryUri) {
+            authConfig << [serveraddress: container.registryUri]
+        }
+        JsonBuilder authConfigJson = new JsonBuilder(authConfig)
+        authConfigJson.toString().bytes.encodeBase64().toString()
+    }
+
     def buildUpdateContainerPayload(Map args){
 
         def container = args.container[0]
+        def payload = [:]
 
-        def nanoCPUs
         if (container.cpuLimit) {
-           nanoCPUs = convertCpuToNanoCpu(container.cpuLimit.toFloat())
+            def nanoCPUs = convertCpuToNanoCpu(container.cpuLimit.toFloat())
+            payload << ["NanoCPUs": nanoCPUs]
         }
 
-        def memoryLimit
         if (container.memoryLimit) {
-           memoryLimit = convertMBsToBytes(container.memoryLimit.toFloat())
+            def memoryLimit = convertMBsToBytes(container.memoryLimit.toFloat())
+            payload << ["Memory": memoryLimit]
         }
-           
-        def cpuCount
+
         if (container.cpuCount) {
-           cpuCount = container.cpuCount.toInteger()
+            def cpuCount = container.cpuCount.toInteger()
+            payload << ["cpuCount": cpuCount]
         }
 
-        def memoryReservation
         if (container.memorySize) {
-           memoryReservation = convertMBsToBytes(container.memorySize.toFloat())
+            def memoryReservation = convertMBsToBytes(container.memorySize.toFloat())
+            payload << ["MemoryReservation": memoryReservation]
         }
 
-        def hash=[
-                    "Memory": memoryLimit,
-                    "MemoryReservation": memoryReservation,
-                    "NanoCPUs": nanoCPUs,
-                    "cpuCount": cpuCount      
-                ]
+        payload
     }
 
     def buildContainerPayload(Map args){
@@ -707,11 +721,8 @@ public class DockerClient extends BaseClient {
         def container = args.container[0]
         def encodedAuthConfig
 
-        if(container.credentialName && container.registryUri){
-            EFClient efClient = new EFClient()
-            def cred = efClient.getCredentials(container.credentialName)
-            def authConfig = "{\"username\":\"${cred.userName}\",\"password\": \"${cred.password}\",\"serveraddress\": \"${container.registryUri}\"}"
-            encodedAuthConfig = authConfig.bytes.encodeBase64().toString()
+        if(container.credentialName){
+            encodedAuthConfig = buildAuthConfig(container)
         }
 
         def binds = []
