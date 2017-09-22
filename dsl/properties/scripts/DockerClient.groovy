@@ -342,8 +342,8 @@ public class DockerClient extends BaseClient {
                 } else {
                     logger INFO, "Nothing to update for the container $serviceName - None of the updateable parameters where specified."
                 }
-                //TODO: attach container to networks if not already attached.
-                //attachAdditionalNetworks(serviceName, serviceDetails)
+                
+                attachAdditionalNetworks(serviceName, serviceDetails)
 
             } else {
                 def (containerDefinition,encodedAuthConfig) = buildContainerPayload(serviceDetails)
@@ -860,8 +860,13 @@ public class DockerClient extends BaseClient {
     def attachAdditionalNetworks(def container, def serviceDetails){
         def networkList = getNetworkList(serviceDetails)
 
-        for(int i=1;i<networkList.size();i++){
-            dockerClient.connectNetwork(networkList[i], container)
+        for(int i=0;i<networkList.size();i++){
+            try{
+                    dockerClient.connectNetwork(networkList[i], container)
+                }catch(Exception e){
+                    // If network is already attached, move on to next network.
+                    logger INFO, "${container} already attached to ${networkList[i]}"
+                }
         }  
     }
 
