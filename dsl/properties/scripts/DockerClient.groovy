@@ -148,18 +148,18 @@ public class DockerClient extends BaseClient {
             createOrUpdateService(clusterEndpoint, serviceDetails)
         }
         
-        /*
+        def uri = new URI(clusterEndpoint)
+        def serviceEndpoint = "http://${uri.host}"
         
-        def serviceEndpoint = getDeployedServiceEndpoint(clusterEndpoint, namespace, serviceDetails, accessToken)
-
         if (serviceEndpoint) {
             serviceDetails.port?.each { port ->
-                String portName = port.portName
+ 
+                String portName = port.subport
                 String url = "${serviceEndpoint}:${port.listenerPort}"
-                efClient.createProperty("${resultsPropertySheet}/${serviceName}/${portName}/url", url)
+                efClient.createProperty("${resultsPropertySheet}/${formatName(serviceName)}/${portName}/url", url)
+                println "Saved $url under ${resultsPropertySheet}/${formatName(serviceName)}/${portName}/url"
             }
         }
-        */
     }
 
     def undeployService(
