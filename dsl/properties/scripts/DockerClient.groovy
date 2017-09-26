@@ -149,7 +149,7 @@ public class DockerClient extends BaseClient {
         }
         
         def uri = new URI(clusterEndpoint)
-        def serviceEndpoint = "http://${uri.host}"
+        def serviceEndpoint = "${uri.host}"
         
         if (serviceEndpoint) {
             serviceDetails.port?.each { port ->
