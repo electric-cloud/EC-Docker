@@ -334,26 +334,16 @@ public class DockerClient extends BaseClient {
             def deployedContainer = getContainer(serviceName)
 
             if(deployedContainer){
-                logger INFO, "Updating container $serviceName. Update of only following parameters is supported: \"Minimum CPU requested\", \"Maximum CPU allowed\", \"MemoryMemory\", \"Limit\"."
-                def updateContainerDefinition = buildUpdateContainerPayload(serviceDetails)
-                if (updateContainerDefinition) {
-                    logger INFO, "Payload to update container $serviceName:\n $updateContainerDefinition"
-                    def response = dockerClient.updateContainer(serviceName, updateContainerDefinition)
-                    logger INFO, "Updated Container $serviceName. Response: $response"
-                } else {
-                    logger INFO, "Nothing to update for the container $serviceName - None of the updateable parameters where specified."
-                }
-                
-                attachAdditionalNetworks(serviceName, serviceDetails)
+               // Remove the container if it is already deployed, in order to update it. 
+                undeployDockerService(serviceName)
+            } 
 
-            } else {
-                def (containerDefinition,encodedAuthConfig) = buildContainerPayload(serviceDetails)
-                def (imageName,tag) = getContainerImage(serviceDetails)
-                logger INFO, "Payload to create container $serviceName:\n $containerDefinition \n with image: $imageName, tag: $tag"
-                def response = dockerClient.run(imageName, containerDefinition, tag, serviceName, encodedAuthConfig)
-                logger INFO, "Created Container $serviceName. Response: $response"
-                attachAdditionalNetworks(serviceName, serviceDetails)
-            }
+            def (containerDefinition,encodedAuthConfig) = buildContainerPayload(serviceDetails)
+            def (imageName,tag) = getContainerImage(serviceDetails)
+            logger INFO, "Payload to create container $serviceName:\n $containerDefinition \n with image: $imageName, tag: $tag"
+            def response = dockerClient.run(imageName, containerDefinition, tag, serviceName, encodedAuthConfig)
+            logger INFO, "Created Container $serviceName. Response: $response"
+            attachAdditionalNetworks(serviceName, serviceDetails)   
                   
         }else{
             // Given endpoint is a Swarm manager. Deploy Flow service as a swarm service.
@@ -685,34 +675,6 @@ public class DockerClient extends BaseClient {
         }
         JsonBuilder authConfigJson = new JsonBuilder(authConfig)
         authConfigJson.toString().bytes.encodeBase64().toString()
-    }
-
-    def buildUpdateContainerPayload(Map args){
-
-        def container = args.container[0]
-        def payload = [:]
-
-        if (container.cpuLimit) {
-            def nanoCPUs = convertCpuToNanoCpu(container.cpuLimit.toFloat())
-            payload << ["NanoCPUs": nanoCPUs]
-        }
-
-        if (container.memoryLimit) {
-            def memoryLimit = convertMBsToBytes(container.memoryLimit.toFloat())
-            payload << ["Memory": memoryLimit]
-        }
-
-        if (container.cpuCount) {
-            def cpuCount = container.cpuCount.toInteger()
-            payload << ["cpuCount": cpuCount]
-        }
-
-        if (container.memorySize) {
-            def memoryReservation = convertMBsToBytes(container.memorySize.toFloat())
-            payload << ["MemoryReservation": memoryReservation]
-        }
-
-        payload
     }
 
     def buildContainerPayload(Map args){
