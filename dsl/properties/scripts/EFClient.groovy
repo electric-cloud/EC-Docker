@@ -121,7 +121,7 @@ public class EFClient extends BaseClient {
             [(it.parameterName): it.parameterValue]
         }
 
-        logger DEBUG, "Cluster params from Deploy: $provisionParams"
+        logger DEBUG, "Cluster parameters from ElectricFlow cluster definition: $provisionParams"
 
         return provisionParams
     }
