@@ -233,7 +233,7 @@
                     <tbody>
                         <tr>
                             <td class="required">Service Name*</td>
-                            <td>The name of the service in Deploy that encapsulates the service to be deployed on a stand-alone Docker host or a Docker Swarm cluster.</td>
+                            <td>The name of the service in ElectricFlow that encapsulates the service to be deployed on a stand-alone Docker host or a Docker Swarm cluster.</td>
                         </tr>
                         <tr>
                             <td class="required">Service Project Name</td>
@@ -249,7 +249,7 @@
                         </tr>  
                         <tr>
                             <td>Cluster Name</td>
-                            <td>The name of the cluster in Deploy that encapsulates the stand-alone Docker host or a Docker Swarm cluster on which the service is to be deployed.</td>
+                            <td>The name of the cluster in ElectricFlow that encapsulates the stand-alone Docker host or a Docker Swarm cluster on which the service is to be deployed.</td>
                         </tr>                        
                         <tr>
                             <td>Cluster or environment project name</td>
@@ -303,7 +303,7 @@
 
                         <tr>
                             <td class="required">Service Name*</td>
-                            <td>The name of the service in Deploy that encapsulates the service that was previously deployed on a stand-alone Docker host or a Docker Swarm cluster.</td>
+                            <td>The name of the service in ElectricFlow that encapsulates the service that was previously deployed on a stand-alone Docker host or a Docker Swarm cluster.</td>
                         </tr>
 
                         <tr>
