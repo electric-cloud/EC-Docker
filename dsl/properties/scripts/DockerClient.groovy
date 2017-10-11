@@ -131,7 +131,8 @@ public class DockerClient extends BaseClient {
             String clusterName,
             String clusterOrEnvProjectName,
             String environmentName,
-            String resultsPropertySheet){
+            String resultsPropertySheet,
+            String serviceEntityRevisionId){
 
        
         def serviceDetails = efClient.getServiceDeploymentDetails(
@@ -141,7 +142,8 @@ public class DockerClient extends BaseClient {
                 applicationRevisionId,
                 clusterName,
                 clusterOrEnvProjectName,
-                environmentName)
+                environmentName,
+                serviceEntityRevisionId)
 
         if(serviceDetails.container.size() > 1){
             efClient.handleProcedureError("Services in Docker do not support multiple container images within one service. ${serviceDetails.container.size()} container definitions were found in the ElectricFlow service definition for '${serviceName}'.")
@@ -172,7 +174,8 @@ public class DockerClient extends BaseClient {
             String applicationRevisionId,
             String clusterName,
             String envProjectName,
-            String environmentName){
+            String environmentName,
+            String serviceEntityRevisionId){
 
 
         logger INFO, "Undeploying ElectricFlow service: ${serviceName} in service project:${serviceProjectName} application:${applicationName} cluster:${clusterName} environment project:${envProjectName} environment name:${environmentName} cluster endpoint:${clusterEndpoint}"
@@ -184,7 +187,8 @@ public class DockerClient extends BaseClient {
                 applicationRevisionId,
                 clusterName,
                 envProjectName,
-                environmentName)
+                environmentName,
+                serviceEntityRevisionId)
 
         if (OFFLINE) return null
 
