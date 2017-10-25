@@ -747,7 +747,7 @@ public class DockerClient extends BaseClient {
            
         def cpuCount
         if (container.cpuCount) {
-           cpuCount = container.cpuCount.toInteger()
+           cpuCount = convertCpuToNanoCpu(container.cpuCount.toFloat())
         }
 
         def memoryReservation
