@@ -50,7 +50,7 @@ public class DockerClient extends BaseClient {
 
         System.setProperty("docker.cert.path","${this.certificatesDir}")
 
-        if (pluginConfig.credential.password){
+        if (pluginConfig.credential?.password){
             // If docker client private key is provided in plugin config then enable TLS mode
             System.setProperty("docker.tls.verify", "1")
         }else{
@@ -58,7 +58,6 @@ public class DockerClient extends BaseClient {
         }
         
         dockerClient = new DockerClientImpl(pluginConfig.endpoint)
-        
     }
 
 
