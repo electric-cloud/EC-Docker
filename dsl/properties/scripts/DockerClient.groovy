@@ -251,27 +251,29 @@ public class DockerClient extends BaseClient {
 
                         def networkConfig = [:]
                         try{
+                            def subnet = subnets[j].trim()
+                            def gateway = gateways[j].trim()
 
-                            if(subnets[j] != ""){
-                                networkConfig["Subnet"] = subnets[j]
+                            if(subnet != ""){
+                                networkConfig["Subnet"] = subnet
                             } 
 
-                            if(gateways[j] != ""){
-                                networkConfig["Gateway"] = gateways[j]
+                            if(gateway != ""){
+                                networkConfig["Gateway"] = gateway
                             }
 
                             // If atleast one of the config parameter is given
                             // then add them to network config. Adding an empty
                             // value causes docker to pick empty values and
                             // prevents it from supplying default values.
-                            if(subnets[j] != "" || gateways[j] != ""){
+                            if(subnet != "" || gateway != ""){
                                 config << networkConfig
                             }
                         }catch(ArrayIndexOutOfBoundsException e){
 
                             // If gateway not defined for a given subnet
                             config << [
-                                "Subnet":subnets[j]
+                                "Subnet":subnets[j].trim()
                             ]
                         }   
                     }
