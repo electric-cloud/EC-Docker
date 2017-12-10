@@ -26,9 +26,7 @@ public class BaseClient {
                          Object requestBody = null,
                          def queryArgs = null) {
 
-        logger DEBUG, "requestUrl: $requestUrl"
-        logger DEBUG, "method: $method"
-        logger DEBUG, "URI: $requestUri"
+        logger DEBUG, "Request details:\n  requestUrl: '$requestUrl' \n  method: '$method' \n  URI: '$requestUri'"
         if (queryArgs) {
             logger DEBUG, "queryArgs: '$queryArgs'"
         }
@@ -57,12 +55,13 @@ public class BaseClient {
 
             if (failOnErrorCode) {
                 response.failure = { resp, reader ->
-                    logger ERROR, "Error details: $reader"
+                    logger ERROR, "Response: $reader"
                     handleError("Request failed with $resp.statusLine")
                 }
             } else {
-                response.failure = { resp ->
-                    logger INFO, "Response: $resp.statusLine"
+                response.failure = { resp, reader ->
+                    logger DEBUG, "Response: $reader"
+                    logger DEBUG, "Response: $resp.statusLine"
                     [statusLine: resp.statusLine,
                      status: resp.status]
                 }
@@ -122,9 +121,9 @@ public class BaseClient {
         System.exit(-1)
     }
 
-    def static logger(Integer level, def message) {
+    def logger(Integer level, def message) {
         if ( level >= logLevel ) {
-            println message
+            println getLogLevelStr(level) + message
         }
     }
 

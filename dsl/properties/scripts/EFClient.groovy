@@ -30,6 +30,11 @@ public class EFClient extends BaseClient {
         doHttpRequest(POST, getServerUrl(), requestUri, ['Cookie': "sessionId=$sessionId"], failOnErrorCode, requestBody, query)
     }
 
+    Object doHttpPut(String requestUri, Object requestBody, boolean failOnErrorCode = true, def query = null) {
+        def sessionId = System.getenv('COMMANDER_SESSIONID')
+        doHttpRequest(PUT, getServerUrl(), requestUri, ['Cookie': "sessionId=$sessionId"], failOnErrorCode, requestBody, query)
+    }
+
     def getApplication(def projectName, def applicationName) {
 
         def result = doHttpGet("/rest/v1.0/projects/$projectName/applications/$applicationName", /*failOnErrorCode*/ false)
@@ -67,9 +72,10 @@ public class EFClient extends BaseClient {
             [(it.propertyName): it.value]
         }
 
-        logger(DEBUG, "Config values: " + values)
+        logger(INFO, "Plugin configuration values: " + values)
+
         def cred = getCredentials(config)
-        values["credential"] = [userName: cred.userName, password: cred.password]
+        values << [credential: [userName: cred.userName, password: cred.password]]
 
         //Set the log level using the plugin configuration setting
         logLevel = (values.logLevel?: INFO).toInteger()
@@ -86,19 +92,33 @@ public class EFClient extends BaseClient {
 
         def result = doHttpGet("/rest/v1.0/projects/${projectName}/applications/${applicationName}/tierMaps")
 
-        logger INFO, "Tier Maps: " + JsonOutput.toJson(result)
+        logger DEBUG, "Tier Maps: " + JsonOutput.prettyPrint(JsonOutput.toJson(result))
         // Filter tierMap based on environment.
         def tierMap = result.data.tierMap.find {
             it.environmentName == environmentName && it.environmentProjectName == envProjectName
         }
 
-        logger INFO, "Environment tier map for environment '$environmentName' and environment project '$envProjectName': \n" + JsonOutput.toJson(tierMap)
+        logger DEBUG, "Environment tier map for environment '$environmentName' and environment project '$envProjectName': \n" + JsonOutput.prettyPrint(JsonOutput.toJson(tierMap))
         // Filter applicationServiceMapping based on service name.
-        def appSvcMapping = tierMap?.appServiceMappings?.applicationServiceMapping?.find {
+        def svcMapping = tierMap?.appServiceMappings?.applicationServiceMapping?.find {
             it.serviceName == serviceName
         }
-        logger INFO, "Service map for service '$serviceName': \n" + JsonOutput.toJson(appSvcMapping)
-        appSvcMapping?.clusterName
+        // If svcMapping not found, try with serviceClusterMappings for post 8.0 tierMap structure
+        if (!svcMapping) {
+            svcMapping = tierMap?.serviceClusterMappings?.serviceClusterMapping?.find {
+                it.serviceName == serviceName
+            }
+        }
+
+        // Fail if service mapping still not found fail.
+        if (!svcMapping) {
+            handleError("Could not find the service mapping for service '$serviceName', " +
+                    "therefore, the cluster cannot be determined. Try specifying the cluster name " +
+                    "explicitly when invoking 'Undeploy Service' procedure.")
+        }
+        logger DEBUG, "Service map for service '$serviceName': \n" + JsonOutput.prettyPrint(JsonOutput.toJson(svcMapping))
+        svcMapping.clusterName
+
     }
 
     def getProvisionClusterParameters(String clusterName,
@@ -133,28 +153,48 @@ public class EFClient extends BaseClient {
                                     String clusterName,
                                     String clusterProjectName,
                                     String environmentName,
-                                    String serviceEntityRevisionId) {
+                                    String serviceEntityRevisionId = null) {
 
         def partialUri = applicationName ?
                 "projects/$serviceProjectName/applications/$applicationName/services/$serviceName" :
                 "projects/$serviceProjectName/services/$serviceName"
+        def jobStepId = '$[/myJobStep/jobStepId]'
         def queryArgs = [
                 request: 'getServiceDeploymentDetails',
                 clusterName: clusterName,
                 clusterProjectName: clusterProjectName,
                 environmentName: environmentName,
                 applicationEntityRevisionId: applicationRevisionId,
-                jobStepId: System.getenv('COMMANDER_JOBSTEPID')
+                jobStepId: jobStepId
         ]
+
         if (serviceEntityRevisionId) {
             queryArgs << [serviceEntityRevisionId: serviceEntityRevisionId]
         }
+
         def result = doHttpGet("/rest/v1.0/$partialUri", /*failOnErrorCode*/ true, queryArgs)
 
         def svcDetails = result.data.service
-        logger DEBUG, "Service Details: " + JsonOutput.toJson(svcDetails)
+        logger DEBUG, "Service Details: " + JsonOutput.prettyPrint(JsonOutput.toJson(svcDetails))
 
         svcDetails
+    }
+
+    def expandString(String str) {
+        def jobStepId = '$[/myJobStep/jobStepId]'
+        def payload = [
+                value: str,
+                jobStepId: jobStepId
+        ]
+
+        def result = doHttpPost("/rest/v1.0/expandString", /* request body */ payload,
+                /*failOnErrorCode*/ false, [request: 'expandString'])
+
+        if (result.status >= 400){
+            handleProcedureError("Failed to expand '$str'. $result.statusLine")
+        }
+
+        result.data?.value
     }
 
     def getActualParameters() {
@@ -183,6 +223,11 @@ public class EFClient extends BaseClient {
         handleError(msg)
     }
 
+    boolean runningInPipeline() {
+        def result = getEFProperty('/myPipelineStageRuntime/id', /*ignoreError*/ true)
+        return result.data ? true : false
+    }
+
     def createProperty(String propertyName, String value, Map additionalArgs = [:]) {
         // Creating the property in the context of a job-step by default
         def jobStepId = '$[/myJobStep/jobStepId]'
@@ -195,6 +240,57 @@ public class EFClient extends BaseClient {
         ]
 
         doHttpPost("/rest/v1.0/properties", /* request body */ payload)
+    }
+
+    def createProperty2(String propertyName, String value, Map additionalArgs = [:]) {
+        // Creating the property in the context of a job-step by default
+        def jobStepId = '$[/myJobStep/jobStepId]'
+        def payload = [:]
+        payload << additionalArgs
+        payload << [
+                propertyName: propertyName,
+                value: value,
+                jobStepId: jobStepId
+        ]
+        // to prevent getting the value getting converted to json
+        payload = JsonOutput.toJson(payload)
+        doHttpPost("/rest/v1.0/properties", /* request body */ payload)
+    }
+
+    def createPropertyInPipelineContext(String applicationName,
+                                        String serviceName, String targetPort,
+                                        String propertyName, String value) {
+        if (runningInPipeline()) {
+
+            String relativeProp = applicationName ?
+                    "${applicationName}/${serviceName}/${targetPort}" :
+                    "${serviceName}/${targetPort}"
+            String fullProperty = "/myStageRuntime/${relativeProp}/${propertyName}"
+            logger INFO, "Registering pipeline runtime property '$fullProperty' with value $value"
+            setEFProperty(fullProperty, value)
+        }
+    }
+
+    def setEFProperty(String propertyName, String value, Map additionalArgs = [:]) {
+        // Creating the property in the context of a job-step by default
+        def jobStepId = '$[/myJobStep/jobStepId]'
+        def payload = [:]
+        payload << additionalArgs
+        payload << [
+                value: value,
+                jobStepId: jobStepId
+        ]
+        // to prevent getting the value getting converted to json
+        payload = JsonOutput.toJson(payload)
+        doHttpPut("/rest/v1.0/properties/${propertyName}", /* request body */ payload)
+    }
+
+    def getEFProperty(String propertyName, boolean ignoreError = false) {
+        // Get the property in the context of a job-step by default
+        def jobStepId = '$[/myJobStep/jobStepId]'
+
+        doHttpGet("/rest/v1.0/properties/${propertyName}",
+                /* failOnErrorCode */ !ignoreError, [jobStepId: jobStepId])
     }
 
 
@@ -237,7 +333,7 @@ public class EFClient extends BaseClient {
     }
 
     def buildProcessDsl(def name, def projectName, def applicationName, def serviceConfig) {
-              
+
         def dsl = """
             processStep '$name', {
               dependencyJoinType = 'and'
@@ -251,7 +347,7 @@ public class EFClient extends BaseClient {
 
     def buildProcessDependencyDsl(def name, def serviceConfig){
         def processDependency = ''
-        
+
         serviceConfig.dependsOn.each{ dependency ->
 
             processDependency += """
@@ -277,7 +373,7 @@ public class EFClient extends BaseClient {
         def command = serviceConfig.command?.parts?.join(',') ?:null
         def entrypoint = serviceConfig.entrypoint?:null
         def defaultCapacity = serviceConfig.deploy?.replicas
-       
+
         // Volumes
         // Initial empty volume spec
         def serviceVolumes = null
@@ -301,14 +397,14 @@ public class EFClient extends BaseClient {
                 serviceVolumesList << """
                 {
                     \"name\": \"${volumeName}\",
-                    \"hostPath\": \"${hostPath}\" 
-                }""".toString()   
+                    \"hostPath\": \"${hostPath}\"
+                }""".toString()
 
                 containerVolumesList << """
                 {
                     \"name\": \"${volumeName}\",
-                    \"mountPath\": \"${volume.target}\" 
-                }""".toString()   
+                    \"mountPath\": \"${volume.target}\"
+                }""".toString()
                 counter++
             }
             serviceVolumes = "'''[" + serviceVolumesList.join(",") + "\n]'''"
@@ -323,7 +419,7 @@ public class EFClient extends BaseClient {
             int counter = 0
             for (portConfig in serviceConfig.ports.portConfigs){
                 def targetPort = portConfig?.target
-                def publishedPort = portConfig?.published 
+                def publishedPort = portConfig?.published
 
                 containerPort +=  """
                     port '${name}_containerPort_${counter}', {
@@ -391,7 +487,7 @@ public class EFClient extends BaseClient {
         """.toString()
     }
 
-    /* Function to convert B, KB, MB, GB to MB. 
+    /* Function to convert B, KB, MB, GB to MB.
      * Defaults to 1 MB if less that 1 MB
      */
 
@@ -403,7 +499,7 @@ public class EFClient extends BaseClient {
             def floatMemory
             if(!suffix.isNumber()){
                 floatMemory = Float.parseFloat(memory.substring(0, memory.length()-1))
-               
+
                 switch (suffix){
 
                     case ['B', 'b']:
@@ -424,17 +520,19 @@ public class EFClient extends BaseClient {
             }else{
                 // If no memory unit defined in compose file then Default is B(byte)
                 floatMemory = Float.parseFloat(memory)
-               
+
                 if((floatMemory * 0.000001) < 1){
                     // less than 1 MB.. defaulting to 1 MB
                     memoryInMBs = "1"
                 }else{
                     memoryInMBs = Integer.toString(floatMemory * 0.000001 as int)
-                }          
+                }
             }
         }
         memoryInMBs
     }
+
+
 }
 
 

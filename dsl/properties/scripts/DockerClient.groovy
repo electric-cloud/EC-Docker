@@ -133,7 +133,8 @@ public class DockerClient extends BaseClient {
             String resultsPropertySheet,
             String serviceEntityRevisionId){
 
-       
+        logger INFO, "Deploying ElectricFlow service: '${serviceName}', serviceEntityRevisionId: '${serviceEntityRevisionId}' in service project: '${serviceProjectName}', application: '${applicationName}', applicationRevisionId: '${applicationRevisionId}' from cluster: '${clusterName}' in environment: '${environmentName}', environment project: '${clusterOrEnvProjectName}', cluster endpoint: '${clusterEndpoint}'"
+
         def serviceDetails = efClient.getServiceDeploymentDetails(
                 serviceName,
                 serviceProjectName,
@@ -156,10 +157,10 @@ public class DockerClient extends BaseClient {
         if (serviceEndpoint) {
             serviceDetails.port?.each { port ->
  
-                String portName = port.subport
+                def portName = port.subport?:port.listenerPort
                 String url = "${serviceEndpoint}:${port.listenerPort}"
                 efClient.createProperty("${resultsPropertySheet}/${formatName(serviceName)}/${portName}/url", url)
-                println "Saved $url under ${resultsPropertySheet}/${formatName(serviceName)}/${portName}/url"
+                efClient.createPropertyInPipelineContext(applicationName, serviceName, portName, 'url', url)
             }
         }
     }
@@ -177,7 +178,7 @@ public class DockerClient extends BaseClient {
             String serviceEntityRevisionId){
 
 
-        logger INFO, "Undeploying ElectricFlow service: ${serviceName} in service project:${serviceProjectName} application:${applicationName} cluster:${clusterName} environment project:${envProjectName} environment name:${environmentName} cluster endpoint:${clusterEndpoint}"
+        logger INFO, "Undeploying ElectricFlow service: '${serviceName}', serviceEntityRevisionId: '${serviceEntityRevisionId}' in service project: '${serviceProjectName}', application: '${applicationName}', applicationRevisionId: '${applicationRevisionId}' from cluster: '${clusterName}' in environment: '${environmentName}', environment project: '${envProjectName}', cluster endpoint: '${clusterEndpoint}'"
 
         def serviceDetails = efClient.getServiceDeploymentDetails(
                 serviceName,
@@ -438,10 +439,14 @@ public class DockerClient extends BaseClient {
         
         try{
             def serviceSpec = dockerClient.inspectService(serviceName).content
-            }catch(Exception e){
-                 logger INFO, "Service $serviceName not found."
-                 return null
+            if (serviceSpec) {
+                logger DEBUG, "Service information obtained for '$serviceName' from the Docker swarm cluster: " + JsonOutput.prettyPrint(JsonOutput.toJson(serviceSpec))
             }
+            serviceSpec
+        }catch(Exception e){
+             logger INFO, "Service $serviceName not found."
+             return null
+        }
 
     }
 
@@ -454,11 +459,15 @@ public class DockerClient extends BaseClient {
         if (OFFLINE) return null
         
         try{
-            def containerSpec = dockerClient.inspectContainer(serviceName).content
-            }catch(Exception e){
-                 logger INFO, "Container $serviceName not found."
-                 return null
+            def containerSpec = dockerClient.inspectContainer(serviceName)?.content
+            if (containerSpec) {
+                logger DEBUG, "Container information obtained for '$serviceName' from the Docker engine: " + JsonOutput.prettyPrint(JsonOutput.toJson(containerSpec))
             }
+            containerSpec
+        } catch(Exception e){
+             logger INFO, "Container '$serviceName' not found."
+             return null
+        }
 
     }
 
@@ -468,8 +477,11 @@ public class DockerClient extends BaseClient {
      */
     def getContainerId(String serviceName) {
 
-        def containers = dockerClient.ps([name:serviceName]).content
-        containers?.find{it}?.Id
+        // do not rely on docker ps name:<name> as it does not do an exact match
+        // so all containers with names containing the <name> will be retrieved
+        //def containers = dockerClient.ps([name:serviceName]).content
+        def containerInfo = getContainer(serviceName)
+        containerInfo?.Id
     }
 
      Object doHttpGet(String requestUrl, String requestUri, String accessToken, boolean failOnErrorCode = true) {
@@ -796,7 +808,14 @@ public class DockerClient extends BaseClient {
             it.parameterName == parameterName
         }?.parameterValue
 
-        return result != null ? result : defaultValue
+        // expand any property references in the service parameter if required
+        if (result && result.toString().contains('$[')) {
+            EFClient efClient = new EFClient()
+            result = efClient.expandString(result.toString())
+        }
+
+        // not using groovy truthiness so that we can account for 0
+        return result != null && result.toString().trim() != '' ? result.toString().trim() : defaultValue
     }
 
     def getServiceNameToUseForDeployment (def serviceDetails) {
