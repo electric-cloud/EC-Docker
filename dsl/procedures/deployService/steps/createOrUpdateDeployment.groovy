@@ -29,7 +29,6 @@ DockerClient dockerClient = new DockerClient(pluginConfig)
 //def pluginConfig = dockerClient.getPluginConfig(efClient, clusterName, clusterOrEnvProjectName, environmentName)
 def clusterEndpoint = pluginConfig.endpoint
 
-println "serviceName: ${serviceName} serviceEntityRevisionId: ${serviceEntityRevisionId} serviceProjectName:${serviceProjectName} applicationName:${applicationName} clusterName:${clusterName} clusterOrEnvProjectName:${clusterOrEnvProjectName} environmentName:${environmentName} clusterEndpoint:${clusterEndpoint} applicationRevisionId:${applicationRevisionId}"
 
 dockerClient.deployService(
 		        efClient,    
