@@ -195,7 +195,7 @@
                 <h2>Deploy Service</h2>
                 <p>This procedure deploys container on stand-alone Docker engine or Docker Swarm service on already setup Docker Swarm cluster.</p>
                 <p>
-                    User can provide comma separate list of networks to which deploy a container or a swarm service in service mapping override page. If the network does not already exist then the procedure creates one with provided subnet and gateway. If no subnet and gateway is specified, Docker uses default values. Each of the user-defined networks can have multiple subnets and gateways. In that case, multiple subnets/gateways must be separated by '|'(pipe). If Docker endpoint is stand-alone Docker engine then user-defined <b>"bridge"</b> network is created. If Docker endpoint is Docker swarm cluster then user-defined <b>"overlay"</b> network is created.
+                    User can provide a comma-separated list of networks on which to deploy the container or the swarm service in the service mapping page when mapping the service to a cluster in ElectricFlow. If the network does not already exist then the procedure will create one with the provided subnet and gateway. If no subnet and gateway is specified, Docker uses default values. Each of the user-defined networks can have multiple subnets and gateways. In that case, multiple subnets/gateways must be separated by '|'(pipe). If deploying to a stand-alone Docker engine then the user-defined <b>"bridge"</b> network is created.  If deploying to a Docker swarm cluster then the user-defined <b>"overlay"</b> network is created.
                 </p>
                 <p>
                     For example, 
