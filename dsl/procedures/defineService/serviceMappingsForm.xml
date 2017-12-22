@@ -35,7 +35,7 @@
         <label>Subnets:</label>
         <property>subnetList</property>
         <required>0</required>
-        <documentation>Comma separated (CSV) list of subnets for networks mentioned in 'Networks' field. Multiple subnets for same network must be separated by '|' (pipe). For example, 10.200.1.0/24|10.200.2.0/24, 192.168.10.0/24. To use default values for any network in list skip it using commas like ,,192.168.10.0/24</documentation>
+        <documentation>Comma separated (CSV) list of subnet IPs (in IP/netmask format, IP should not end with 0) for networks mentioned in 'Networks' field. Multiple subnets for same network must be separated by '|' (pipe). For example, 10.200.1.10/24|10.200.2.10/24, 192.168.10.10/24. To use default values for any network in list skip it using commas like ,,192.168.10.10/24</documentation>
     </formElement>
     <formElement>
         <type>entry</type>
