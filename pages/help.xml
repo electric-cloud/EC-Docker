@@ -843,7 +843,7 @@
                 -->
         <h2>EC-Docker-1.2.2</h2>
         <ul>
-            <li>Registered the <i>Undeploy Service</i> procedure as an <i>undeployService</i> operation to enable undeploying micro-services modeled in ElectricFlow from Docker using the service process.</li></li>
+            <li>Registered the <i>Undeploy Service</i> procedure as an <i>undeployService</i> operation to enable undeploying micro-services modeled in ElectricFlow from Docker using the service process.</li>
         </ul>
         <h2>EC-Docker-1.2.1</h2>
         <ul>
