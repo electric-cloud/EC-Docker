@@ -844,6 +844,9 @@
         <h2>EC-Docker-1.2.2</h2>
         <ul>
             <li>Registered the <i>Undeploy Service</i> procedure as an <i>undeployService</i> operation to enable undeploying micro-services modeled in ElectricFlow from Docker using the service process.</li>
+            <li>Added <i>Create Ingress</i> and <i>Delete Network</i> procedures.</li>
+            <li>Added support for container update on standalone docker engine.</li>
+            <li>Added support for attaching additional networks during container update.</li>
         </ul>
         <h2>EC-Docker-1.2.1</h2>
         <ul>
