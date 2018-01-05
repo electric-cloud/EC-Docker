@@ -1,6 +1,9 @@
 use Cwd;
 use File::Spec;
 use POSIX;
+use Archive::Zip;
+use MIME::Base64;
+use File::Temp qw(tempfile tempdir);
 my $dir = getcwd;
 my $logfile ="";
 my $pluginDir;
@@ -11,9 +14,6 @@ if ( defined $ENV{QUERY_STRING} ) {    # Promotion through UI
 }
 else {
     my $commanderPluginDir = $commander->getProperty('/server/settings/pluginsDirectory')->findvalue('//value');
-    unless ( $commanderPluginDir && -d $commanderPluginDir ) {
-        die "Cannot find commander plugin dir, please ensure that the option server/settings/pluginsDirectory is set up correctly";
-    }
     $pluginDir = File::Spec->catfile($commanderPluginDir, $pluginName);
 }
 
@@ -25,19 +25,25 @@ $logfile .= "Current directory: $dir\n";
 
 # Evaluate promote.groovy or demote.groovy based on whether plugin is being promoted or demoted ($promoteAction)
 local $/ = undef;
-# If env variable QUERY_STRING exists:
-my $dslFilePath;
-if(defined $ENV{QUERY_STRING}) { # Promotion through UI
-    $dslFilePath = File::Spec->catfile($ENV{COMMANDER_PLUGINS}, $pluginName, "dsl", "$promoteAction.groovy");
-} else {  # Promotion from the command line
-    $dslFilePath = File::Spec->catfile($pluginDir, "dsl", "$promoteAction.groovy");
+
+my $demoteDsl = q{
+# demote.groovy placeholder
+};
+
+my $promoteDsl = q{
+# promote.groovy placeholder
+};
+
+
+my $dsl;
+if ($promoteAction eq 'promote') {
+  $dsl = $promoteDsl;
+}
+else {
+  $dsl = $demoteDsl;
 }
 
-$logfile .= "Evaluating dsl file: $dslFilePath\n";
 
-open FILE, $dslFilePath or die "Couldn't open file: $dslFilePath: $!";
-my $dsl = <FILE>;
-close FILE;
 my $dslReponse = $commander->evalDsl(
     $dsl, {
         parameters => qq(
@@ -63,6 +69,22 @@ if ( !$errorMessage ) {
     # delete artifact if it exists first
     $commander->deleteArtifactVersion("com.electriccloud:EC-Docker-Grapes:1.0.1");
 
+    my $dependenciesProperty = '/projects/@PLUGIN_NAME@/ec_groovyDependencies';
+    my $base64 = $commander->getProperty($dependenciesProperty)->findvalue('//value')->string_value;
+    my $binary = decode_base64($base64);
+    my ($tempFh, $tempFilename) = tempfile(CLEANUP => 1);
+    binmode($tempFh);
+    print $tempFh $binary;
+    close $tempFh;
+
+    my ($tempDir) = tempdir(CLEANUP => 1);
+    my $zip = Archive::Zip->new();
+    unless($zip->read($tempFilename) == Archive::Zip::AZ_OK()) {
+      die "Cannot read .zip dependencies: $!";
+    }
+    $zip->extractTree("", File::Spec->catfile($tempDir, ''));
+
+
     if ( $promoteAction eq "promote" ) {
 
         #publish jars to the repo server if the plugin project was created successfully
@@ -72,7 +94,7 @@ if ( !$errorMessage ) {
                 artifactKey     => "EC-Docker-Grapes",
                 version         => "1.0.1",
                 includePatterns => "**",
-                fromDirectory   => "$pluginDir/lib",
+                fromDirectory   => "$tempDir/lib",
                 description => "JARs that EC-Docker plugin procedures depend on"
             }
         );
