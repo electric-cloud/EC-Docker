@@ -3,6 +3,7 @@ use File::Spec;
 use POSIX;
 use Archive::Zip;
 use MIME::Base64;
+use Digest::MD5 qw(md5_hex);
 use File::Temp qw(tempfile tempdir);
 my $dir = getcwd;
 my $logfile ="";
@@ -70,7 +71,39 @@ if ( !$errorMessage ) {
     $commander->deleteArtifactVersion("com.electriccloud:EC-Docker-Grapes:1.0.1");
 
     my $dependenciesProperty = '/projects/@PLUGIN_NAME@/ec_groovyDependencies';
-    my $base64 = $commander->getProperty($dependenciesProperty)->findvalue('//value')->string_value;
+    my $base64 = '';
+    my $xpath;
+    eval {
+      $xpath = $commander->getProperties({path => $dependenciesProperty});
+      1;
+    };
+    unless($@) {
+      my $blocks = {};
+      my $checksum = '';
+      for my $prop ($xpath->findnodes('//property')) {
+        my $name = $prop->findvalue('propertyName')->string_value;
+        my $value = $prop->findvalue('value')->string_value;
+        if ($name eq 'checksum') {
+          $checksum = $value;
+        }
+        else {
+          my ($number) = $name =~ /ec_dependencyChunk_(\d+)$/;
+          $blocks->{$number} = $value;
+        }
+      }
+      for my $key (sort {$a <=> $b} keys %$blocks) {
+        $base64 .= $blocks->{$key};
+      }
+
+      my $resultChecksum = md5_hex($base64);
+      unless($checksum) {
+        die "No checksum found in dependendencies property, please reinstall the plugin";
+      }
+      if ($resultChecksum ne $checksum) {
+        die "Wrong dependency checksum: original checksum is $checksum";
+      }
+    }
+
     my $binary = decode_base64($base64);
     my ($tempFh, $tempFilename) = tempfile(CLEANUP => 1);
     binmode($tempFh);
