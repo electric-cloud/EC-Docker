@@ -68,7 +68,7 @@ if ( !$errorMessage ) {
     # This is here because we cannot do publishArtifactVersion in dsl today
 
     # delete artifact if it exists first
-    $commander->deleteArtifactVersion("com.electriccloud:EC-AzureContainerService-Grapes:1.0.0");
+    $commander->deleteArtifactVersion("com.electriccloud:EC-Docker-Grapes:1.0.1");
 
     my $dependenciesProperty = '/projects/@PLUGIN_NAME@/ec_groovyDependencies';
     my $base64 = '';
@@ -124,11 +124,11 @@ if ( !$errorMessage ) {
         my $am = new ElectricCommander::ArtifactManagement($commander);
         my $artifactVersion = $am->publish(
             {   groupId         => "com.electriccloud",
-                artifactKey     => "EC-AzureContainerService-Grapes",
-                version         => "1.0.0",
+                artifactKey     => "EC-Docker-Grapes",
+                version         => "1.0.1",
                 includePatterns => "**",
                 fromDirectory   => "$tempDir/lib",
-                description => "JARs that EC-AzureContainerService plugin procedures depend on"
+                description => "JARs that EC-Docker plugin procedures depend on"
             }
         );
 
