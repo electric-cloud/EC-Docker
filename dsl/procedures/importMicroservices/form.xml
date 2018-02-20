@@ -1,0 +1,73 @@
+<!--
+
+     Copyright 2015 Electric Cloud, Inc.
+
+     Licensed under the Apache License, Version 2.0 (the "License");
+     you may not use this file except in compliance with the License.
+     You may obtain a copy of the License at
+
+         http://www.apache.org/licenses/LICENSE-2.0
+
+     Unless required by applicable law or agreed to in writing, software
+     distributed under the License is distributed on an "AS IS" BASIS,
+     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+     See the License for the specific language governing permissions and
+     limitations under the License.
+
+-->
+<editor>
+    <help/>
+	<formElement>
+        <type>artifactUpload</type>
+        <label>Docker Compose file</label>
+        <property>docker_compose_file_content</property>
+        <required>1</required>
+		<fileUploadRequired>1</fileUploadRequired>
+        <documentation>Docker Compose YAML file</documentation>
+    </formElement>
+    <formElement>
+        <type>entry</type>
+        <label>Project Name:</label>
+        <property>project</property>
+        <required>1</required>
+        <documentation>The name of project in which the application or the services will be created.</documentation>
+    </formElement>
+	<formElement>
+        <type>checkbox</type>
+        <label>Create application-scoped micro-services:</label>
+        <property>application_scoped</property>
+        <required>0</required>
+		<checkedValue>1</checkedValue>
+        <uncheckedValue>0</uncheckedValue>
+        <initiallyChecked>0</initiallyChecked>
+        <documentation>Whether all the services defined in the Docker Compose file should be created within one application in ElectricFlow. If checked, ‘Application Name’ must be provided.</documentation>
+    </formElement>
+    <formElement>
+        <type>entry</type>
+        <label>Application Name:</label>
+        <property>application</property>
+        <required>0</required>
+        <documentation>Name of the application to be created as part of discovery.</documentation>
+    </formElement>
+	<formElement>
+		<type>entry</type>
+        <label>Environment Project Name:</label>
+        <property>environment_project</property>
+        <required>1</required>
+        <documentation>The name of project that the environment belongs to.</documentation>
+	</formElement>
+	<formElement>
+		<type>entry</type>
+        <label>Environment Name:</label>
+        <property>environment</property>
+        <required>1</required>
+        <documentation>The name of the environment containing the cluster where the newly created microservice(s) will be deployed.</documentation>
+	</formElement>
+	<formElement>
+		<type>entry</type>
+        <label>Cluster Name:</label>
+        <property>cluster</property>
+        <required>1</required>
+        <documentation>The name of the EC-Docker backed cluster within the environment where the newly created microservice(s) will be deployed.</documentation>
+	</formElement>
+</editor>
