@@ -24,4 +24,6 @@ composeFile << dockerComposeContent
 def composeConfig = DockerClient.readCompose(composeFile.absolutePath)
 
 ImportMicroservices importServices = new ImportMicroservices(dockerClient, pluginConfig, composeConfig)
-importServices.buildServicesDefinitions(projectName, applicationName)
+def services = importServices.buildServicesDefinitions(projectName, applicationName)
+
+importServices.saveToEF(services, projectName, envProjectName, environmentName, clusterName)
