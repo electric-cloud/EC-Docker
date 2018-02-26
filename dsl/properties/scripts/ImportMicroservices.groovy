@@ -14,25 +14,21 @@
  */
 
 public class ImportMicroservices extends EFClient {
-	def dockerClient
-    def pluginConfig
-    def clusterEndpoint
+
 	def composeConfig
     def importedSummary = [:]
 	
 	static final String CREATED_DESCRIPTION = "Created by Container ImportMicroservices"
 	
-	def ImportMicroservices(def dockerClient, def pluginConfig, def composeConfig) {
-        dockerClient = dockerClient
-        pluginConfig = params.pluginConfig
-        accessToken = kubeClient.retrieveAccessToken(pluginConfig)
+	def ImportMicroservices(def composeConfig) {
 		this.composeConfig = composeConfig
-        clusterEndpoint = pluginConfig.clusterEndpoint
     }
 	
 	def buildServicesDefinitions(def projectName, def applicationName) {
 		def efServices = []
+		println "buildServicesDefinitions: "
 		composeConfig.services.each { name, serviceConfig ->
+			println "composeConfig.services.each:  " + name
 			def efService = buildServiceDefinition(name, projectName, applicationName, serviceConfig)
 			efServices.push(efService)
         }
@@ -41,6 +37,7 @@ public class ImportMicroservices extends EFClient {
 	
 	def buildServiceDefinition(def name, def projectName, def applicationName, def serviceConfig) {
         def efServiceName = name
+		print "buildServiceDefinition: " + name
         def efService = [
             service: [
                 serviceName: efServiceName
@@ -50,63 +47,60 @@ public class ImportMicroservices extends EFClient {
 
         // Service Fields
 		efService.service.defaultCapacity = serviceConfig.deploy?.replicas
-		efService.service.minCapacity = serviceConfig.updateConfig?.parallelism
+		efService.service.minCapacity = serviceConfig.deploy?.updateConfig?.parallelism
 		
-		String[] imageInfo = serviceConfig.image?.split(':')
-        def image = ''
-        def version = ''
-        if (imageInfo && imageInfo.length > 0) {
-            image = imageInfo[0]
-            if (imageInfo.length > 1) {
-                version = imageInfo[1]
-            }
-        }
+		// image
+		def image = ''
+		def version = ''
+		def repositoryName = '' 
+		String imageInfo = serviceConfig?.image
+		print "IMAGE !: " + imageInfo
+		if ( imageInfo != null ) {
+			if (imageInfo.contains("/")) {
+				String[] parts = imageInfo.split('/')
+				repositoryName = parts[0]
+				if (parts.length > 1 && parts[1].contains(":")) {
+					String[] imageParts = parts[1].split(':')
+					image = imageParts[0]
+					version = imageParts[1]
+				} else {
+					image = parts[1]
+				}
+			} else {
+				String[] parts = imageInfo.split(':')	
+				image = imageInfo[0]
+				if (parts.length > 1) {
+					version = imageInfo[1]
+				}
+			}
+		} 
 		
 		// ENV variables
-        def envVars = ""
-        serviceConfig.environment.entries.each{key, value ->
-            envVars += """
-            environmentVariable '$key', {
-                type = 'string'
-                value = '$value'
-            }""".toString()
+        def envVars = serviceConfig.environment.entries?.collect{
+			[environmentVariableName: it.key, type: 'string', value: it.value]
         }
-		efService.service.environmentVariable = envVars
 		
 		// port config
+		def containerPort = ""
+        def servicePort = ""
+		def ports = serviceConfig.ports.portConfigs?.collect {
+			[containerPort: it.target, servicePort: it.published]
+		}
+		
+		/*
         def containerPort = ""
         def servicePort = ""
-        if(serviceConfig.ports){
-            // Append port config
-            int counter = 0
-            for (portConfig in serviceConfig.ports.portConfigs){
-                def targetPort = portConfig?.target
-                def publishedPort = portConfig?.published
-
-                containerPort +=  """
-                    port '${name}_containerPort_${counter}', {
-                        applicationName = '$applicationName'
-                        containerName = '$name'
-                        containerPort = '$targetPort'
-                        projectName = '$projectName'
-                        serviceName = '$name'
-                    }
-                """.toString()
-
-                servicePort +=  """
-                port '${name}_servicePort_${counter}', {
-                      applicationName = '$applicationName'
-                      listenerPort = '$publishedPort'
-                      projectName = '$projectName'
-                      serviceName = '$name'
-                      subcontainer = '$name'
-                      subport = '${name}_containerPort_${counter}'
-                }
-                """.toString()
-                counter++
-            }
-        }
-		efService.service.port = servicePort
+		String ports = serviceConfig?.ports
+		print "PORTS!!: " + ports
+		String[] port = ports.split(":");
+		if(port[1].contains("tcp")) {
+			containerPort = port[0].replaceAll("[^0-9]+", "") 
+			servicePort = "tcp"
+		} else {
+			containerPort = port[0].replaceAll("[^0-9]+", "") 
+			servicePort = port[1].replaceAll("[^0-9]+", "")
+		}
+		efService.service.port = servicePort */
 		
 		// Volumes
         def serviceVolumes = null
@@ -114,7 +108,6 @@ public class ImportMicroservices extends EFClient {
         if(serviceConfig.volumes){
             def serviceVolumesList = []
             def containerVolumesList = []
-            def counter = 0
             for(volume in serviceConfig.volumes){
 
                 def volumeName, hostPath
@@ -122,8 +115,6 @@ public class ImportMicroservices extends EFClient {
                     volumeName = volume.source
                     hostPath = ""
                 }else{
-                    // bind volume type
-                    volumeName = "${name}_volume_${counter}"
                     hostPath = volume.source
                 }
 
@@ -138,7 +129,6 @@ public class ImportMicroservices extends EFClient {
                     \"name\": \"${volumeName}\",
                     \"mountPath\": \"${volume.target}\"
                 }""".toString()
-                counter++
             }
             serviceVolumes = "'''[" + serviceVolumesList.join(",") + "\n]'''"
             containerVolumes = "'''[" + containerVolumesList.join(",") + "\n]'''"
@@ -150,6 +140,7 @@ public class ImportMicroservices extends EFClient {
                 containerName: efServiceName,
 				command: serviceConfig.command?.parts?.join(',') ?: null,
 				entryPoint: serviceConfig.entrypoint ?: null,
+				repositoryName: repositoryName,
                 image: image,
                 version: version,
                 memoryLimit: convertToMBs(serviceConfig.deploy?.resources?.limits?.memory),
@@ -157,20 +148,16 @@ public class ImportMicroservices extends EFClient {
 				cpuLimit: serviceConfig.deploy?.resources?.limits?.nanoCpus,
 				cpuCount: serviceConfig.deploy?.resources?.reservations?.nanoCpus,
 				volumeMount: containerVolumes,
-				port: containerPort,
-				environmentVariable: envVars
+				port: ports
             ]
         ]
 		
 		efService.container = container
+		efService.container.env = envVars
 		
 		// dependencies
-		def processDependency = ''
-        serviceConfig.dependsOn.each{ dependency ->
-            processDependency += """
-            processDependency '$dependency', targetProcessStepName: '$name', {
-               branchType = 'ALWAYS'
-            }""".toString()
+        def processDependency = serviceConfig.dependsOn?.collect {
+			[processDependencyName: it.dependency, targetProcessStepName: name, branchType: 'ALWAYS']
         }
 		efService.service.processDependency = processDependency
 		
@@ -179,11 +166,11 @@ public class ImportMicroservices extends EFClient {
         def subnetListParams = null
 		def gatewayListParams = null
 		if(serviceConfig.networks) {
+		
 			def networkList = []
 			def subnetList = []
 			def gatewayList = []
-			def counter = 0
-			
+		
 			for(network in serviceConfig.networks){
                 def networkParam, subnetParam, gatewayParam
 				networParam = network.network
@@ -193,25 +180,20 @@ public class ImportMicroservices extends EFClient {
                 networkList << """
                 {
                     \"name\": \"${name}\",
-                    \"network\": \"${networParam}\",
-					\"count\": \"${counter}\"
+                    \"network\": \"${networParam}\"
                 }""".toString()
 
                 subnetList << """
                 {
                     \"name\": \"${volumeName}\",
-                    \"subnet\": \"${subnetParam}\",
-					\"count\": \"${counter}\"
+                    \"subnet\": \"${subnetParam}\"
                 }""".toString()
 				
 				gatewayList << """
                 {
                     \"name\": \"${volumeName}\",
-                    \"gateway\": \"${gatewayParam}\",
-					\"count\": \"${counter}\"
+                    \"gateway\": \"${gatewayParam}\"
                 }""".toString()
-				
-                counter++
             }
 			
             networkListParams = "'''[" + networkList.join(",") + "\n]'''"
@@ -219,7 +201,7 @@ public class ImportMicroservices extends EFClient {
 			gatewayListParams = "'''[" + gatewayList.join(",") + "\n]'''"
 		}
 		
-		efService.serviceMapping.networkList = networkListParams`
+		efService.serviceMapping.networkList = networkListParams
 		efService.serviceMapping.subnetList = subnetListParams
 		efService.serviceMapping.gatewayList = gatewayListParams
 		
@@ -438,3 +420,8 @@ public class ImportMicroservices extends EFClient {
         return normalizer(oneName) == normalizer(anotherName)
     }
 	
+	def prettyPrint(object) {
+        println new JsonBuilder(object).toPrettyString()
+    }
+
+}

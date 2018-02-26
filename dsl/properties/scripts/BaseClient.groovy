@@ -126,6 +126,10 @@ public class BaseClient {
             println getLogLevelStr(level) + message
         }
     }
+	
+	def prettyPrint(object) {
+        println new JsonBuilder(object).toPrettyString()
+    }
 
     String formatName(String name){
         return name.replaceAll(' ', '-').replaceAll('_', '-').replaceAll("^-+", "").replaceAll("-+\$", "").toLowerCase()

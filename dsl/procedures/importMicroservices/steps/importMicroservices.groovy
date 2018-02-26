@@ -9,12 +9,7 @@ def environmentProjectName = '$[environment_project]'
 def environmentName = '$[environment]'
 def clusterName = '$[cluster]'
 
-
 EFClient efClient = new EFClient()
-def clusterParameters = efClient.getProvisionClusterParameters(clusterName, environmentProjectName, environmentName)
-
-def pluginConfig = efClient.getConfigValues('ec_plugin_cfgs', clusterParameters.config, pluginProjectName)
-DockerClient dockerClient = new DockerClient(pluginConfig)
 
 String dir = System.getenv('COMMANDER_WORKSPACE')
 File composeFile = new File(dir, 'docker-compose.yml')
@@ -23,7 +18,7 @@ composeFile << dockerComposeContent
 // read the compose file
 def composeConfig = DockerClient.readCompose(composeFile.absolutePath)
 
-ImportMicroservices importServices = new ImportMicroservices(dockerClient, pluginConfig, composeConfig)
+ImportMicroservices importServices = new ImportMicroservices(composeConfig)
 def services = importServices.buildServicesDefinitions(projectName, applicationName)
 
 importServices.saveToEF(services, projectName, envProjectName, environmentName, clusterName)

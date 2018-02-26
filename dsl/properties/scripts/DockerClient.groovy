@@ -823,13 +823,11 @@ public class DockerClient extends BaseClient {
     }
 
     static def readCompose(String filePath) {
-
         File composeFile = new File(filePath)
         def composeStream = new FileInputStream(composeFile)
         String workingDir = composeFile.parent
         ComposeFileReader composeFileReader = new ComposeFileReader()
         ComposeConfig composeConfig = composeFileReader.load(composeStream, workingDir, System.getenv())
-        logger INFO, "composeContent: $composeConfig}"
         composeConfig
     }
 
