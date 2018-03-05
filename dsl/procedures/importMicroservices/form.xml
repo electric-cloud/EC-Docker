@@ -18,11 +18,10 @@
 <editor>
     <help/>
 	<formElement>
-        <type>artifactUpload</type>
+        <type>textarea</type>
         <label>Docker Compose file</label>
         <property>docker_compose_file_content</property>
         <required>1</required>
-		<fileUploadRequired>1</fileUploadRequired>
         <documentation>Docker Compose YAML file</documentation>
     </formElement>
     <formElement>

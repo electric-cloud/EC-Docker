@@ -822,8 +822,7 @@ public class DockerClient extends BaseClient {
         formatName(getServiceParameter(serviceDetails, "serviceNameOverride", serviceDetails.serviceName))
     }
 
-    static def readCompose(String filePath) {
-        File composeFile = new File(filePath)
+    static def readCompose(File composeFile) {
         def composeStream = new FileInputStream(composeFile)
         String workingDir = composeFile.parent
         ComposeFileReader composeFileReader = new ComposeFileReader()
