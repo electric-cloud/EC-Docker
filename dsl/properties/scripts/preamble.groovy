@@ -1,3 +1,4 @@
+$[/myProject/scripts/PluginException]
 $[/myProject/scripts/Logger]
 $[/myProject/scripts/BaseClient]
 $[/myProject/scripts/EFClient]

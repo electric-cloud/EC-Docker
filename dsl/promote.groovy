@@ -20,7 +20,7 @@ def stepsWithAttachedCredentials = [
 				stepName: 'checkCluster'
 		], [
 				procedureName: 'Deploy Service',
-				stepName: 'createOrUpdateDeployment'
+				stepName: 'artifact2image'
 		], [
 				procedureName: 'Remove Docker Service',
 				stepName: 'cleanup'
@@ -39,6 +39,9 @@ def stepsWithAttachedCredentials = [
 		], [
 				procedureName: 'Delete Network',
 				stepName: 'deleteNetwork'
+		], [
+		    	procedureName: 'Artifact2Image',
+				stepName: 'artifact2image'
 		]
 		
 ]

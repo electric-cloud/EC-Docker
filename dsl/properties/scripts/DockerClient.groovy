@@ -8,6 +8,7 @@
 
 import de.gesellix.docker.client.DockerClientImpl
 import de.gesellix.docker.client.DockerClientException
+import de.gesellix.docker.client.image.BuildConfig
 import de.gesellix.docker.compose.ComposeFileReader
 import de.gesellix.docker.compose.types.ComposeConfig
 
@@ -664,6 +665,19 @@ public class DockerClient extends BaseClient {
             logger ERROR, "Service clean up timed out."
             exit 1
         }
+    }
+    
+    
+    def buildImage(String tag, InputStream tar) {
+        def response = dockerClient.build(tar, new BuildConfig(query: [t: tag]))
+        logger INFO, "Created image $tag. Response $response\n"
+        return response.imageId
+    }
+
+    def pushImage(String name, String auth, String registry) {
+        def response = dockerClient.push(name, auth, registry)
+        logger INFO, "Pushed image $name. Response $response\n"
+        return response
     }
 
     def awaitServiceRemoved(def name,def timeout) {
