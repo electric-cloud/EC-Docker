@@ -22,8 +22,7 @@ my @retrievedArtifactVersions = $am->retrieve({
     toDirectory => $destination,
 });
 
-print Dumper \@retrievedArtifactVersions;
-
-my $version = $retrievedArtifactVersions[0];
-print "Retrieval result: @{[$version->diagnostics()]}\n";
+my $retrievedVersion = $retrievedArtifactVersions[0];
+print "Retrieval result: @{[$retrievedVersion->diagnostics()]}\n";
 $ec->setProperty("/myJob/$artifactName/location", $destination);
+$ec->setProperty("/myJobStep/summary", "Retrieved @{[$retrievedVersion->artifactVersionName]}");

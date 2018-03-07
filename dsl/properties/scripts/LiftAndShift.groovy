@@ -1,4 +1,5 @@
 
+
 import com.electriccloud.client.groovy.ElectricFlow
 import groovy.text.SimpleTemplateEngine
 import groovy.text.Template
@@ -6,7 +7,7 @@ import de.gesellix.docker.client.builder.BuildContextBuilder
 import groovy.json.JsonBuilder
 
 
-class LiftAndShift {
+class LiftAndShift extends BaseClient {
     @Lazy
     ElectricFlow ef = { new ElectricFlow() }()
 
@@ -15,12 +16,23 @@ class LiftAndShift {
     static final String WAR = 'war'
     static final String JAR = 'jar'
 
+    /**
+     *
+     * @param artifact
+     * @param dockerfileDetails [
+     *      ENV: env entry
+     *      PORTS: EXPOSE entry
+     *      BASE_IMAGE: base image for dockerfile
+ *          COMMAND: command for dockerfile
+     * ]
+     * @return
+     */
     File generateDockerfile(File artifact, Map dockerfileDetails) {
         String type = getArtifactType(artifact)
         String dockerfile = buildDockerfile(dockerfileDetails, type, artifact)
         logger INFO, "Dockefile: ${dockerfile}"
         new File(artifact.parentFile, "Dockerfile").write(dockerfile)
-        logger INFO, "Saved Dockerfile"
+        logger INFO, "Saved Dockerfile under ${artifact.parentFile}/Dockerfile"
         artifact.parentFile
     }
 
@@ -32,27 +44,37 @@ class LiftAndShift {
         )
 
         InputStream tar = new FileInputStream(destination)
-        String imageId = dockerClient.buildImage(tag, tar)
-        imageId
+        def response = dockerClient.buildImage(tag, tar)
+        String imageId = response.imageId
+        String log = response.log
+        logger INFO, "Image has been built successfully: ${imageId}"
+        if (log) {
+            logger INFO, "Build log: ${log}"
+        }
+        return imageId
     }
 
 
-    def pushImage(String imageId, String registryURL = null, String userName = null, String password = null) {
+    def pushImage(String imageName, String registryURL = null, String userName = null, String pass = null) {
         String auth
-        if (userName && password) {
+        if (userName && pass) {
             def json = new JsonBuilder()
             def jsonAuth = json {
                 username userName
-                password password
+                password pass
                 if (registryURL) {
                     serveraddress registryURL
                 }
             }
-            logger DEBUG, "Auth: ${jsonAuth.toPrettyString()}"
-            auth = jsonAuth.toString().bytes.encodeBase64().toString()
+
+            logger DEBUG, "Auth: ${json.toPrettyString()}"
+            auth = json.toString().bytes.encodeBase64().toString()
         }
-        def response = dockerClient.pushImage(imageId, auth, registryURL)
-        println response
+        def response = dockerClient.pushImage(imageName, auth, registryURL)
+        def content = response.content
+        content.each {
+            logger INFO, "${it}"
+        }
     }
 
 
@@ -66,15 +88,14 @@ class LiftAndShift {
                 name = 'tomcat'
                 break
         }
-        String templateText = ef.getProperty_0(propertyName: '/plugins/EC-Docker/project/dockerfiles/defaults/' + name)
-        println templateText
+        String templatePath = '/plugins/EC-Docker/project/dockerfiles/defaults/' + name
+        String templateText = ef.getProperty_0(propertyName: templatePath)?.property?.value
+        assert templateText : "Template ${templatePath} was not found"
+        logger DEBUG, "Template: ${templateText}"
         Template template = new SimpleTemplateEngine().createTemplate(templateText)
-        def map = [:]
+        def map = details
         map.FILENAME = artifact.name
-        map.COMMAND = details.dockerCommand
-        map.ENV = details.env ?: []
-        map.PORTS = details.ports ?: []
-        map.BASE_IMAGE = details.image
+        logger DEBUG, "Template parameters: ${map}"
         String dockerfile = template.make(map)
         return dockerfile
     }
@@ -98,7 +119,7 @@ class LiftAndShift {
                 throw new PluginException("Cannot process artifact ${file.name}")
             }
         }
-
+        logger INFO, "Artifact to be converted to Docker image: ${artifact.name}"
         return artifact
     }
 

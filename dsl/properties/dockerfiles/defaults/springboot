@@ -1,14 +1,9 @@
 FROM ${BASE_IMAGE:'openjdk:8-jdk-alpine'}
 
 ADD ${FILENAME} app.jar
-<% PORTS.each { port -> %>
-EXPOSE ${port}
-<% } %>
-<% if (PORTS.size() == 0) { %>
-EXPOSE 8080
-<% } %>
-<% ENV.each { env -> %>
-ENV ${env.name} ${env.value}
+EXPOSE ${PORTS:8080}
+<% if (ENV) { %>
+ENV ${ENV}
 <% } %>
 
 CMD [${COMMAND:'"java", "-jar", "/app.jar"'}]

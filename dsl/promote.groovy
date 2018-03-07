@@ -20,7 +20,7 @@ def stepsWithAttachedCredentials = [
 				stepName: 'checkCluster'
 		], [
 				procedureName: 'Deploy Service',
-				stepName: 'artifact2image'
+				stepName: 'createOrUpdateDeployment'
 		], [
 				procedureName: 'Remove Docker Service',
 				stepName: 'cleanup'
@@ -43,7 +43,7 @@ def stepsWithAttachedCredentials = [
 		    	procedureName: 'Artifact2Image',
 				stepName: 'artifact2image'
 		]
-		
+
 ]
 project pluginName, {
 
