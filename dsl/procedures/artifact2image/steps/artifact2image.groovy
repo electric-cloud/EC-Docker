@@ -18,7 +18,7 @@ String env = '''$[ec_docker_env]'''.trim()
 ElectricFlow ef = new ElectricFlow()
 EFClient efClient = new EFClient()
 
-String artifactLocation = ef.getProperty_0(
+String artifactLocation = ef.getProperty(
     propertyName: "/myJob/${artifactName}/location"
 )?.property?.value
 
@@ -57,6 +57,8 @@ def liftAndShift = new LiftAndShift(
     artifactCacheDirectory: artifactFolder
 )
 
+String resultPropertySheet = "/myParent/parent"
+
 try {
     File artifact = liftAndShift.findArtifact()
     def details = [
@@ -68,7 +70,10 @@ try {
     File dockerfileWorkspace = liftAndShift.generateDockerfile(artifact, details)
     String imageId = liftAndShift.buildImage(imageName, dockerfileWorkspace)
     liftAndShift.pushImage(imageName, registryUrl, userName, password)
-    ef.setProperty_0(propertyName: '/myJobStep/summary', value: "Image ID: ${imageId}")
+    ef.setProperty(propertyName: '/myJobStep/summary', value: "Image ID: ${imageId}")
+
+    ef.setProperty(propertyName: "${resultPropertySheet}/${imageName}/imageId", value: imageId)
+
 } catch (PluginException e) {
     efClient.handleProcedureError(e.getMessage())
 }

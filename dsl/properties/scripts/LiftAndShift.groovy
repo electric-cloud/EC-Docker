@@ -85,7 +85,7 @@ class LiftAndShift extends BaseClient {
                 name = 'springboot'
                 break
             case WAR:
-                name = 'tomcat'
+                name = 'jetty'
                 break
         }
         String templatePath = '/plugins/EC-Docker/project/dockerfiles/defaults/' + name

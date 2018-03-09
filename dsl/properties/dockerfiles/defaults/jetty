@@ -1,0 +1,11 @@
+FROM ${BASE_IMAGE:'jetty:9.4.7-jre8-alpine'}
+
+COPY ${FILENAME} /var/lib/jetty/webapps/ROOT.war
+EXPOSE ${PORTS:8080}
+<% if (ENV) { %>
+ENV ${ENV}
+<% } %>
+
+<% if (COMMAND) { %>
+CMD [${COMMAND}]
+<% } %>
