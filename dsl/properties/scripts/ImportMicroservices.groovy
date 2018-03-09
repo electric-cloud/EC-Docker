@@ -41,6 +41,7 @@ public class ImportMicroservices extends EFClient {
 		// Services
 		composeConfig.services.each { name, serviceConfig ->
 			checkForUnsupportedParameters(name, serviceConfig)
+            logger INFO, "VOLUME CLASS: ${serviceConfig.volumes?.source.getClass()}"
 			def efService = buildServiceDefinition(name, serviceConfig)
 			efServices.push(efService)
         }
@@ -140,7 +141,7 @@ public class ImportMicroservices extends EFClient {
         def envVars = serviceConfig.environment.entries?.collect{
 			[environmentVariableName: it.key, type: 'string', value: it.value]
         }
-		
+
 		 // port config
         def containerPort = ""
         def servicePort = ""
@@ -152,15 +153,18 @@ public class ImportMicroservices extends EFClient {
 		efService.service.port = servicePort
 		
 		// Volumes
-		def serviceVolumes = serviceConfig.volumes?.collect{
-			[volume: it.source]
+        String serviceVolumeValue = null
+        def servicesVolumes = serviceConfig.volumes?.source
+        if(servicesVolumes != null) {
+            serviceVolumeValue = servicesVolumes.first()
         }
-		
-		def containerVolumes = serviceConfig.volumes?.collect{
-			[volume: it.target]
+        efService.service.volume = serviceVolumeValue
+
+        String containerVolumeValue = null
+        def containerVolumes = serviceConfig.volumes?.target
+        if(containerVolumes != null) {
+            containerVolumeValue = containerVolumes.first()
         }
-		
-		efService.service.volume = serviceVolumes
 		
 		def container = [
             container: [
@@ -174,8 +178,8 @@ public class ImportMicroservices extends EFClient {
 				memorySize: convertToMBs(serviceConfig.deploy?.resources?.reservations?.memory),
 				cpuLimit: serviceConfig.deploy?.resources?.limits?.nanoCpus,
 				cpuCount: serviceConfig.deploy?.resources?.reservations?.nanoCpus,
-				volumeMount: containerVolumes,
-				port: containerPort
+				volumeMount: containerVolumeValue,
+				port: containerPortValue
             ]
         ]
 		
@@ -204,18 +208,20 @@ public class ImportMicroservices extends EFClient {
 		def driver = networkConfig?.driver
         def subnet = null
 		def gateway = null
-		
-		networkConfig.ipam.config.subnet?.each{ param ->
-			if(param != null) {
-				subnet = param
-			}
-		}
-		
-		networkConfig.ipam.config.gateway?.each { param ->
-			if(param != null) {
-				gateway = param
-			}
-		}
+
+        if(networkConfig.ipam?.config) {
+            networkConfig.ipam.config.subnet?.each{ param ->
+                if(param != null) {
+                    subnet = param
+                }
+            }
+
+            networkConfig.ipam.config.gateway?.each { param ->
+                if(param != null) {
+                    gateway = param
+                }
+            }
+        }
 		
 		efNetwork.serviceMapping.driver = driver
 		efNetwork.serviceMapping.subnet = subnet
@@ -227,7 +233,9 @@ public class ImportMicroservices extends EFClient {
 	def saveToEF(services, projectName, envProjectName, envName, clusterName) {
         def efServices = getServices(projectName)
         services.each { service ->
-            createOrUpdateService(projectName, envProjectName, envName, clusterName, efServices, service)
+			if (service?.network == null) {
+                createOrUpdateService(projectName, envProjectName, envName, clusterName, efServices, service)
+            }
         }
 
         def lines = ["Imported services: ${importedSummary.size()}"]
@@ -235,12 +243,14 @@ public class ImportMicroservices extends EFClient {
             def containerNames = containers.collect { k -> k }
             lines.add("${serviceName}: ${containerNames.join(', ')}")
         }
+
         updateJobSummary(lines.join("\n"))
     }
 	
-	 def createOrUpdateService(projectName, envProjectName, envName, clusterName, efServices, service) {
+	 def createOrUpdateService(def projectName, def envProjectName, def envName, def clusterName, def efServices, def service) {
         def existingService = efServices.find { s ->
             equalNames(s.serviceName, service.service.serviceName)
+            logger INFO, "createOrUpdateService: efServices.find = ${s.serviceName}"
         }
         def result
         def serviceName

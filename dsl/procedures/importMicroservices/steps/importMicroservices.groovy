@@ -28,7 +28,7 @@ configList.each { config ->
 	parsedYamlConfigList.push(parsedConfig)  
 }
 
-ImportMicroservices importServices = new ImportMicroservices(composeConfig, parsedYamlConfigList)
+def importServices = new ImportMicroservices(composeConfig, parsedYamlConfigList)
 def services = importServices.buildServicesDefinitions(projectName, applicationName)
 
 importServices.saveToEF(services, projectName, environmentProjectName, environmentName, clusterName)
