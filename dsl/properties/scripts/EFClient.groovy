@@ -3,6 +3,8 @@
  */
 public class EFClient extends BaseClient {
 
+	static final String REST_VERSION = 'v1.0'
+
     def getServerUrl() {
         def commanderServer = System.getenv('COMMANDER_SERVER')
         def secure = Integer.getInteger("COMMANDER_SECURE", 0).intValue()
@@ -284,6 +286,68 @@ public class EFClient extends BaseClient {
         payload = JsonOutput.toJson(payload)
         doHttpPut("/rest/v1.0/properties/${propertyName}", /* request body */ payload)
     }
+	
+	// Import Microservices
+	def createService(projName, payload, appName = null) {
+        if (appName) {
+            payload.applicationName = appName
+        }
+        def result = doRestPost("/rest/${REST_VERSION}/projects/${projName}/services", /* request body */ payload,
+                /*failOnErrorCode*/ true)
+        result?.data
+    }
+	
+	def getEnvMaps(projectName, serviceName) {
+        def result = doHttpGet("/rest/${REST_VERSION}/projects/${projectName}/services/${serviceName}/environmentMaps")
+        result?.data
+    }
+	
+	def createEnvMap(projName, serviceName, payload) {
+        def result = doRestPost("/rest/${REST_VERSION}/projects/${projName}/services/${serviceName}/environmentMaps", payload, true)
+        result?.data
+    }
+	
+	def createProcess(projName, serviceName, payload) {
+        def result = doRestPost("/rest/${REST_VERSION}/projects/${projName}/services/${serviceName}/processes", payload, false)
+        result?.data
+    }
+	
+	def createProcessStep(projName, serviceName, processName, payload) {
+        def result = doRestPost("/rest/${REST_VERSION}/projects/${projName}/services/${serviceName}/processes/${processName}/processSteps", payload, false)
+        result?.data
+    }
+	
+	def createServiceMapDetails(projName, serviceName, envMapName, serviceClusterMapName, payload) {
+        def result = doRestPost("/rest/${REST_VERSION}/projects/${projName}/services/${serviceName}/environmentMaps/${envMapName}/serviceClusterMappings/${serviceClusterMapName}/serviceMapDetails", payload, false)
+        result?.data
+    }
+	
+	def createServiceClusterMapping(projName, serviceName, envMapName, payload) {
+        def result = doRestPost("/rest/${REST_VERSION}/projects/${projName}/services/${serviceName}/environmentMaps/${envMapName}/serviceClusterMappings", payload, true)
+        result?.data
+    }
+	
+	def getContainers(projectName, serviceName, applicationName = null) {
+        def query = [
+            serviceName: serviceName
+        ]
+        if (applicationName) {
+            query.applicationName = applicationName
+        }
+        def result = doHttpGet("/rest/${REST_VERSION}/projects/${projectName}/containers", false, query)
+        result?.data?.container
+    }
+	
+	def updateJobSummary(String message) {
+        def jobStepId = System.getenv('COMMANDER_JOBSTEPID')
+        def summary = getEFProperty('/myJob/summary', true)?.value
+        def lines = []
+        if (summary) {
+            lines = summary.split(/\n/)COMMANDER_JOBSTEPID
+        }
+        lines.add(message)
+        setEFProperty('/myJob/summary', lines.join("\n"))
+    }
 
     def getEFProperty(String propertyName, boolean ignoreError = false) {
         // Get the property in the context of a job-step by default
@@ -302,8 +366,17 @@ public class EFClient extends BaseClient {
                 dsl: dslStr,
                 jobStepId: jobStepId
         ]
-
+		
         doHttpPost("/rest/v1.0/server/dsl", /* request body */ payload)
+    }
+	
+	def getServices(projName, appName = null) {
+        def query = [:]
+        if (appName) {
+            query.applicationName = appName
+        }
+        def result = doHttpGet("/rest/${REST_VERSION}/projects/${projName}/services", true, query)
+        result?.data?.service
     }
 
     def buildApplicationDsl(def projectName, def applicationName, def composeConfig) {
