@@ -31,4 +31,4 @@ configList.each { config ->
 def importServices = new ImportMicroservices(composeConfig, parsedYamlConfigList)
 def services = importServices.buildServicesDefinitions(projectName, applicationName)
 
-importServices.saveToEF(services, projectName, environmentProjectName, environmentName, clusterName)
+importServices.saveToEF(services, projectName, environmentProjectName, environmentName, clusterName, applicationName)

@@ -12,6 +12,7 @@
  *	redis:
  *	image: redis
  */
+import com.electriccloud.client.groovy.ElectricFlow
 
 public class ImportMicroservices extends EFClient {
 
@@ -179,7 +180,7 @@ public class ImportMicroservices extends EFClient {
 				cpuLimit: serviceConfig.deploy?.resources?.limits?.nanoCpus,
 				cpuCount: serviceConfig.deploy?.resources?.reservations?.nanoCpus,
 				volumeMount: containerVolumeValue,
-				port: containerPortValue
+				port: containerPort
             ]
         ]
 		
@@ -230,11 +231,11 @@ public class ImportMicroservices extends EFClient {
         efNetwork
 	}
 	
-	def saveToEF(services, projectName, envProjectName, envName, clusterName) {
+	def saveToEF(services, projectName, envProjectName, envName, clusterName, applicationName) {
         def efServices = getServices(projectName)
         services.each { service ->
 			if (service?.network == null) {
-                createOrUpdateService(projectName, envProjectName, envName, clusterName, efServices, service)
+                createOrUpdateService(projectName, envProjectName, envName, clusterName, efServices, service, applicationName)
             }
         }
 
@@ -247,7 +248,7 @@ public class ImportMicroservices extends EFClient {
         updateJobSummary(lines.join("\n"))
     }
 	
-	 def createOrUpdateService(def projectName, def envProjectName, def envName, def clusterName, def efServices, def service) {
+	 def createOrUpdateService(def projectName, def envProjectName, def envName, def clusterName, def efServices, def service, def applicationName) {
         def existingService = efServices.find { s ->
             equalNames(s.serviceName, service.service.serviceName)
             logger INFO, "createOrUpdateService: efServices.find = ${s.serviceName}"
@@ -264,7 +265,7 @@ public class ImportMicroservices extends EFClient {
         }
         else {
             serviceName = service.service.serviceName
-            result = createEFService(projectName, service)
+            result = createEFService(projectName, service, applicationName)
             logger INFO, "Service ${serviceName} has been created"
             importedSummary[serviceName] = [:]
         }
@@ -429,11 +430,18 @@ public class ImportMicroservices extends EFClient {
         logger INFO, "Process step ${processStepName} has been created for process ${processName} in service ${serviceName}"
     }
 	
-	def createEFService(projectName, service) {
+	def createEFService(projectName, service, applicationName) {
         def payload = service.service
         payload.description = "Created by EF Import Microservices"
-        def result = createService(projectName, payload)
-        result
+        ElectricFlow ef  = new ElectricFlow();
+        if(applicationName.equals('')) applicationName = null
+        ef.createService(projectName: projectName , serviceName: payload?.serviceName, addDeployProcess: payload?.addDeployProcess, applicationName:  applicationName,
+                defaultCapacity: payload?.defaultCapacity, description: payload?.description, maxCapacity: payload?.maxCapacity, minCapacity: payload?.minCapacity,
+                volume: payload?.volume)
+        //_createService (args.projectName, args.serviceName, args.addDeployProcess, args.applicationName, args.defaultCapacity, args.description,
+        // args.maxCapacity, args.minCapacity, args.volume, onSuccess, onFailure)
+        //def result = createService(projectName, payload)
+        //result
     }
 	
 	def equalNames(String oneName, String anotherName) {
