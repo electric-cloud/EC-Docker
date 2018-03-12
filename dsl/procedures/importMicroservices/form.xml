@@ -22,7 +22,7 @@
         <label>Docker Compose file</label>
         <property>ec_docker_compose_file_content</property>
         <required>1</required>
-        <documentation>Docker Compose YAML file</documentation>
+        <documentation>Docker Compose file contents</documentation>
     </formElement>
     <formElement>
         <type>project</type>
@@ -33,20 +33,20 @@
     </formElement>
 	<formElement>
         <type>checkbox</type>
-        <label>Create application-scoped micro-services:</label>
+        <label>Create application-scoped microservices:</label>
         <property>ec_docker_application_scoped</property>
         <required>0</required>
 		<checkedValue>1</checkedValue>
         <uncheckedValue>0</uncheckedValue>
         <initiallyChecked>0</initiallyChecked>
-        <documentation>Whether all the services defined in the Docker Compose file should be created within one application in ElectricFlow. If checked, �Application Name� must be provided.</documentation>
+        <documentation>Whether all the services defined in the Docker Compose file should be created within one application in ElectricFlow. If checked, then the application name must be provided.</documentation>
     </formElement>
     <formElement>
         <type>entry</type>
         <label>Application Name:</label>
         <property>ec_docker_application</property>
         <required>0</required>
-        <documentation>Name of the application to be created as part of discovery.</documentation>
+        <documentation>The name of the application to create, within which the microservices will be created. Required if 'Create application-scoped microservices' is checked.</documentation>
     </formElement>
 	<formElement>
 		<type>entry</type>
