@@ -1,13 +1,13 @@
 $[/myProject/scripts/preamble]
 
 // Input parameters
-def dockerComposeContent = '''$[docker_compose_file_content]'''
-def projectName = '$[project]'
-def applicationScoped = '$[application_scoped]'
-def applicationName = '$[application]'
-def environmentProjectName = '$[environment_project]'
-def environmentName = '$[environment]'
-def clusterName = '$[cluster]'
+def dockerComposeContent = '''$[ec_docker_compose_file_content]'''
+def projectName = '$[ec_docker_project]'
+def applicationScoped = '$[ec_docker_application_scoped]'
+def applicationName = '$[ec_docker_application]'
+def environmentProjectName = '$[ec_docker_environment_project]'
+def environmentName = '$[ec_docker_environment]'
+def clusterName = '$[ec_docker_cluster]'
 
 EFClient efClient = new EFClient()
 
