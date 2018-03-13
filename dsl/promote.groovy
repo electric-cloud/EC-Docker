@@ -39,8 +39,11 @@ def stepsWithAttachedCredentials = [
 		], [
 				procedureName: 'Delete Network',
 				stepName: 'deleteNetwork'
+		], [
+		    	procedureName: 'Artifact2Image',
+				stepName: 'artifact2image'
 		]
-		
+
 ]
 project pluginName, {
 
