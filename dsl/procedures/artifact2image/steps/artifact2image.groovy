@@ -61,14 +61,19 @@ def liftAndShift = new LiftAndShift(
 String resultPropertySheet = "/myParent/parent"
 
 try {
-    File artifact = liftAndShift.findArtifact()
     def details = [
         COMMAND: command,
         ENV: env,
         BASE_IMAGE: baseImage,
         PORTS: ports
     ]
-    File dockerfileWorkspace = liftAndShift.generateDockerfile(artifact, details)
+    def artifact = liftAndShift.getArtifact()
+    String templateName = artifact.getTemplateName()
+    String fullTemplatePath = "/projects/$[/myProject/projectName]/dockerfiles/defaults/${templateName}"
+    String template = ef.getProperty(propertyName: fullTemplatePath)?.property?.value
+    assert template : "Template ${templateName} is not found ($fullTemplatePath)"
+
+    File dockerfileWorkspace = liftAndShift.generateDockerfile(artifact, details, template)
     String imageId = liftAndShift.buildImage(imageName, dockerfileWorkspace)
     liftAndShift.pushImage(imageName, registryUrl, userName, password)
     ef.setProperty(propertyName: '/myJobStep/summary', value: "Image ID: ${imageId}")
@@ -77,6 +82,7 @@ try {
 } catch (PluginException e) {
     efClient.handleProcedureError(e.getMessage())
 }
+
 
 
 def parseEnvVariables(String env) {
