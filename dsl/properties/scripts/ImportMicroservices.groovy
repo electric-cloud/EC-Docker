@@ -237,9 +237,7 @@ public class ImportMicroservices extends EFClient {
 	def saveToEF(services, projectName, envProjectName, envName, clusterName, applicationName) {
         def efServices = getServices(projectName)
         services.each { service ->
-			if (service?.network == null) {
-                createService(projectName, envProjectName, envName, clusterName, efServices, service, applicationName)
-            }
+            createService(projectName, envProjectName, envName, clusterName, efServices, service, applicationName)
         }
 
         def lines = ["Imported services: ${importedSummary.size()}"]
@@ -280,7 +278,7 @@ public class ImportMicroservices extends EFClient {
          createEFContainer(projectName, serviceName, service.container)
          createEFPorts(projectName, serviceName, service.container, service.service)
 
-        if (service.serviceMapping) {
+        if (service.serviceMapping && envProjectName && envName && clusterName) {
             createOrUpdateMapping(projectName, envProjectName, envName, clusterName, serviceName, service)
         }
 
@@ -322,6 +320,9 @@ public class ImportMicroservices extends EFClient {
     }
 	
 	def createOrUpdateMapping(projName, envProjName, envName, clusterName, serviceName, service) {
+        assert envProjectName
+        assert envName
+        assert clusterName
         def mapping = service.serviceMapping
 
         def envMaps = getEnvMaps(projName, serviceName)
