@@ -42,7 +42,6 @@ public class ImportMicroservices extends EFClient {
 		// Services
 		composeConfig.services.each { name, serviceConfig ->
 			checkForUnsupportedParameters(name, serviceConfig)
-            logger INFO, "VOLUME CLASS: ${serviceConfig.volumes?.source.getClass()}"
 			def efService = buildServiceDefinition(name, serviceConfig)
 			efServices.push(efService)
         }
@@ -120,6 +119,9 @@ public class ImportMicroservices extends EFClient {
 		String imageInfo = serviceConfig?.image
 		if (imageInfo != null) {
 			if (imageInfo.contains("/")) {
+                //TODO: Handle registry urls of the form:
+                // ecdocker/motorbike:v1 - this is a public DockerHub registry example so no need to specify the registry url
+                // gcr.io/google_samples/gb-redisslave:v1 - this is a Google Container registry url url/user/image:version
 				String[] parts = imageInfo.split('/')
 				repositoryName = parts[0]
 				if (parts.length > 1 && parts[1].contains(":")) {
@@ -144,14 +146,15 @@ public class ImportMicroservices extends EFClient {
         }
 
 		 // port config
-        def containerPort = ""
-        def servicePort = ""
-        if(serviceConfig.ports){
-            containerPort = serviceConfig.ports.portConfigs?.target
-            servicePort = serviceConfig.ports.portConfigs?.published
+        logger INFO, "Reading port configs: " + prettyPrint(serviceConfig.ports)
+        def containerPorts = []
+        def servicePorts = []
+        serviceConfig.ports?.portConfigs?.each { port ->
+            containerPorts << port.target
+            servicePorts << port.published
         }
 		
-		efService.service.port = servicePort
+		efService.service.ports = servicePorts
 		
 		// Volumes
         String serviceVolumeValue = null
@@ -168,20 +171,18 @@ public class ImportMicroservices extends EFClient {
         }
 		
 		def container = [
-            container: [
-                containerName: efServiceName,
-				command: serviceConfig.command?.parts?.join(',') ?: null,
-				entryPoint: serviceConfig.entrypoint ?: null,
-				repositoryName: repositoryName,
-                image: image,
-                version: version,
-                memoryLimit: convertToMBs(serviceConfig.deploy?.resources?.limits?.memory),
-				memorySize: convertToMBs(serviceConfig.deploy?.resources?.reservations?.memory),
-				cpuLimit: serviceConfig.deploy?.resources?.limits?.nanoCpus,
-				cpuCount: serviceConfig.deploy?.resources?.reservations?.nanoCpus,
-				volumeMount: containerVolumeValue,
-				port: containerPort
-            ]
+            containerName: efServiceName,
+            command: serviceConfig.command?.parts?.join(',') ?: null,
+            entryPoint: serviceConfig.entrypoint ?: null,
+            registryUri: repositoryName,
+            imageName: image,
+            imageVersion: version,
+            memoryLimit: convertToMBs(serviceConfig.deploy?.resources?.limits?.memory),
+            memorySize: convertToMBs(serviceConfig.deploy?.resources?.reservations?.memory),
+            cpuLimit: serviceConfig.deploy?.resources?.limits?.nanoCpus,
+            cpuCount: serviceConfig.deploy?.resources?.reservations?.nanoCpus,
+            volumeMount: containerVolumeValue,
+            ports: containerPorts
         ]
 		
 		efService.container = container
@@ -192,7 +193,9 @@ public class ImportMicroservices extends EFClient {
 			[processDependencyName: it.dependency, targetProcessStepName: name, branchType: 'ALWAYS']
         }
 		efService.service.processDependency = processDependency
-		
+
+        logger INFO, "Service definition read from the Docker Compose file:"
+        logger INFO, prettyPrint(efService)
         efService
     }
 	
@@ -235,7 +238,7 @@ public class ImportMicroservices extends EFClient {
         def efServices = getServices(projectName)
         services.each { service ->
 			if (service?.network == null) {
-                createOrUpdateService(projectName, envProjectName, envName, clusterName, efServices, service, applicationName)
+                createService(projectName, envProjectName, envName, clusterName, efServices, service, applicationName)
             }
         }
 
@@ -248,20 +251,22 @@ public class ImportMicroservices extends EFClient {
         updateJobSummary(lines.join("\n"))
     }
 	
-	 def createOrUpdateService(def projectName, def envProjectName, def envName, def clusterName, def efServices, def service, def applicationName) {
+	 def createService(def projectName, def envProjectName, def envName, def clusterName, def efServices, def service, def applicationName) {
         def existingService = efServices.find { s ->
+            logger INFO, "createService: efServices.find = ${s.serviceName}"
             equalNames(s.serviceName, service.service.serviceName)
-            logger INFO, "createOrUpdateService: efServices.find = ${s.serviceName}"
         }
         def result
         def serviceName
 
-        logger DEBUG, "Service payload:"
-        logger DEBUG, new JsonBuilder(service).toPrettyString()
+        logger INFO, "Service payload:"
+        logger INFO, prettyPrint(service)
 
         if (existingService) {
             serviceName = existingService.serviceName
             logger WARNING, "Service ${existingService.serviceName} already exists, skipping"
+            // return since we do not want to update an existing service.
+            return
         }
         else {
             serviceName = service.service.serviceName
@@ -271,13 +276,9 @@ public class ImportMicroservices extends EFClient {
         }
         assert serviceName
 
-        // Containers
-        def efContainers = getContainers(projectName, serviceName)
-
-        service.containers.each { container ->
-            createOrUpdateContainer(projectName, serviceName, container, efContainers)
-            mapContainerPorts(projectName, serviceName, container, service)
-        }
+        // Container - Docker service has only one container
+         createEFContainer(projectName, serviceName, service.container)
+         createEFPorts(projectName, serviceName, service.container, service.service)
 
         if (service.serviceMapping) {
             createOrUpdateMapping(projectName, envProjectName, envName, clusterName, serviceName, service)
@@ -287,23 +288,36 @@ public class ImportMicroservices extends EFClient {
         createDeployProcess(projectName, serviceName)			
     }
 	
-	def mapContainerPorts(projectName, serviceName, container, service) {
-        container.ports?.each { containerPort ->
-            service.ports?.each { servicePort ->
-                prettyPrint(servicePort)
-                prettyPrint(containerPort)
-                if (containerPort.portName == servicePort.portName || servicePort.targetPort == containerPort.name) {
-                    def generatedPortName = "servicehttp${serviceName}${container.container.containerName}${containerPort.containerPort}"
-                    def generatedPort = [
-                        portName: generatedPortName,
-                        listenerPort: servicePort.listenerPort,
-                        subcontainer: container.container.containerName,
-                        subport: containerPort.portName
-                    ]
-                    createPort(projectName, serviceName, generatedPort)
-                    logger INFO, "Port ${generatedPortName} has been created for service ${serviceName}, listener port: ${generatedPort.listenerPort}, container port: ${generatedPort.subport}"
-                }
-            }
+	def createEFPorts(projectName, serviceName, container, service) {
+        def containerName = container.containerName
+        // the ports in the built up container and service definitions are stored
+        // at the same indices so we match by index
+        container.ports?.eachWithIndex { containerPort, index ->
+            def servicePort = service.ports[index]
+            // A docker service contains only one container so the port name uniqueness can be ensured
+            // using just the port number. No other prefixes are needed.
+            def containerPortName = "port${containerPort}"
+            // create container port
+            def generatedPort = [
+                portName: containerPortName,
+                containerPort: containerPort
+            ]
+            createContainerPort(projectName, serviceName, containerName, generatedPort)
+            logger INFO, "Port ${generatedPort.portName} has been created for container ${containerName}, container port: ${generatedPort.containerPort}"
+
+            // create corresponding service port
+            // A docker service contains only one container so the port name uniqueness can be ensured
+            // within a service using the container name and the port number. No other prefixes are needed.
+            def servicePortName = "port${containerName}${containerPort}"
+            generatedPort = [
+                portName: servicePortName,
+                listenerPort: servicePort?:containerPort,
+                subcontainer: containerName,
+                subport: containerPortName
+            ]
+            createServicePort(projectName, serviceName, generatedPort)
+            logger INFO, "Port ${servicePortName} has been created for service ${serviceName}, listener port: ${generatedPort.listenerPort}, container port: ${generatedPort.subport}"
+
         }
     }
 	
@@ -369,7 +383,7 @@ public class ImportMicroservices extends EFClient {
                 serviceName,
                 envMapName,
                 serviceClusterMappingName,
-                [containerName: container.container.containerName]
+                [containerName: container.containerName]
             )
         }
     }
@@ -382,39 +396,26 @@ public class ImportMicroservices extends EFClient {
         existingMap
     }
 	
-	def createOrUpdateContainer(projectName, serviceName, container, efContainers) {
-        def existingContainer = efContainers.find {
-            equalNames(it.containerName, container.container.containerName)
-        }
-        def containerName
-        def result
+	def createEFContainer(projectName, serviceName, container) {
         logger DEBUG, "Container payload:"
-        logger DEBUG, new JsonBuilder(container).toPrettyString()
-        if (existingContainer) {
-            containerName = existingContainer.containerName
-            logger WARNING, "Container ${containerName} already exists, skipping"
-        }
-        else {
-            containerName = container.container.containerName
-            logger INFO, "Going to create container ${serviceName}/${containerName}"
-            logger INFO, pretty(container.container)
-            result = createContainer(projectName, serviceName, container.container)
-            logger INFO, "Container ${serviceName}/${containerName} has been created"
-            discoveredSummary[serviceName][containerName] = [:]
-        }
+        logger DEBUG, prettyPrint(container)
 
+        def containerName = container.containerName
         assert containerName
-        def efPorts = getPorts(projectName, serviceName, /* appName */ null, containerName)
-        container.ports.each { port ->
+        logger INFO, "Going to create container ${serviceName}/${containerName}"
+        logger INFO, prettyPrint(container)
+        createContainer(projectName, serviceName, container)
+        logger INFO, "Container ${serviceName}/${containerName} has been created"
+
+        //creating container ports at the same time as service ports in createEFPorts
+        /*container.ports?.each { port ->
             createPort(projectName, serviceName, port, containerName)
             logger INFO, "Port ${port.portName} has been created for container ${containerName}, container port: ${port.containerPort}"
-        }
+        }*/
 
-        if (container.env) {
-            container.env.each { env ->
-                createEnvironmentVariable(projectName, serviceName, containerName, env)
-                logger INFO, "Environment variable ${env.environmentVariableName} has been created"
-            }
+        container.env?.each { env ->
+            createEnvironmentVariable(projectName, serviceName, containerName, env)
+            logger INFO, "Environment variable ${env.environmentVariableName} has been created"
         }
     }
 	
@@ -454,8 +455,4 @@ public class ImportMicroservices extends EFClient {
         return normalizer(oneName) == normalizer(anotherName)
     }
 	
-	def prettyPrint(object) {
-        println new JsonBuilder(object).toPrettyString()
-    }
-
 }

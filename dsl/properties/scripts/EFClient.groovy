@@ -2,8 +2,7 @@
  * ElectricFlow API client
  */
 public class EFClient extends BaseClient {
-
-	static final String REST_VERSION = 'v1.0'
+    static final String REST_VERSION = 'v1.0'
 
     def getServerUrl() {
         def commanderServer = System.getenv('COMMANDER_SERVER')
@@ -13,12 +12,6 @@ public class EFClient extends BaseClient {
         def url = "$protocol://$commanderServer:$commanderPort"
         logger DEBUG, "Using ElectricFlow server url: $url"
         url
-    }
-
-    Object doHttpDelete(String requestUri, boolean failOnErrorCode = true, def query = null) {
-        def sessionId = System.getenv('COMMANDER_SESSIONID')
-        doHttpRequest(DELETE, getServerUrl(), requestUri, ['Cookie': "sessionId=$sessionId"],
-                failOnErrorCode, /*requestBody*/ null, query)
     }
 
     Object doHttpGet(String requestUri, boolean failOnErrorCode = true, def query = null) {
@@ -37,22 +30,30 @@ public class EFClient extends BaseClient {
         doHttpRequest(PUT, getServerUrl(), requestUri, ['Cookie': "sessionId=$sessionId"], failOnErrorCode, requestBody, query)
     }
 
-    def getApplication(def projectName, def applicationName) {
-
-        def result = doHttpGet("/rest/v1.0/projects/$projectName/applications/$applicationName", /*failOnErrorCode*/ false)
-        result.data
+    private def payloadToJson(payload) {
+        def refinedPayload = [:]
+        payload.each {k, v ->
+            if (v != null) {
+                refinedPayload[k] = v
+            }
+        }
+        JsonOutput.toJson(refinedPayload)
     }
 
-    def deleteApplication(def projectName, def applicationName) {
+    Object doRestPost(String requestUri, Map payload, boolean failOnErrorCode = true, def query = null) {
+        def json = payloadToJson(payload)
+        doHttpPost(requestUri, json, failOnErrorCode, query)
+    }
 
-        doHttpDelete("/rest/v1.0/projects/$projectName/applications/$applicationName")
+    Object doRestPut(String requestUri, Map payload, boolean failOnErrorCode = true, def query = null) {
+        def json = payloadToJson(payload)
+        doHttpPut(requestUri, json, failOnErrorCode, query)
     }
 
     def getConfigValues(def configPropertySheet, def config, def pluginProjectName) {
 
         // Get configs property sheet
         def result = doHttpGet("/rest/v1.0/projects/$pluginProjectName/$configPropertySheet", /*failOnErrorCode*/ false)
-
         def configPropSheetId = result.data?.property?.propertySheetId
         if (!configPropSheetId) {
             handleProcedureError("No plugin configurations exist!")
@@ -94,13 +95,13 @@ public class EFClient extends BaseClient {
 
         def result = doHttpGet("/rest/v1.0/projects/${projectName}/applications/${applicationName}/tierMaps")
 
-        logger DEBUG, "Tier Maps: " + JsonOutput.prettyPrint(JsonOutput.toJson(result))
+        logger DEBUG, "Tier Maps: " + prettyPrint(result)
         // Filter tierMap based on environment.
         def tierMap = result.data.tierMap.find {
             it.environmentName == environmentName && it.environmentProjectName == envProjectName
         }
 
-        logger DEBUG, "Environment tier map for environment '$environmentName' and environment project '$envProjectName': \n" + JsonOutput.prettyPrint(JsonOutput.toJson(tierMap))
+        logger DEBUG, "Environment tier map for environment '$environmentName' and environment project '$envProjectName': \n" + prettyPrint(tierMap)
         // Filter applicationServiceMapping based on service name.
         def svcMapping = tierMap?.appServiceMappings?.applicationServiceMapping?.find {
             it.serviceName == serviceName
@@ -118,7 +119,7 @@ public class EFClient extends BaseClient {
                     "therefore, the cluster cannot be determined. Try specifying the cluster name " +
                     "explicitly when invoking 'Undeploy Service' procedure.")
         }
-        logger DEBUG, "Service map for service '$serviceName': \n" + JsonOutput.prettyPrint(JsonOutput.toJson(svcMapping))
+        logger DEBUG, "Service map for service '$serviceName': \n" + prettyPrint(svcMapping)
         svcMapping.clusterName
 
     }
@@ -160,7 +161,8 @@ public class EFClient extends BaseClient {
         def partialUri = applicationName ?
                 "projects/$serviceProjectName/applications/$applicationName/services/$serviceName" :
                 "projects/$serviceProjectName/services/$serviceName"
-        def jobStepId = '$[/myJobStep/jobStepId]'
+        def jobStepId = System.getenv('COMMANDER_JOBSTEPID')
+        // def jobStepId = '$[/myJobStep/jobStepId]'
         def queryArgs = [
                 request: 'getServiceDeploymentDetails',
                 clusterName: clusterName,
@@ -177,7 +179,7 @@ public class EFClient extends BaseClient {
         def result = doHttpGet("/rest/v1.0/$partialUri", /*failOnErrorCode*/ true, queryArgs)
 
         def svcDetails = result.data.service
-        logger DEBUG, "Service Details: " + JsonOutput.prettyPrint(JsonOutput.toJson(svcDetails))
+        logger DEBUG, "Service Details: " + prettyPrint(svcDetails)
 
         svcDetails
     }
@@ -286,67 +288,29 @@ public class EFClient extends BaseClient {
         payload = JsonOutput.toJson(payload)
         doHttpPut("/rest/v1.0/properties/${propertyName}", /* request body */ payload)
     }
-	
-	// Import Microservices
-	def createService(projName, payload, appName = null) {
-        if (appName) {
-            payload.applicationName = appName
-        }
-        def result = doRestPost("/rest/${REST_VERSION}/projects/${projName}/services", /* request body */ payload,
-                /*failOnErrorCode*/ true)
-        result?.data
-    }
-	
-	def getEnvMaps(projectName, serviceName) {
-        def result = doHttpGet("/rest/${REST_VERSION}/projects/${projectName}/services/${serviceName}/environmentMaps")
-        result?.data
-    }
-	
-	def createEnvMap(projName, serviceName, payload) {
-        def result = doRestPost("/rest/${REST_VERSION}/projects/${projName}/services/${serviceName}/environmentMaps", payload, true)
-        result?.data
-    }
-	
-	def createProcess(projName, serviceName, payload) {
-        def result = doRestPost("/rest/${REST_VERSION}/projects/${projName}/services/${serviceName}/processes", payload, false)
-        result?.data
-    }
-	
-	def createProcessStep(projName, serviceName, processName, payload) {
-        def result = doRestPost("/rest/${REST_VERSION}/projects/${projName}/services/${serviceName}/processes/${processName}/processSteps", payload, false)
-        result?.data
-    }
-	
-	def createServiceMapDetails(projName, serviceName, envMapName, serviceClusterMapName, payload) {
-        def result = doRestPost("/rest/${REST_VERSION}/projects/${projName}/services/${serviceName}/environmentMaps/${envMapName}/serviceClusterMappings/${serviceClusterMapName}/serviceMapDetails", payload, false)
-        result?.data
-    }
-	
-	def createServiceClusterMapping(projName, serviceName, envMapName, payload) {
-        def result = doRestPost("/rest/${REST_VERSION}/projects/${projName}/services/${serviceName}/environmentMaps/${envMapName}/serviceClusterMappings", payload, true)
-        result?.data
-    }
-	
-	def getContainers(projectName, serviceName, applicationName = null) {
-        def query = [
-            serviceName: serviceName
-        ]
-        if (applicationName) {
-            query.applicationName = applicationName
-        }
-        def result = doHttpGet("/rest/${REST_VERSION}/projects/${projectName}/containers", false, query)
-        result?.data?.container
-    }
-	
-	def updateJobSummary(String message) {
+
+
+    def updateJobSummary(String message) {
         def jobStepId = System.getenv('COMMANDER_JOBSTEPID')
         def summary = getEFProperty('/myJob/summary', true)?.value
         def lines = []
         if (summary) {
-            lines = summary.split(/\n/)COMMANDER_JOBSTEPID
+            lines = summary.split(/\n/)
         }
         lines.add(message)
         setEFProperty('/myJob/summary', lines.join("\n"))
+    }
+
+    def evalDsl(String dslStr) {
+        // Run the dsl in the context of a job-step by default
+        def jobStepId = '$[/myJobStep/jobStepId]'
+        def payload = [:]
+        payload << [
+                dsl: dslStr,
+                jobStepId: jobStepId
+        ]
+
+        doHttpPost("/rest/v1.0/server/dsl", /* request body */ payload)
     }
 
     def getEFProperty(String propertyName, boolean ignoreError = false) {
@@ -357,20 +321,24 @@ public class EFClient extends BaseClient {
                 /* failOnErrorCode */ !ignoreError, [jobStepId: jobStepId])
     }
 
-
-    def evalDsl(String dslStr) {
-        // Run the dsl in the context of a job-step by default
-        def jobStepId = '$[/myJobStep/jobStepId]'
-        def payload = [:]
-        payload << [
-                dsl: dslStr,
-                jobStepId: jobStepId
-        ]
-		
-        doHttpPost("/rest/v1.0/server/dsl", /* request body */ payload)
+    // Discovery methods, EF model generation
+    def createService(projName, payload, appName = null) {
+        if (appName) {
+            payload.applicationName = appName
+        }
+        def result = doRestPost("/rest/${REST_VERSION}/projects/${projName}/services", /* request body */ payload)
+        result?.data
     }
-	
-	def getServices(projName, appName = null) {
+
+    def updateService(projName, serviceName, payload, applicationName = null) {
+        if (applicationName) {
+            payload.applicationName = applicationName
+        }
+        def result = doRestPut("/rest/${REST_VERSION}/projects/${projName}/services/${serviceName}", /* request body */ payload)
+        result?.data
+    }
+
+    def getServices(projName, appName = null) {
         def query = [:]
         if (appName) {
             query.applicationName = appName
@@ -379,190 +347,124 @@ public class EFClient extends BaseClient {
         result?.data?.service
     }
 
-    def buildApplicationDsl(def projectName, def applicationName, def composeConfig) {
-
-        def servicesDsl = ''
-        def processesDsl = ''
-        def dependenciesDsl = ''
-        composeConfig.services.each { name, serviceConfig ->
-            servicesDsl += buildServiceDsl(name, projectName, applicationName, serviceConfig)
-            processesDsl +=  buildProcessDsl(name, projectName, applicationName, serviceConfig)
-            dependenciesDsl += buildProcessDependencyDsl(name, serviceConfig)
+    def getPorts(projectName, serviceName, appName = null, containerName = null) {
+        def query = [:]
+        if (containerName) {
+            query.containerName = containerName
         }
-
-        """
-        application '$applicationName', projectName: '$projectName', {
-        $servicesDsl
-
-            process 'Deploy', {
-                applicationName = '$applicationName'
-                processType = 'OTHER'
-                projectName = '$projectName'
-                $processesDsl
-                $dependenciesDsl
-            }
+        if (appName) {
+            query.applicationName = appName
         }
-        """.toString()
+        def result = doHttpGet("/rest/${REST_VERSION}/projects/${projectName}/services/${serviceName}/ports", true, query)
+        result?.data?.port
     }
 
-    def buildProcessDsl(def name, def projectName, def applicationName, def serviceConfig) {
-
-        def dsl = """
-            processStep '$name', {
-              dependencyJoinType = 'and'
-              errorHandling = 'failProcedure'
-              processStepType = 'service'
-              projectName = '$projectName'
-              subcomponentApplicationName = '$applicationName'
-              subservice = '$name'
-            }""".toString()
+    def createContainerPort(projName, serviceName, containerName, payload, String appName = null) {
+        if (appName) {
+            payload.applicationName = appName
+        }
+        def json = JsonOutput.toJson(payload)
+        def result = doHttpPost("/rest/${REST_VERSION}/projects/${projName}/services/${serviceName}/containers/${containerName}/ports", json)
+        result?.data
     }
 
-    def buildProcessDependencyDsl(def name, def serviceConfig){
-        def processDependency = ''
-
-        serviceConfig.dependsOn.each{ dependency ->
-
-            processDependency += """
-            processDependency '$dependency', targetProcessStepName: '$name', {
-               branchType = 'ALWAYS'
-            }""".toString()
+    def createServicePort(projName, serviceName, payload, String appName = null) {
+        if (appName) {
+            payload.applicationName = appName
         }
-        processDependency
+        def json = JsonOutput.toJson(payload)
+        def result = doHttpPost("/rest/${REST_VERSION}/projects/${projName}/services/${serviceName}/ports", json)
+        result?.data
     }
 
-    def buildServiceDsl(def name, def projectName, def applicationName, def serviceConfig) {
-
-        String[] imageInfo = serviceConfig.image?.split(':')
-        def image = ''
-        def version = ''
-        if (imageInfo && imageInfo.length > 0) {
-            image = imageInfo[0]
-            if (imageInfo.length > 1) {
-                version = imageInfo[1]
-            }
+    def createEnvironmentVariable(projName, serviceName, containerName, payload, failOnError = false, appName = null) {
+        if (appName) {
+            payload.applicationName = appName
         }
+        payload.containerName = containerName
+        payload.serviceName = serviceName
+        def json = JsonOutput.toJson(payload)
+        def result = doHttpPost("/rest/${REST_VERSION}/projects/${projName}/containers/${containerName}/environmentVariables", json, failOnError)
+        result?.data
+    }
 
-        def command = serviceConfig.command?.parts?.join(',') ?:null
-        def entrypoint = serviceConfig.entrypoint?:null
-        def defaultCapacity = serviceConfig.deploy?.replicas
-
-        // Volumes
-        // Initial empty volume spec
-        def serviceVolumes = null
-        def containerVolumes = null
-        if(serviceConfig.volumes){
-            def serviceVolumesList = []
-            def containerVolumesList = []
-            def counter = 0
-            for(volume in serviceConfig.volumes){
-
-                def volumeName, hostPath
-                if(volume.type == "volume"){
-                    volumeName = volume.source
-                    hostPath = ""
-                }else{
-                    // bind volume type
-                    volumeName = "${name}_volume_${counter}"
-                    hostPath = volume.source
-                }
-
-                serviceVolumesList << """
-                {
-                    \"name\": \"${volumeName}\",
-                    \"hostPath\": \"${hostPath}\"
-                }""".toString()
-
-                containerVolumesList << """
-                {
-                    \"name\": \"${volumeName}\",
-                    \"mountPath\": \"${volume.target}\"
-                }""".toString()
-                counter++
-            }
-            serviceVolumes = "'''[" + serviceVolumesList.join(",") + "\n]'''"
-            containerVolumes = "'''[" + containerVolumesList.join(",") + "\n]'''"
+    def getContainers(projectName, serviceName, applicationName = null) {
+        def query = [
+                serviceName: serviceName
+        ]
+        if (applicationName) {
+            query.applicationName = applicationName
         }
+        def result = doHttpGet("/rest/${REST_VERSION}/projects/${projectName}/containers", false, query)
+        result?.data?.container
+    }
 
-        // port config
-        def containerPort = ""
-        def servicePort = ""
-        if(serviceConfig.ports){
-            // Append port config
-            int counter = 0
-            for (portConfig in serviceConfig.ports.portConfigs){
-                def targetPort = portConfig?.target
-                def publishedPort = portConfig?.published
-
-                containerPort +=  """
-                    port '${name}_containerPort_${counter}', {
-                        applicationName = '$applicationName'
-                        containerName = '$name'
-                        containerPort = '$targetPort'
-                        projectName = '$projectName'
-                        serviceName = '$name'
-                    }
-                """.toString()
-
-                servicePort +=  """
-                port '${name}_servicePort_${counter}', {
-                      applicationName = '$applicationName'
-                      listenerPort = '$publishedPort'
-                      projectName = '$projectName'
-                      serviceName = '$name'
-                      subcontainer = '$name'
-                      subport = '${name}_containerPort_${counter}'
-                }
-                """.toString()
-                counter++
-            }
+    def updateContainer(String projectName, String serviceName, String containerName, payload, appName = null) {
+        payload.serviceName = serviceName
+        if (appName) {
+            payload.applicationName = appName
         }
+        def result = doRestPut("/rest/${REST_VERSION}/projects/${projectName}/containers/${containerName}", payload, true)
+        result?.data
+    }
 
-        // ENV variables
-        def envVars = ""
-        serviceConfig.environment.entries.each{key, value ->
-            envVars += """
-            environmentVariable '$key', {
-                type = 'string'
-                value = '$value'
-            }""".toString()
+    def createContainer(String projectName, String serviceName, payload, appName = null) {
+        payload.serviceName = serviceName
+        if (appName) {
+            payload.appName = appName
         }
+        def result = doRestPost("/rest/${REST_VERSION}/projects/${projectName}/containers", payload)
+        result?.data
+    }
 
-        // update config
-        def minCapacity = serviceConfig.deploy?.updateConfig?.parallelism
+    def getEnvMaps(projectName, serviceName) {
+        def result = doHttpGet("/rest/${REST_VERSION}/projects/${projectName}/services/${serviceName}/environmentMaps")
+        result?.data
+    }
 
-        // Limits and reservations
-        def memoryLimit = convertToMBs(serviceConfig.deploy?.resources?.limits?.memory)
-        def memorySize = convertToMBs(serviceConfig.deploy?.resources?.reservations?.memory)
-        def cpuLimit = serviceConfig.deploy?.resources?.limits?.nanoCpus
-        def cpuCount = serviceConfig.deploy?.resources?.reservations?.nanoCpus
+    def createEnvMap(projName, serviceName, payload) {
+        def result = doRestPost("/rest/${REST_VERSION}/projects/${projName}/services/${serviceName}/environmentMaps", payload)
+        result?.data
+    }
 
-        def dsl = """
-        service '$name', {
-            defaultCapacity = '$defaultCapacity'
-            volume = $serviceVolumes
-            minCapacity = '$minCapacity'
-            container '$name', {
-              command = '$command'
-              entryPoint = '$entrypoint'
-              imageName = '$image'
-              imageVersion = '$version'
-              memoryLimit = '$memoryLimit'
-              memorySize = '$memorySize'
-              cpuLimit = '$cpuLimit'
-              cpuCount = '$cpuCount'
-              volumeMount = $containerVolumes
-              $containerPort
-              $envVars
-            }
-            $servicePort
-        }
-        """.toString()
+    def createServiceClusterMapping(projName, serviceName, envMapName, payload) {
+        def result = doRestPost("/rest/${REST_VERSION}/projects/${projName}/services/${serviceName}/environmentMaps/${envMapName}/serviceClusterMappings", payload)
+        result?.data
+    }
+
+    def createServiceMapDetails(projName, serviceName, envMapName, serviceClusterMapName, payload) {
+        def result = doRestPost("/rest/${REST_VERSION}/projects/${projName}/services/${serviceName}/environmentMaps/${envMapName}/serviceClusterMappings/${serviceClusterMapName}/serviceMapDetails", payload)
+        result?.data
+    }
+
+    def createProcess(projName, serviceName, payload) {
+        def result = doRestPost("/rest/${REST_VERSION}/projects/${projName}/services/${serviceName}/processes", payload)
+        result?.data
+    }
+
+    def createProcessStep(projName, serviceName, processName, payload) {
+        def result = doRestPost("/rest/${REST_VERSION}/projects/${projName}/services/${serviceName}/processes/${processName}/processSteps", payload)
+        result?.data
+    }
+
+    def getClusters(projName, envName) {
+        def result = doHttpGet("/rest/${REST_VERSION}/projects/${projName}/environments/${envName}/clusters")
+        result?.data?.cluster
+    }
+
+    def createCredential(projName, credName, userName, password) {
+        def payload = [
+                credentialName: credName,
+                userName: userName,
+                password: password
+        ]
+        def result = doRestPost("/rest/${REST_VERSION}/projects/${projName}/credentials", payload)
+        result?.data?.credential
     }
 
     /* Function to convert B, KB, MB, GB to MB.
-     * Defaults to 1 MB if less that 1 MB
-     */
+ * Defaults to 1 MB if less that 1 MB
+ */
 
     def convertToMBs(String memory){
 
@@ -605,6 +507,9 @@ public class EFClient extends BaseClient {
         memoryInMBs
     }
 
+    def prettyPrint(object) {
+        JsonOutput.prettyPrint(JsonOutput.toJson(object))
+    }
 
 }
 
