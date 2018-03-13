@@ -1,5 +1,7 @@
 @Grab(group='net.sf.json-lib', module='json-lib', version='2.3', classifier='jdk15')
 @Grab('org.codehaus.groovy.modules.http-builder:http-builder:0.7.1')
+@Grab(group='xml-apis', module='xml-apis', version='1.4.01')
+@Grab('org.yaml:snakeyaml:1.19')
 @GrabExclude(group='org.codehaus.groovy', module='groovy', version='2.4.11')
 
 import groovy.json.JsonBuilder
@@ -8,6 +10,7 @@ import groovy.json.JsonSlurper
 import groovyx.net.http.HTTPBuilder
 import groovyx.net.http.Method
 
+import org.yaml.snakeyaml.Yaml
 import static groovyx.net.http.ContentType.JSON
 import static groovyx.net.http.Method.DELETE
 import static groovyx.net.http.Method.GET

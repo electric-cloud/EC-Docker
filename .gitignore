@@ -1,3 +1,4 @@
 out/*
 .idea/*
 EC-Docker.jar
+build/*
