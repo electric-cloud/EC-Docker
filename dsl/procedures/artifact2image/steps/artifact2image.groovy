@@ -7,14 +7,14 @@ import groovy.json.JsonException
 
 
 String configName = '$[config]'
-String artifactName = '$[ec_docker_artifactName]'
-String imageName = '$[ec_docker_imageName]'
-String registryUrl = '$[ec_docker_registryUrl]'
-String credentialName = '$[ec_docker_credential]'
-String baseImage = '$[ec_docker_baseImage]'
-String ports = '''$[ec_docker_ports]'''.trim()
-String command = '''$[ec_docker_command]'''.trim()
-String env = '''$[ec_docker_env]'''.trim()
+String artifactName = '$[ecp_docker_artifactName]'
+String imageName = '$[ecp_docker_imageName]'
+String registryUrl = '$[ecp_docker_registryUrl]'
+String credentialName = '$[ecp_docker_credential]'
+String baseImage = '$[ecp_docker_baseImage]'
+String ports = '''$[ecp_docker_ports]'''.trim()
+String command = '''$[ecp_docker_command]'''.trim()
+String env = '''$[ecp_docker_env]'''.trim()
 
 ElectricFlow ef = new ElectricFlow()
 EFClient efClient = new EFClient()

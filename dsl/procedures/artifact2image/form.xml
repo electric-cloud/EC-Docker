@@ -26,14 +26,14 @@
     <formElement>
         <type>entry</type>
         <label>Artifact Name:</label>
-        <property>ec_docker_artifactName</property>
+        <property>ecp_docker_artifactName</property>
         <required>1</required>
         <documentation>Artifact name in form group:artifact:version. Artifact will be taken from EF repository.</documentation>
     </formElement>
     <formElement>
         <type>entry</type>
         <required>1</required>
-        <property>ec_docker_imageName</property>
+        <property>ecp_docker_imageName</property>
         <label>Image Name:</label>
         <documentation>Name for the image, e.g. myrepo/image:v1.0.</documentation>
     </formElement>
@@ -41,13 +41,13 @@
         <type>entry</type>
         <required>0</required>
         <label>Registry URL:</label>
-        <property>ec_docker_registryUrl</property>
+        <property>ecp_docker_registryUrl</property>
         <documentation>Registry URL (if not specified, Dockerhub will be used).</documentation>
     </formElement>
     <formElement>
         <type>credential</type>
         <required>0</required>
-        <property>ec_docker_credential</property>
+        <property>ecp_docker_credential</property>
         <label>Username and Password:</label>
         <attachedAsParameterToStep>artifact2image</attachedAsParameterToStep>
         <documentation>Username and password to connect to Docker registry.</documentation>
@@ -55,7 +55,7 @@
     <formElement>
         <type>entry</type>
         <required>0</required>
-        <property>ec_docker_baseImage</property>
+        <property>ecp_docker_baseImage</property>
         <label>Base Image:</label>
         <documentation>Base Image for the DockerFile. If not specified, the default base image for the artifact will be used.
         </documentation>
@@ -66,19 +66,19 @@
         <documentation>The ports to list in the EXPOSE instruction in the DockerFile. If not specified, the default port defined in the template DockerFile for the artifact will be used.
         </documentation>
         <label>Ports:</label>
-        <property>ec_docker_ports</property>
+        <property>ecp_docker_ports</property>
     </formElement>
     <formElement>
         <type>textarea</type>
         <label>Command:</label>
-        <property>ec_docker_command</property>
+        <property>ecp_docker_command</property>
         <documentation>Command instruction for the DockerFile. E.g., "executable","param1","param2". If not specified, the default command defined in the template DockerFile for the artifact will be used.
         </documentation>
         <required>0</required>
     </formElement>
     <formElement>
         <type>textarea</type>
-        <property>ec_docker_env</property>
+        <property>ecp_docker_env</property>
         <label>Environment Variables:</label>
         <required>0</required>
         <documentation>Multi-line name=value pairs. If specified, merge with any existing environment variables defined in the template DockerFile for the artifact.

@@ -10,7 +10,7 @@ use File::Spec;
 my $ec = ElectricCommander->new();
 my $am = new ElectricCommander::ArtifactManagement($ec);
 
-my $artifactName = $ec->getProperty('ec_docker_artifactName')->findvalue('//value')->string_value;
+my $artifactName = $ec->getProperty('ecp_docker_artifactName')->findvalue('//value')->string_value;
 
 my ($group, $name, $version) = split(':', $artifactName);
 my $destination = File::Spec->catfile(getcwd(), $artifactName . '-dockerfile');
