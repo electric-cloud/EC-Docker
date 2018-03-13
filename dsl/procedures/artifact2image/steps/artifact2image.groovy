@@ -1,4 +1,5 @@
 $[/myProject/scripts/preamble]
+$[/myProject/scripts/LiftAndShift]
 
 import com.electriccloud.client.groovy.ElectricFlow
 import groovy.json.JsonSlurper
@@ -71,7 +72,6 @@ try {
     String imageId = liftAndShift.buildImage(imageName, dockerfileWorkspace)
     liftAndShift.pushImage(imageName, registryUrl, userName, password)
     ef.setProperty(propertyName: '/myJobStep/summary', value: "Image ID: ${imageId}")
-
     ef.setProperty(propertyName: "${resultPropertySheet}/${imageName}/imageId", value: imageId)
 
 } catch (PluginException e) {
