@@ -1,0 +1,16 @@
+
+excludeProcedures:
+  - Setup
+  - Define Container
+  - Define Service
+  - Populate Certs
+proceduresOrder:
+  - Check Cluster
+  - Deploy Service
+  - Undeploy Service
+  - Remove Docker Service
+  - runDockerBuild
+  - runDockerPull
+  - runDockerRun
+  - Discover
+

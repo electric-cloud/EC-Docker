@@ -1,895 +1,920 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-    <meta name="generator"
-          content="HTML Tidy for Windows (vers 14 February 2006), see www.w3.org" />
-    <meta content="text/html; charset=us-ascii"
-          http-equiv="content-type" />
-
-<!-- Enter the new plugin name in the following line. -->
-
-    <title>ElectricFlow Plugin for Docker</title>
+    <meta content="text/html; charset=us-ascii" http-equiv="content-type"/>
+    <title>@PLUGIN_KEY@ Plugin</title>
     <link rel="stylesheet" href="../../plugins/@PLUGIN_NAME@/pluginhelp.css" type="text/css" media="screen"/>
 </head>
-
 <body>
-    <div class="help">
-
-        <h1>EC-Docker</h1>
-
-        <p>Plugin Version @PLUGIN_VERSION@</p>
-
-        <hr style="margin-left: -10px; margin-top: 10px; height: 1px; width: 100%; color: #5981BD;" noshade="noshade" />
-
-				<!--If you are revising a plugin, enter the date when the current sprint will end.
-				If you are writing the first version of a new plugin, change "Revised on" to "Created on" and
-				enter the date when the current sprint will end, and the document will be published.-->
-
-				<h1>Contents</h1>
-
-				<ul>
-    				<li><p><a href="#overview">Overview</a></p></li>
-                    <li><p><a href="#setupconfig">Plugin Configuration</a></p></li>
-    				<li><p><a href="#procedures">Plugin Procedures</a></p></li>
-    				<ul>
-    				<li><a href="#ProvisionCluster">Check Cluster</a></li>
-    				<li><a href="#DeployService">Deploy Service</a></li>
-                    <li><a href="#UndeployService">Undeploy Service</a></li>
-                    <li><a href="#RemoveDockerService">Remove Docker Service</a></li>
-                    <li><a href="#runDockerBuild">runDockerBuild</a></li>
-                    <li><a href="#runDockerPull">runDockerPull</a></li>
-                    <li><a href="#runDockerRun">runDockerRun</a></li>
-                    <li><a href="#Discover">Discover</a></li>
-	            </ul>
-				<!--
-
-				</ul>
-				<li><p><a href="#example">Examples and Use Cases</a></p></li>
-				<ul>
-				<li><a href="#UseCase1">UseCase1</a></li>
-				</ul>
-
-				-->
-
-				<li><p><a href="#rns">Release Notes</a></p></li>
-				</ul>
-
-				<p>IMPORTANT: For all parameter descriptions in this document, required parameters are shown
-				in <span class='required'>bold italics</span>.</p>
-
-		        <p>IMPORTANT: In the ElectricFlow UI, from the Home page, open the Main Menu, and
-				click <b>Administration</b> > <b>Plugins</b> to open the Plugin Manager.</p>
-
-		    <!-- The next section is required. -->
-
-				<h1 id="overview">Overview</h1>
-
-				<!-- The integration description should answer the questions:
-				How deep does our integration go? Why should I care?
-				What general functionality does the plugin include?
-				What functionality does the plugin omit? -->
-
-				<p>Docker is an open platform for developing, shipping, and running applications.
-				Docker is designed to deliver your applications faster. With Docker, you can separate
-				your applications from your infrastructure and treat your infrastructure like a
-				managed application. Docker helps you ship code faster, test faster, deploy faster,
-				and shorten the cycle between writing code and deploying it.</p>
-
-                <p>With Docker, you can package an application will all its dependencies into a standardized unit
-				for software development. Containers wrap your application in a complete file system that has
-                everything it needs to run (code, runtime, system tools, libraries, and other components installed
-                on a server.  The result is an application that will run the same, regardless of the environment
-                on which it is running.</p>
-
-                <p>For more information about Docker, go to the <a href="http://www.docker.com/">Docker home page</a>.</p>
-
-                <p>Plugin also supports Docker engines in Swarm mode. The cluster management and orchestration features embedded in the Docker Engine are built using SwarmKit. Docker Swarm is a cluster of Docker engines, or nodes, where you deploy services. When you create a service, you specify which container image to use and which commands to execute inside running containers.</p>
-
-                <p>More information about Docker Swarm can be found at <a href="https://docs.docker.com/engine/swarm/key-concepts/">Docker Swarm key concepts</a>.</p>
-        <!-- This section is required. Replace the plugin name, the URL to the website with the new plugin information, and the name of the link. -->
-
-			
-
-        <h2>ElectricFlow Integration to EC-Docker</h2>
-
-		<!-- The integration description should answer the questions:
-        How deep does our integration go? Why should I care?
-        What general functionality does the plugin include?
-				What functionality does the plugin omit? -->
-            <p>Plugin deploys ElectricFlow service as a single container or as a Docker Swarm service based on whether given Docker endpoint is a stand-alone Docker engine or Docker Swarm cluster manager. Plugin checks type of Docker endpoint at runtime and takes decision to deploy correct type of workload (container or Docker Swarm service) accordingly.</p>
-
-            <p>The TLS mutual authentication and encryption is supported between Docker endpoint and the ElectricFlow agent.</p>
-
-
-		<h2>Integrated Version</h2>
-
-
-
-            <p>This plugin was tested against Docker Engine 17.06.</p>
-            <h2>Prerequisite for deploying ElectricFlow service on stand-alone Docker engine</h2>
-            <p>Docker engine daemon must listen on TCP socket. By default, daemon listens on Unix socket on linux/unix based OSs and on named pipe (npipe://) on windows. </p>
-            <p>To make above changes, </p>
-                <ol>
-                    <li>Add '{"hosts": ["tcp://IP:PORT"]}' entry in '/etc/docker/daemon.json' (on linux) and in 'C:\ProgramData\Docker\config\daemon.json' (on Windows) file .</li>
-                    <li>Restart Docker daemon</li>
-                </ol>
-        <h2>Prerequisite for deploying ElectricFlow service on Docker Swarm cluster</h2>
-            <p>Docker Swarm cluster must be already setup and Docker Swarm manager must be accessible over network.</p>
+<!--
+    Generated by PluginWizardHelp
+    https://github.com/electric-cloud/PluginWizardHelp
+    Do *NOT* edit manually, use help file generation.
+-->
+<div class="help">
+    <h1>@PLUGIN_KEY@</h1>
+    <p>Plugin version @PLUGIN_VERSION@</p>
+    <hr style="margin-left: -10px; margin-top: 10px; height: 1px; width: 100%; color: #5981BD;" noshade="noshade"/>
+    <h3>Overview</h3>
+    <p><p>Docker is an open platform for developing, shipping, and running applications.
+Docker is designed to deliver your applications faster. With Docker, you can separate
+your applications from your infrastructure and treat your infrastructure like a
+managed application. Docker helps you ship code faster, test faster, deploy faster,
+and shorten the cycle between writing code and deploying it.</p>
+<p>With Docker, you can package an application will all its dependencies into a standardized unit
+for software development. Containers wrap your application in a complete file system that has
+everything it needs to run (code, runtime, system tools, libraries, and other components installed
+on a server.  The result is an application that will run the same, regardless of the environment
+on which it is running.</p>
+<p>For more information about Docker, go to the <a href="http://www.docker.com/">Docker home page</a>.</p>
+<p>Plugin also supports Docker engines in Swarm mode. The cluster management and orchestration features embedded in the Docker Engine are built using SwarmKit. Docker Swarm is a cluster of Docker engines, or nodes, where you deploy services. When you create a service, you specify which container image to use and which commands to execute inside running containers.</p>
+<p>More information about Docker Swarm can be found at <a href="https://docs.docker.com/engine/swarm/key-concepts/">Docker Swarm key concepts</a>.</p>
+<h2>ElectricFlow Integration to Docker</h2>
+<p>Plugin deploys ElectricFlow service as a single container or as a Docker Swarm service based on whether given Docker endpoint is a stand-alone Docker engine or Docker Swarm cluster manager. Plugin checks type of Docker endpoint at runtime and takes decision to deploy correct type of workload (container or Docker Swarm service) accordingly.</p>
+<p>The TLS mutual authentication and encryption is supported between Docker endpoint and the ElectricFlow agent.</p>
+<h2>Integrated Version</h2>
+<p>This plugin was tested against Docker Engine 17.06.</p>
+<h2>Prerequisite for deploying ElectricFlow service on stand-alone Docker engine</h2>
+<p>Docker engine daemon must listen on TCP socket. By default, daemon listens on Unix socket on linux/unix based OSs and on named pipe (npipe://) on windows. </p>
+<p>To make above changes, </p>
+<ol>
+    <li>Add '{"hosts": ["tcp://IP:PORT"]}' entry in '/etc/docker/daemon.json' (on linux) and in 'C:\ProgramData\Docker\config\daemon.json' (on Windows) file .</li>
+    <li>Restart Docker daemon</li>
+</ol>
+<h2>Prerequisite for deploying ElectricFlow service on Docker Swarm cluster</h2>
+<p>Docker Swarm cluster must be already setup and Docker Swarm manager must be accessible over network.</p>
+<h2>Prerequisite for supporting TLS based authentication</h2>
+<p>In case of Docker endpoint supporting TLS based authentication, CA certificate (CA's public key), client's public and private keys are required. All three keys can be stored in plugin configuration.
+More information about how to setup TLS certificates on Docker endpoint can be found <a href="https://github.com/docker/docker.github.io/blob/master/swarm/configure-tls.md">here</a>.</p>
+<p>If the Docker Swarm cluster is on Docker EE then client certificates can be obtained from UCP (Universal Control Plane) from "User Profile" page by clicking on "Create a Client Bundle". Bundle contains all the required certificates. </p>
+<p>In case of stand-alone Docker engine and for Docker Swarm cluster on Docker CE, perform below steps to generate client side certificates using openssl utility:</p>
+<p><b>Note:</b>If you already have access to a CA and certificates, you should skip this step 1.</p>
+<p>Step 1: Setup CA server</p>
+<ol>
+    <li>openssl genrsa -out ca-priv-key.pem 2048</li>
+    <li>openssl req -config /usr/lib/ssl/openssl.cnf -new -key ca-priv-key.pem -x509 -days 1825 -out ca.pem</li>
+</ol>
+<p>Step 2: Generete client side certificates</p>
+    <ol>
+        <li>openssl genrsa -out key.pem 2048</li>
+        <li>openssl req -subj "/CN=client" -new -key key.pem -out client.csr</li>
+        <li>openssl x509 -req -days 1825 -in client.csr -CA ca.pem -CAkey ca-priv-key.pem -CAcreateserial -out cert.pem -extensions v3_req -extfile /usr/lib/ssl/openssl.cnf</li>
+    </ol>
+<p>If TLS support is not enabled on Docker endpoint then leave "CA Certificate", "Client Certificate" and "Client Private Key" input parameters on plugin configuration page empty. Plugin will establish simple HTTP connection with such Docker endpoint.</p>
+</p>
+    
+    <h1>Contents</h1>
+    <ul>
+    <li><a href="#overview">Overview</a></li>
+    
+    <li><a href="#CreateConfiguration">Plugin Configuration</a></li>
+    
+    <li><a href="#procedures">Plugin Procedures</a></li>
+    <ul>
         
-        <h2>Prerequisite for supporting TLS based authentication</h2>
-            <p>In case of Docker endpoint supporting TLS based authentication, CA certificate (CA's public key), client's public and private keys are required. All three keys can be stored in plugin configuration.
-                More information about how to setup TLS certificates on Docker endpoint can be found <a href="https://github.com/docker/docker.github.io/blob/master/swarm/configure-tls.md">here</a>.</p>
-                <p>If the Docker Swarm cluster is on Docker EE then client certificates can be obtained from UCP (Universal Control Plane) from "User Profile" page by clicking on "Create a Client Bundle". Bundle contains all the required certificates. </p>
-                <p>In case of stand-alone Docker engine and for Docker Swarm cluster on Docker CE, perform below steps to generate client side certificates using openssl utility:</p>
-                <p><b>Note:</b>If you already have access to a CA and certificates, you should skip this step 1.</p>
-                <p>Step 1: Setup CA server</p>
-                <ol>
-                    <li>openssl genrsa -out ca-priv-key.pem 2048</li>
-                    <li>openssl req -config /usr/lib/ssl/openssl.cnf -new -key ca-priv-key.pem -x509 -days 1825 -out ca.pem</li>
-                </ol>
-                <p>Step 2: Generete client side certificates</p>
-                    <ol>
-                        <li>openssl genrsa -out key.pem 2048</li>
-                        <li>openssl req -subj "/CN=client" -new -key key.pem -out client.csr</li>
-                        <li>openssl x509 -req -days 1825 -in client.csr -CA ca.pem -CAkey ca-priv-key.pem -CAcreateserial -out cert.pem -extensions v3_req -extfile /usr/lib/ssl/openssl.cnf</li>
-                    </ol>
-                    
-                <p>If TLS support is not enabled on Docker endpoint then leave "CA Certificate", "Client Certificate" and "Client Private Key" input parameters on plugin configuration page empty. Plugin will establish simple HTTP connection with such Docker endpoint.</p>
 
-	
-    <h1 id="setupconfig">Plugin Configuration</h1>
+        <li><a href="#CheckCluster">Check Cluster</a></li>
+        
 
-                <p>Plugin configurations are sets of parameters that apply across some or all of the plugin procedures. They reduce repetition of common values, create predefined parameter sets for end users, and securely store credentials where needed. Each configuration is given a unique name that is entered in designated parameters on procedures that use them.<br /><br />
-                </p>
+        <li><a href="#DeployService">Deploy Service</a></li>
+        
 
+        <li><a href="#UndeployService">Undeploy Service</a></li>
+        
 
-                <h3>Creating Plugin Configurations</h3>
-                <p>To create plugin configurations in ElectricFlow, do these steps:</p>
-                
-                <li>Go to <b>Administration</b> &gt; <b>Plugins</b> to open the Plugin Manager.</li>
-                    <li>Find the EC-Docker row.</li>
-                    <li>Click <b>Configure</b> to open the
-                    Docker Configurations page.</li>
-                    <li>Click <b>Create Configuration</b>.</li>
-                    <li>For communicating with Docker host, you need <br/>
-                    <ul type="square">
-                        <li>1. Docker endpoint (For example, tcp://swarmmanager.example.com:2376)</li>
-                        <li>2. TLS certificates in case of cert based authentication with Docker endpoint.
-                        </li>
-                    </ul>
-                </li>
+        <li><a href="#RemoveDockerService">Remove Docker Service</a></li>
+        
 
+        <li><a href="#runDockerBuild">runDockerBuild</a></li>
+        
 
+        <li><a href="#runDockerPull">runDockerPull</a></li>
+        
 
-	<h1 id="procedures">Plugin Procedures</h1>
+        <li><a href="#runDockerRun">runDockerRun</a></li>
+        
 
-     <div class="procedure" id="ProvisionCluster">
+        <li><a href="#Discover">Discover</a></li>
+        
 
-     <a name='ProvisionCluster' id="ProvisionCluster"></a>
+        <li><a href="#Artifact2Image">Artifact2Image</a></li>
+        
 
-     <p>Please note that some of names given in ElectricFlow UI will be modified to comply with the naming conventions of Docker. Specifically characters such as "space , _ " will be converted to "-". Such parameters are marked with an asterisk (*).</p>
-     <h2>Check Cluster</h2>
+        <li><a href="#CreateIngress">Create Ingress</a></li>
+        
 
-			<p>The procedure checks if Docker endpoint reachable with provided details.</p>
+        <li><a href="#DeleteNetwork">Delete Network</a></li>
+        
 
-			<h3>Check Cluster Parameters</h3>
-                <table class="grid">
-                    <thead>
-                        <tr>
-                            <th>Parameter</th>
-                            <th>Description</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td class="required">Configuration</td>
-                            <td>The name of an existing configuration which holds all the connection information for a stand-alone Docker host or Docker Swarm manager.</td>
-                        </tr>
+        <li><a href="#ImportMicroservices">Import Microservices</a></li>
+        
+    </ul>
+    
+    
+    <li><a href="#releaseNotes">Release Notes</a></li>
+</ul>
+    
+    <div id="CreateConfiguration">
+        <a name='CreateConfiguration' id="CreateConfiguration"> </a>
+        <h2>Plugin Configurations</h2>
 
-                    </tbody>
-                </table>
-            </div>  
-            <div id="DeployService">
-                <h2>Deploy Service</h2>
-                <p>This procedure deploys container on stand-alone Docker engine or Docker Swarm service on already setup Docker Swarm cluster.</p>
-                <p>
-                    User can provide a comma-separated list of networks on which to deploy the container or the swarm service in the service mapping page when mapping the service to a cluster in ElectricFlow. If the network does not already exist then the procedure will create one with the provided subnet and gateway. If no subnet and gateway is specified, Docker uses default values. Each of the user-defined networks can have multiple subnets and gateways. In that case, multiple subnets/gateways must be separated by '|'(pipe). If deploying to a stand-alone Docker engine then the user-defined <b>"bridge"</b> network is created.  If deploying to a Docker swarm cluster then the user-defined <b>"overlay"</b> network is created.
-                </p>
-                <p>
-                    For example, 
-                    <table class="grid">
-                    <thead>
-                        <tr>
-                            <td>Networks:</td>
-                            <td>bridge, net1, net2</td>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>Subnets:</td>
-                            <td>,10.200.1.10/24|10.200.2.10/24,198.168.10.10/24</td>
-                        </tr>
-                        <tr>
-                            <td>Gateways:</td>
-                            <td>,10.200.1.1|10.200.2.1,198.168.10.1</td>
-                        </tr>
-                    </tbody>
-                </table>
-                    In this example, container gets attached to bridge, net1 and net2 networks. "bridge" network is already created by Docker and no need to specify subnet/gateway for it. "net1" and "net2" are user defined networks. "net1" have two subnet IP ranges i.e. 10.200.1.10/24(Gateway:10.200.1.1) and 10.200.2.10/24(Gateway:10.200.2.1) while "net2" have single subnet IP range i.e. 198.168.10.10/24(Gateway:198.168.10.1). 
-                </p>
-                <p>
-                    For more information on docker networking, see <a href="https://docs.docker.com/engine/userguide/networking/">here</a>
-                </p>
-                <h3>Deploy Service Parameters</h3>
-                <table class="grid">
-                    <thead>
-                        <tr>
-                            <th>Parameter</th>
-                            <th>Description</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td class="required">Service Name*</td>
-                            <td>The name of the service in ElectricFlow that encapsulates the service to be deployed on a stand-alone Docker host or a Docker Swarm cluster.</td>
-                        </tr>
-                        <tr>
-                            <td>Service Revision ID</td>
-                            <td>Revision Id of the service in ElectricFlow.</td>
-                        </tr>
-                        <tr>
-                            <td class="required">Project Name</td>
-                            <td>The name of the project that the service belongs to. In case of an application-level service it also owns the application.</td>
-                        </tr>
-                        <tr>
-                            <td>Application Name</td>
-                            <td>The name of the application that the service belongs to. Not applicable for a top-level service.</td>
-                        </tr>
-                        <tr>
-                            <td>Application Revision ID</td>
-                            <td>Revision Id of the application version that the service belongs to.</td>
-                        </tr>  
-                        <tr>
-                            <td>Cluster Name</td>
-                            <td>The name of the cluster in ElectricFlow that encapsulates the stand-alone Docker host or a Docker Swarm cluster on which the service is to be deployed.</td>
-                        </tr>                        
-                        <tr>
-                            <td>Cluster or environment project name</td>
-                            <td>The name of the project that the cluster belongs to if it is a top-level project cluster. Or the name of the project that the environment belongs to if it is an environment-scoped cluster.</td>
-                        </tr>
-                        <tr>
-                            <td>Environment Name</td>
-                            <td>The name of the environment that the cluster belongs to. Not applicable for a top-level project cluster.</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-            <div id="UndeployService">
-                <h2>Undeploy Service</h2>
-                <p>Undeploys a previously deployed service on a stand-alone Docker host or a Docker Swarm cluster</p>
+        <p>
+            Plugin configurations are sets of parameters that apply
+            across some or all of the plugin procedures. They
+            reduce repetition of common values, create
+            predefined parameter sets for end users, and
+            securely store credentials where needed. Each configuration
+            is given a unique name that is entered in designated
+            parameters on procedures that use them.<br /><br />
+        </p>
 
-                <h3>Undeploy Service Parameters</h3>
-                <table class="grid">
-                    <thead>
-                        <tr>
-                            <th>Parameter</th>
-                            <th>Description</th>
-                        </tr>
-                    </thead>
-                    <tbody>
+        <h3>Creating Plugin Configurations</h3>
+        <p>To create plugin configurations in ElectricFlow,
+            do these steps:</p>
 
-                        <tr>
-                            <td>Application Name</td>
-                            <td>The name of the application that the service belongs to. Not applicable for a top-level service.</td>
-                        </tr>
+        <li>Go to <b>Administration</b> &gt; <b>Plugins</b> to open the Plugin Manager.</li>
+        <li>Find the @PLUGIN_NAME@ row.</li>
+        <li>Click <b>Configure</b> to open the
+             Configurations page.</li>
+        <li>Click <b>Create Configuration</b>.</li>
+        
+        <li>For communicating with Docker host, you need
+<ul type="square">
+    <li>1. Docker endpoint (For example, tcp://swarmmanager.example.com:2376)</li>
+    <li>2. TLS certificates in case of cert based authentication with Docker endpoint. </li>
+</ul>
+</li>
 
-                        <tr>
-                            <td>Application Revision ID</td>
-                            <td>Revision Id of the application version that the service belongs to.</td>
-                        </tr>
+        
+        Configuration Parameters
+        <table class="grid">
+            <thead>
+            <tr>
+                <th>Parameter</th>
+                <th>Description</th>
+            </tr>
+            </thead>
+            <tbody>
+            
+            <tr>
+                <td class="required">Configuration</td>
+                <td>Unique name for the plugin configuration.</td>
+            </tr>
+            
+            <tr>
+                <td >Description</td>
+                <td>Description for the plugin configuration.</td>
+            </tr>
+            
+            <tr>
+                <td class="required">Docker Endpoint</td>
+                <td>The endpoint at which Docker REST API will be reachable. Must be a IP address or a resolvable DNS name.</td>
+            </tr>
+            
+            <tr>
+                <td >CA Certificate</td>
+                <td>CA Certificate used for authentication when communicating with a secure Docker end-point. Required if the plugin configuration is used for deploying services on a TLS-enabled Docker engine.</td>
+            </tr>
+            
+            <tr>
+                <td >Client Certificate</td>
+                <td>Client certificate used for authentication when communicating with a secure Docker end-point. Required if the plugin configuration is used for deploying services on a TLS-enabled Docker engine.</td>
+            </tr>
+            
+            <tr>
+                <td >Client Private Key</td>
+                <td>Private key used by a Docker client for authentication when communicating with a secure Docker end-point. Required if the plugin configuration is used for deploying services on Docker.</td>
+            </tr>
+            
+            <tr>
+                <td >Test Connection</td>
+                <td>Check this checkbox to verify connectivity to the Docker endpoint.</td>
+            </tr>
+            
+            <tr>
+                <td >Log Level</td>
+                <td>Log level to use for logging output. Error=4, Warning=3, Info=2, Debug=1.</td>
+            </tr>
+            
+            </tbody>
+        </table>
+        
+    </div>
+    
 
-                        <tr>
-                            <td>Cluster Name</td>
-                            <td>The name of the cluster in the environment on which the service was previously deployed. If not specified, the application tier mapping will be used to find the cluster name.</td>
-                        </tr>
+    <h1 id="procedures">Plugin Procedures</h1>
+    
 
-                        <tr>
-                            <td class="required">Environment Name</td>
-                            <td>The name of the environment that the cluster belongs to.</td>
-                        </tr>
+    
+    <div id="CheckCluster">
+        <h2>Check Cluster</h2>
+        <p>Checks that the Docker endpoint specified in the plugin configuration is reachable</p>
+        
+        <h3>Check Cluster Parameters</h3>
+        <table class="grid">
+            <thead>
+            <tr>
+                <th>Parameter</th>
+                <th>Description</th>
+            </tr>
+            </thead>
+            <tbody>
+            
+            <tr>
+                <td class="required">Configuration</td>
+                <td>The name of an existing configuration which holds all the connection information for a stand-alone Docker host or Docker Swarm manager.</td>
+            </tr>
+            
+            </tbody>
+        </table>
+        
+    </div>
 
-                        <tr>
-                            <td>Environment Project Name</td>
-                            <td>The name of the project that the environment belongs to. If not specified, the environment is assumed to be in the same project as the service.</td>
-                        </tr>
+    
+    <div id="DeployService">
+        <h2>Deploy Service</h2>
+        <p>Deploys or updates a service on a stand-alone Docker host or a Docker Swarm cluster</p>
+        
+            <p>
+User can provide a comma-separated list of networks on which to deploy the container or the swarm service in the service mapping page when mapping the service to a cluster in ElectricFlow. If the network does not already exist then the procedure will create one with the provided subnet and gateway. If no subnet and gateway is specified, Docker uses default values. Each of the user-defined networks can have multiple subnets and gateways. In that case, multiple subnets/gateways must be separated by '|'(pipe). If deploying to a stand-alone Docker engine then the user-defined <b>"bridge"</b> network is created.  If deploying to a Docker swarm cluster then the user-defined <b>"overlay"</b> network is created.
+</p>
+<p>
+For example,
+<table class="grid">
+<thead>
+    <tr>
+        <td>Networks:</td>
+        <td>bridge, net1, net2</td>
+    </tr>
+</thead>
+<tbody>
+    <tr>
+        <td>Subnets:</td>
+        <td>,10.200.1.10/24|10.200.2.10/24,198.168.10.10/24</td>
+    </tr>
+    <tr>
+        <td>Gateways:</td>
+        <td>,10.200.1.1|10.200.2.1,198.168.10.1</td>
+    </tr>
+</tbody>
+</table>
+In this example, container gets attached to bridge, net1 and net2 networks. "bridge" network is already created by Docker and no need to specify subnet/gateway for it. "net1" and "net2" are user defined networks. "net1" have two subnet IP ranges i.e. 10.200.1.10/24(Gateway:10.200.1.1) and 10.200.2.10/24(Gateway:10.200.2.1) while "net2" have single subnet IP range i.e. 198.168.10.10/24(Gateway:198.168.10.1).
+</p>
+<p>
+For more information on docker networking, see <a href="https://docs.docker.com/engine/userguide/networking/">here</a>
+</p>
 
-                        <tr>
-                            <td class="required">Service Name*</td>
-                            <td>The name of the service in ElectricFlow that encapsulates the service that was previously deployed on a stand-alone Docker host or a Docker Swarm cluster.</td>
-                        </tr>
-                        <tr>
-                            <td>Service Revision ID</td>
-                            <td>Revision Id of the service in ElectricFlow.</td>
-                        </tr>
-                        <tr>
-                            <td class="required">Project Name</td>
-                            <td>The name of the project that the service belongs to. In case of an application-level service it also owns the application.</td>
-                        </tr>
+        
+        <h3>Deploy Service Parameters</h3>
+        <table class="grid">
+            <thead>
+            <tr>
+                <th>Parameter</th>
+                <th>Description</th>
+            </tr>
+            </thead>
+            <tbody>
+            
+            <tr>
+                <td class="required">Service Name</td>
+                <td>The name of the service in ElectricFlow that encapsulates the service to be deployed on a stand-alone Docker host or a Docker Swarm cluster. Please note that this name will be modified to comply with the naming conventions of Docker. Specifically characters such as "space , _ " will be converted to "-".</td>
+            </tr>
+            
+            <tr>
+                <td >Service Revision ID</td>
+                <td>Revision Id of the service in ElectricFlow.</td>
+            </tr>
+            
+            <tr>
+                <td class="required">Project Name</td>
+                <td>The name of the project that the service belongs to. In case of an application-level service it also owns the application.</td>
+            </tr>
+            
+            <tr>
+                <td >Application Name</td>
+                <td>The name of the application that the service belongs to. Not applicable for a top-level service.</td>
+            </tr>
+            
+            <tr>
+                <td >Application Revision ID</td>
+                <td>Revision Id of the application version that the service belongs to.</td>
+            </tr>
+            
+            <tr>
+                <td class="required">Cluster Name</td>
+                <td>The name of the cluster in ElectricFlow that encapsulates the stand-alone Docker host or a Docker Swarm cluster on which the service is to be deployed.</td>
+            </tr>
+            
+            <tr>
+                <td >Cluster Or Environment Project Name</td>
+                <td>The name of the project that the cluster belongs to if it is a top-level project cluster. Or the name of the project that the environment belongs to if it is an environment-scoped cluster.</td>
+            </tr>
+            
+            <tr>
+                <td >Environment Name</td>
+                <td>The name of the environment that the cluster belongs to. Not applicable for a top-level project cluster.</td>
+            </tr>
+            
+            <tr>
+                <td >Results Property Sheet</td>
+                <td>Name of the property sheet where the output properties for the deployed service will be saved. If not specified, will default to '/myParent/parent'.</td>
+            </tr>
+            
+            </tbody>
+        </table>
+        
+    </div>
 
-                    </tbody>
-                </table>
+    
+    <div id="UndeployService">
+        <h2>Undeploy Service</h2>
+        <p>Undeploys a previously deployed service on a stand-alone Docker host or a Docker Swarm cluster</p>
+        
+        <h3>Undeploy Service Parameters</h3>
+        <table class="grid">
+            <thead>
+            <tr>
+                <th>Parameter</th>
+                <th>Description</th>
+            </tr>
+            </thead>
+            <tbody>
+            
+            <tr>
+                <td class="required">Service Name</td>
+                <td>The name of the service in ElectricFlow that encapsulates the service that was previously deployed on a stand-alone Docker host or a Docker Swarm cluster. Please note that this name will be modified to comply with the naming conventions of Docker. Specifically characters such as "space , _ " will be converted to "-".</td>
+            </tr>
+            
+            <tr>
+                <td >Service Revision ID</td>
+                <td>Revision Id of the service in ElectricFlow.</td>
+            </tr>
+            
+            <tr>
+                <td class="required">Project Name</td>
+                <td>The name of the project that the service belongs to. In case of an application-level service it also owns the application.</td>
+            </tr>
+            
+            <tr>
+                <td >Application Name</td>
+                <td>The name of the application that the service belongs to. Not applicable for a top-level service.</td>
+            </tr>
+            
+            <tr>
+                <td >Application Revision ID</td>
+                <td>Revision Id of the application version that the service belongs to.</td>
+            </tr>
+            
+            <tr>
+                <td class="required">Environment Name</td>
+                <td>The name of the environment that the cluster belongs to.</td>
+            </tr>
+            
+            <tr>
+                <td >Environment Project Name</td>
+                <td>The name of the project that the environment belongs to. If not specified, the environment is assumed to be in the same project as the service.</td>
+            </tr>
+            
+            <tr>
+                <td >Cluster Name</td>
+                <td>The name of the cluster in the environment on which the service was previously deployed. If not specified, the application tier mapping will be used to find the cluster name.</td>
+            </tr>
+            
+            </tbody>
+        </table>
+        
+    </div>
 
-            </div>
-            <div id="RemoveDockerService">
-                <h2>Remove Docker Service</h2>
-                <p>Removes service deployed on a stand-alone Docker host or a Docker Swarm cluster.</p>
+    
+    <div id="RemoveDockerService">
+        <h2>Remove Docker Service</h2>
+        <p>Removes service deployed on a stand-alone Docker host or a Docker Swarm cluster.</p>
+        
+        <h3>Remove Docker Service Parameters</h3>
+        <table class="grid">
+            <thead>
+            <tr>
+                <th>Parameter</th>
+                <th>Description</th>
+            </tr>
+            </thead>
+            <tbody>
+            
+            <tr>
+                <td class="required">Configuration</td>
+                <td>The name of an existing configuration which holds all the connection information for communicating with a stand-alone Docker host or a Docker Swarm cluster.</td>
+            </tr>
+            
+            <tr>
+                <td class="required">Service name in Docker</td>
+                <td>The name of the Docker service that needs to be undeployed.</td>
+            </tr>
+            
+            </tbody>
+        </table>
+        
+    </div>
 
-                <h3>Remove Docker Service Parameters</h3>
-                <table class="grid">
-                    <thead>
-                        <tr>
-                            <th>Parameter</th>
-                            <th>Description</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-
-                        <tr>
-                            <td class="required">Configuration</td>
-                            <td>The name of an existing configuration which holds all the connection information for communicating with a stand-alone Docker host or a Docker Swarm cluster.</td>
-                        </tr>
-
-                        <tr>
-                            <td class="required">Service name in Docker</td>
-                            <td>The name of the Docker service that needs to be undeployed.</td>
-                        </tr>
-
-                    </tbody>
-                </table>
-
-            </div>
-
-
-            <div id="Create Ingress">
-                <h2>Create Ingress Network</h2>
-                <p>Creates ingress network on Docker Swarm cluster with given list of subnets and gateways.</p>
-
-                <h3>Create Ingress Network Parameters</h3>
-                <table class="grid">
-                    <thead>
-                        <tr>
-                            <th>Parameter</th>
-                            <th>Description</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td class="required">Project Name</td>
-                            <td>The name of the project that the service belongs to. In case of an application-level service it also owns the application.</td>
-                        </tr>
-                        <tr>
-                            <td class="required">Environment Name</td>
-                            <td>The name of the environment that the cluster belongs to.</td>
-                        </tr>
-
-                        <tr>
-                            <td>Environment Project Name</td>
-                            <td>The name of the project that the environment belongs to. If not specified, the environment is assumed to be in the same project as the service.</td>
-                        </tr>
-                        <tr>
-                            <td>Cluster Name</td>
-                            <td>The name of the cluster in the environment on which the service was previously deployed. If not specified, the application tier mapping will be used to find the cluster name.</td>
-                        </tr>
-
-                        <tr>
-                            <td>Subnets</td>
-                            <td>Comma separated (CSV) list of subnets to create in ingress network.</td>
-                        </tr>
-
-                        <tr>
-                            <td>Gateways</td>
-                            <td>Comma separated (CSV) list of gateways for subnets mentioned in "Subnets" field.</td>
-                        </tr>
-
-                        <tr>
-                            <td>Enable IPv6</td>
-                            <td>Enable IPv6 on the network</td>
-                        </tr>
-
-                        <tr>
-                            <td>Attachable</td>
-                            <td>Globally scoped network is manually attachable by regular containers from workers in swarm mode.</td>
-                        </tr>
-                        
-                        <tr>
-                            <td>MTU</td>
-                            <td>MTU to set to ingress network</td>
-                        </tr>
-
-                        <tr>
-                            <td>Labels</td>
-                            <td>Comma separated list of key=value pairs to assign to ingress network.</td>
-                        </tr>
-                        
-                    </tbody>
-                </table>
-
-            </div>
-
-            <div id="Delete Network">
-                <h2>Delete Network</h2>
-                <p>Deletes Docker network with given name. Ensure that no container/Swarm service is running before deleting the network.</p>
-
-                <h3>Delete Network Parameters</h3>
-                <table class="grid">
-                    <thead>
-                        <tr>
-                            <th>Parameter</th>
-                            <th>Description</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td class="required">Project Name</td>
-                            <td>The name of the project that the service belongs to. In case of an application-level service it also owns the application.</td>
-                        </tr>
-                        <tr>
-                            <td class="required">Environment Name</td>
-                            <td>The name of the environment that the cluster belongs to.</td>
-                        </tr>
-
-                        <tr>
-                            <td>Environment Project Name</td>
-                            <td>The name of the project that the environment belongs to. If not specified, the environment is assumed to be in the same project as the service.</td>
-                        </tr>
-                        <tr>
-                            <td>Cluster Name</td>
-                            <td>The name of the cluster in the environment on which the service was previously deployed. If not specified, the application tier mapping will be used to find the cluster name.</td>
-                        </tr>
-
-                        <tr>
-                            <td>Network Name</td>
-                            <td>Name of the network to delete.</td>
-                        </tr>
-                        
-                    </tbody>
-                </table>
-
-            </div>
-
-            <div class="procedure" id="runDockerBuild">
-
-     <a name='runDockerBuild' id="runDockerBuild"></a>
-
-     <h2>runDockerBuild</h2>
-
-            <p>Use this procedure to build a Docker image. Docker can build images automatically from a source
-
-            repository using the instructions in a Dockerfile.</p>
+    
+    <div id="runDockerBuild">
+        <h2>runDockerBuild</h2>
+        <p>Performs a docker build</p>
+        
             <p><b>Note:</b> This procedure does not use the plugin configuration to connect to a Docker host. It uses the Docker command line <i>docker</i> on the resource that the procedure step is running on to interact with the Docker engine. The procedure expects any required Docker client config files to be available in the default location at $HOME/.docker on the resource.</p>
 
-            <h3>Input</h3>
+        
+        <h3>runDockerBuild Parameters</h3>
+        <table class="grid">
+            <thead>
+            <tr>
+                <th>Parameter</th>
+                <th>Description</th>
+            </tr>
+            </thead>
+            <tbody>
+            
+            <tr>
+                <td >Use sudo</td>
+                <td>Use sudo for running docker build</td>
+            </tr>
+            
+            <tr>
+                <td class="required">Build path</td>
+                <td>Path to source code</td>
+            </tr>
+            
+            </tbody>
+        </table>
+        
+        <p>
+            <img src="../../plugins/@PLUGIN_NAME@/htdocs/images/runDockerBuild1.png" />
+<br />
+<h3>Output</h3>
+<p>After the job runs, you can view the results on the Job Details page in ElectricFlow.
+</p>
+<p>In the <b>runDockerBuild</b> step, click the Log button to see the diagnostic information.
+</p>
 
-            <ol>
-
-            <li>In the Main Menu, click <b>Administration</b> > <b>Plugins</b> to open the Plugin Manager.</li>
-            <li>Click <b>EC-Docker</b>.</li>
-            <li>Click <b>runDockerBuild</b>.</li>
-            <li>Enter the following parameters:<br />
-
-            <table class="grid">
-                <thead>
-                    <tr>
-                        <th>Parameter</th>
-                        <th>Description</th>
-                    </tr>
-                </thead>
-                <tbody>
-
-                 <tr>
-                        <td >Use sudo</td>
-                        <td>When this parameter is selected, ElectricFlow uses sudo to run the Docker build.</td>
-                    </tr>
-
-                   <tr>
-                         <td class='required'>Build path</td>
-                        <td>Path to the source code.</td>
-                    </tr>
-
-                </tbody>
-            </table>
-
-                </li>
-
-        <br />
-
-
-
-        <img src="../../plugins/@PLUGIN_KEY@/htdocs/images/runDockerBuild1.png" />
-        <br />
-
-        </ol>
-
-        <h3>Output</h3>
-
-        <p>After the job runs, you can view the results on the Job Details page in ElectricFlow.
         </p>
-
-        <!-- The Docker build was completed successfully.
-
-        <img src="../../plugins/@PLUGIN_KEY@/images/runDockerBuild2.png" />
-
-        -->
-
-        <p>In the <b>runDockerBuild</b> step, click the Log button to see the diagnostic information.
-        </p>
-
-        <!-- The output is similar to the following diagnostic report:
-
-        <img src="../../plugins/@PLUGIN_KEY@/images/runDockerBuild3.png" />
-
-        -->
-
-        </div>
-
-         <!-- The next section is required for additional procedures. Replace [Procedure2} with the plugin procedure name in the following lines. -->
-
-         <div class="procedure" id="runDockerPull">
-
-           <a name='runDockerPull' id="runDockerPull"></a>
-
-            <h2>runDockerPull</h2>
-
-             <p>Use this procedure to make a Docker pull request to let others know about the changes you have pushed
-             to the repository.</p>
-
-             <p><b>Note:</b> This procedure does not use the plugin configuration to connect to a Docker host. It uses the Docker command line <i>docker</i> on the resource that the procedure step is running on to interact with the Docker engine. The procedure expects any required Docker client config files to be available in the default location at $HOME/.docker on the resource.</p>
-
-            <h3>Input</h3>
-
-            <ol>
-
-            <li>In the Main Menu, click <b>Administration</b> > <b>Plugins</b> to open the Plugin Manager.</li>
-            <li>Click <b>EC-Docker</b>.</li>
-            <li>Click <b>runDockerPull</b>.</li>
-            <li>Enter the following parameters:<br />
-
-            <table class="grid">
-                <thead>
-                    <tr>
-                        <th>Parameter</th>
-                        <th>Description</th>
-                    </tr>
-                </thead>
-                <tbody>
-
-                    <tr>
-                        <td >Use sudo</td>
-                        <td>When this parameter is selected, ElectricFlow uses sudo to run the Docker pull request.</td>
-                    </tr>
-
-                    <tr>
-                         <td class='required'>Image name</td>
-                        <td>Image to pull from the Docker Hub, such as 2ac9d1098bf1, postgres, or committest.</td>
-                    </tr>
-
-                    <tr>
-                        <td >Image tag</td>
-                        <td>Tag or label of the image in the Docker Hub, such as 2.1, 2.3.6, or latest.</td>
-                    </tr>
-
-                </tbody>
-            </table>
-
-                </li>
-
-        <br />
-
-
-
-        <img src="../../plugins/@PLUGIN_KEY@/htdocs/images/runDockerPull1.png" />
-        <br />
-
-        </ol>
-
-        <h3>Output</h3>
-
-        <p>After the job runs, you can view the results on the Job Details page in ElectricFlow.
-        </p>
-
-        <!-- The Docker build was completed successfully.
-
-        <img src="../../plugins/@PLUGIN_KEY@/images/runDockerBuild2.png" />
-
-        -->
-
-        <p>In the <b>runDockerPull</b> step, click the Log button to see the diagnostic information.
-        </p>
-
-        <!-- The output is similar to the following diagnostic report:
-
-        <img src="../../plugins/@PLUGIN_KEY@/images/runDockerBuild3.png" />
-
-        -->
-
+        
     </div>
 
-    <div class="procedure" id="runDockerRun">
+    
+    <div id="runDockerPull">
+        <h2>runDockerPull</h2>
+        <p>Performs a docker pull on the requested image</p>
+        
+            <p><b>Note:</b> This procedure does not use the plugin configuration to connect to a Docker host. It uses the Docker command line <i>docker</i> on the resource that the procedure step is running on to interact with the Docker engine. The procedure expects any required Docker client config files to be available in the default location at $HOME/.docker on the resource.</p>
 
-           <a name='runDockerRun' id="runDockerRun"></a>
+        
+        <h3>runDockerPull Parameters</h3>
+        <table class="grid">
+            <thead>
+            <tr>
+                <th>Parameter</th>
+                <th>Description</th>
+            </tr>
+            </thead>
+            <tbody>
+            
+            <tr>
+                <td >Use sudo</td>
+                <td>Use sudo for running docker pull</td>
+            </tr>
+            
+            <tr>
+                <td class="required">Image name</td>
+                <td>Image to pull from Docker Hub</td>
+            </tr>
+            
+            <tr>
+                <td >Image tag</td>
+                <td>Tag of image</td>
+            </tr>
+            
+            </tbody>
+        </table>
+        
+        <p>
+            <img src="../../plugins/@PLUGIN_KEY@/htdocs/images/runDockerPull1.png" />
+<h3>Output</h3>
+<p>After the job runs, you can view the results on the Job Details page in ElectricFlow.</p>
+<p>In the <b>runDockerPull</b> step, click the Log button to see the diagnostic information. </p>
 
-            <h2>runDockerRun</h2>
-
-             <p>Use this procedure to run a process in an isolated container. Docker runs the process
-             in its own file system, network, and  isolated process tree. Starting with an image, Docker runs
-             the process to create a container.</p>
-             <p><b>Note:</b> This procedure does not use the plugin configuration to connect to a Docker host. It uses the Docker command line <i>docker</i> on the resource that the procedure step is running on to interact with the Docker engine. The procedure expects any required Docker client config files to be available in the default location at $HOME/.docker on the resource.</p>
-
-            <h3>Input</h3>
-
-            <ol>
-
-            <li>In the Main Menu, click <b>Administration</b> > <b>Plugins</b> to open the Plugin Manager.</li>
-            <li>Click <b>EC-Docker</b>.</li>
-            <li>Click <b>runDockerRun</b>.</li>
-            <li>Enter the following parameters:<br />
-
-            <table class="grid">
-                <thead>
-                    <tr>
-                        <th>Parameter</th>
-                        <th>Description</th>
-                    </tr>
-                </thead>
-                <tbody>
-
-                    <tr>
-                        <td >Use sudo</td>
-                        <td>When this parameter is selected, ElectricFlow uses sudo to run the Docker process.</td>
-                    </tr>
-
-                    <tr>
-                        <td class='required'>Image name</td>
-                        <td>Image from which the container is run, such as 2ac9d1098bf1, postgres, or committest.</td>
-                    </tr>
-
-                    <tr>
-                        <td>Container name</td>
-                        <td>Name of the container:
-                        <ul>
-                        <li>UUID long identifier (such as f78375b1c487e03c9438c729345e54db9d20cfa2ac1fc3494b6eb60872e74778)</li>
-                        <li>UUID short identifier (such as f78375b1c487)</li>
-                        <li>Name (such as admin)</li>
-                        </ul>
-                        </td>
-                    </tr>
-
-                    <tr>
-                        <td >Detached mode (-d)</td>
-                        <td>Select this parameter to run the container in the background and print the new
-                        container ID.</td>
-                    </tr>
-
-                    <tr>
-                        <td>Entrypoint</td>
-                        <td>The default command to execute at runtime. When you enter a command for this parameter,
-                        it overwrites the default entrypoint is set by the image. For example, the <b>/bin/bash example/redis</b>
-                        command overwrites the default entrypoint.</td>
-                    </tr>
-
-                    <tr>
-                        <td>Container working directory</td>
-                        <td>The working directory inside the container. such as /path/to/workdir. The default is
-                        the root directory (/).</td>
-                    </tr>
-
-                    <tr>
-                        <td>Publish ports</td>
-                        <td>Use one of the following formats to publish the container's port to the host:
-                        <ul>
-                        <li>IP_address:hostPort:containerPort</li>
-                        <li>IP_address::containerPort</li>
-                        <li>IP_address:containerPort</li>
-                        <li>containerPort</li>
-                        </ul>
-                        <p>Use spaces to delimit port mappings, such as "2666:1666:8088:8080".</p>
-                        </td>
-                    </tr>
-
-                    <tr>
-                        <td>Publish all ports</td>
-                        <td>Select this parameter to publish all exposed ports to the host interfaces.</td>
-                    </tr>
-
-                    <tr>
-                        <td>Publish all ports</td>
-                        <td>Select this parameter to give extended privileges to this container.</td>
-                    </tr>
-
-                    <tr>
-                        <td>Link</td>
-                        <td>The link to another container using the Name-or-ID:alias format.</td>
-                    </tr>
-
-                    <tr>
-                        <td>Command with args</td>
-                        <td>Command to run within the container.</td>
-                    </tr>
-
-                </tbody>
-            </table>
-
-                </li>
-
-        <br />
-
-        <img src="../../plugins/@PLUGIN_KEY@/htdocs/images/runDockerRun1.png" />
-        <br />
-
-        </ol>
-
-        <h3>Output</h3>
-
-        <p>After the job runs, you can view the results on the Job Details page in ElectricFlow.
         </p>
-
-        <!-- The Docker build was completed successfully.
-
-        <img src="../../plugins/@PLUGIN_KEY@/images/runDockerBuild2.png" />
-
-        -->
-
-        <p>In the <b>runDockerRun</b> step, click the Log button to see the diagnostic information.
-        </p>
-
-        <!-- The output is similar to the following diagnostic report:
-
-        <img src="../../plugins/@PLUGIN_KEY@/images/runDockerBuild3.png" />
-
-        -->
-
+        
     </div>
 
-    <div class="procedure" id="Discover">
+    
+    <div id="runDockerRun">
+        <h2>runDockerRun</h2>
+        <p>Performs a docker run</p>
+        
+            <p><b>Note:</b> This procedure does not use the plugin configuration to connect to a Docker host. It uses the Docker command line <i>docker</i> on the resource that the procedure step is running on to interact with the Docker engine. The procedure expects any required Docker client config files to be available in the default location at $HOME/.docker on the resource.</p>
 
-           <a name='Discover' id="Discover"></a>
+        
+        <h3>runDockerRun Parameters</h3>
+        <table class="grid">
+            <thead>
+            <tr>
+                <th>Parameter</th>
+                <th>Description</th>
+            </tr>
+            </thead>
+            <tbody>
+            
+            <tr>
+                <td >Use sudo</td>
+                <td>Use sudo for running docker run</td>
+            </tr>
+            
+            <tr>
+                <td class="required">Image name</td>
+                <td>Image to run a container from</td>
+            </tr>
+            
+            <tr>
+                <td >Container name</td>
+                <td>Assign a name to the container</td>
+            </tr>
+            
+            <tr>
+                <td >Detached mode (-d)</td>
+                <td>Detached mode: run the container in the background and print the new container ID</td>
+            </tr>
+            
+            <tr>
+                <td >Entrypoint</td>
+                <td>Overwrite the default ENTRYPOINT of the image</td>
+            </tr>
+            
+            <tr>
+                <td >Container working directory</td>
+                <td>Working directory inside the container</td>
+            </tr>
+            
+            <tr>
+                <td >Publish ports</td>
+                <td>Publish a container's port to the host (format: ip:hostPort:containerPort | ip::containerPort | hostPort:containerPort | containerPort). Note: use spaces to delimit port mappings, for example "2666:1666 8088:8080"</td>
+            </tr>
+            
+            <tr>
+                <td >Publish all ports</td>
+                <td>Publish all exposed ports to the host interfaces</td>
+            </tr>
+            
+            <tr>
+                <td >Privileged</td>
+                <td>Give extended privileges to this container</td>
+            </tr>
+            
+            <tr>
+                <td >Link</td>
+                <td>Add link to another container in the form of name:alias</td>
+            </tr>
+            
+            <tr>
+                <td >Command with args</td>
+                <td>Command to run within container</td>
+            </tr>
+            
+            </tbody>
+        </table>
+        
+        <p>
+            <img src="../../plugins/@PLUGIN_KEY@/htdocs/images/runDockerRun1.png" />
+<h3>Output</h3>
+<p>After the job runs, you can view the results on the Job Details page in ElectricFlow.
+</p>
+<p>In the <b>runDockerRun</b> step, click the Log button to see the diagnostic information.
+</p>
 
-            <h2>Discover</h2>
-
-             <p>Use this procedure to discover services from Docker Compose file and create corresponding application
-                models for them in ElectricFlow.</p>
-
-            <h3>Input</h3>
-
-            <ol>
-
-            <li>In the Main Menu, click <b>Administration</b> > <b>Plugins</b> to open the Plugin Manager.</li>
-            <li>Click <b>EC-Docker</b>.</li>
-            <li>Click <b>Discover</b>.</li>
-            <li>Enter the following parameters:<br />
-
-            <table class="grid">
-                <thead>
-                    <tr>
-                        <th>Parameter</th>
-                        <th>Description</th>
-                    </tr>
-                </thead>
-                <tbody>
-
-                    <tr>
-                        <td class="required">Docker Compose File Content</td>
-                        <td>Docker Compose YAML File Content.</td>
-                    </tr>
-
-                    <tr>
-                        <td class='required'>Project</td>
-                        <td>Name of the project in which application would be created.</td>
-                    </tr>
-
-                    <tr>
-                        <td class='required'>Application</td>
-                        <td>Name of the application to be created as part of discovery.</td>
-                    </tr>
-
-                    <tr>
-                        <td>Recreate application</td>
-                        <td>Whether the application should be deleted if it already exists before recreating it based on the Docker Compose file content. If not checked, and the application already exists, the application will not be modified.</td>
-                    </tr>
-                </tbody>
-            </table>
-
-                </li>
-
-        <br />
-
-        <img src="../../plugins/@PLUGIN_KEY@/htdocs/images/Discover.png" />
-        <br />
-
-        </ol>
-
-        <h3>Output</h3>
-
-        <p>After the job runs, you can view the results on the Job Details page in ElectricFlow.
         </p>
-
-        <!-- The Docker build was completed successfully.
-
-        <img src="../../plugins/@PLUGIN_KEY@/images/runDockerBuild2.png" />
-
-        -->
-
-        <p>In the <b>Discover</b> step, click the Log button to see the diagnostic information.
-        </p>
-
-        <!-- The output is similar to the following diagnostic report:
-
-        <img src="../../plugins/@PLUGIN_KEY@/images/runDockerBuild3.png" />
-
-        -->
-
+        
     </div>
-       
 
-		<h1 id="rns">Release Notes</h1>
+    
+    <div id="Discover">
+        <h2>Discover</h2>
+        <p>Discovers services in Docker Compose file and creates corresponding application models for them in ElectricFlow</p>
+        
+        <h3>Discover Parameters</h3>
+        <table class="grid">
+            <thead>
+            <tr>
+                <th>Parameter</th>
+                <th>Description</th>
+            </tr>
+            </thead>
+            <tbody>
+            
+            <tr>
+                <td class="required">Docker Compose File Content</td>
+                <td>Docker Compose YAML File Content</td>
+            </tr>
+            
+            <tr>
+                <td class="required">Project</td>
+                <td>Name of the project in which application would be created.</td>
+            </tr>
+            
+            <tr>
+                <td class="required">Application</td>
+                <td>Name of the application to be created as part of discovery.</td>
+            </tr>
+            
+            <tr>
+                <td >Recreate application</td>
+                <td>Whether the application should be deleted if it already exists before recreating it based on the Docker Compose file content. If not checked, and the application already exists, the application will not be modified.</td>
+            </tr>
+            
+            </tbody>
+        </table>
+        
+    </div>
 
-                <!-- For each release, create an h2 section describing new and revised procedures, enhancements, and JIRA fixes.
-                See the following examples for how to write the release note items, which include:
-                - Phrases starting with "Added the N procedure to ...", "Removed the X parameter from the ...", "Fixed the issue where  ...",
-                and so on.
-                - Descriptions of new features or functionality supported by the plugin.
-                -->
-        <h2>EC-Docker-1.3.0</h2>
-        <ul>
-            <li>Added <i>Import Microservices</i> procedure.</li>
-        </ul>
-        <h2>EC-Docker-1.2.2</h2>
-        <ul>
-            <li>Registered the <i>Undeploy Service</i> procedure as an <i>undeployService</i> operation to enable undeploying micro-services modeled in ElectricFlow from Docker using the service process.</li>
-            <li>Added <i>Create Ingress</i> and <i>Delete Network</i> procedures.</li>
-            <li>Added support for container update on standalone docker engine.</li>
-            <li>Added support for attaching additional networks during container update.</li>
-        </ul>
-        <h2>EC-Docker-1.2.1</h2>
-        <ul>
-            <li>Added support for Docker network creation</li>
-                <ul>
-                    <li>For Stand-alone Docker instances, <i>Deploy Service</i> procedure creates a user defined bridge network if network name given in service mapping page. Procedure uses this network to deploy containers.</li>
-                    <li>For Docker Swarm instances, <i>Deploy Service</i> procedure creates a user defined overlay network if network name given in service mapping page. Procedure uses this network to deploy Docker Swarm services.</li>
-                </ul>
-        </ul>
-        <h2>EC-Docker-1.2.0</h2>
-        <ul>
-            <li>Added support for deploying micro-services modeled in ElectricFlow to Docker. Deploying micro-services to the following Docker environments are supported:
-                <ul>
-                    <li>Stand-alone Docker instances</li>
-                    <li>Docker Swarm</li>
-                    <li>Docker Enterprise Edition</li>
-                    <li>Windows Docker containers on Windows 2016</li>
-                </ul>
-            </li>
-            <li>Added procedure <i>Undeploy Service</i> to undeploy a previously deployed service.</li>
-            <li>Added procedure <i>Remove Docker Service</i> to remove a service running on a stand-alone Docker host or a Docker Swarm cluster.</li>
-            <li>Removed support for using EC-Docker as a 'component' plugin. Micro-services based applications should be modeled as applications with services. The services can then be deployed using the native ElectricFlow services deployment capability.</li>
-        </ul>
+    
+    <div id="Artifact2Image">
+        <h2>Artifact2Image</h2>
+        <p>Creates and pushes a new docker image from the existing artifact</p>
+        
+        <h3>Artifact2Image Parameters</h3>
+        <table class="grid">
+            <thead>
+            <tr>
+                <th>Parameter</th>
+                <th>Description</th>
+            </tr>
+            </thead>
+            <tbody>
+            
+            <tr>
+                <td class="required">Configuration Name</td>
+                <td>Previously defined configuration.</td>
+            </tr>
+            
+            <tr>
+                <td class="required">Artifact Name</td>
+                <td>Artifact name in form group:artifact:version. Artifact will be taken from EF repository.</td>
+            </tr>
+            
+            <tr>
+                <td class="required">Image Name</td>
+                <td>Name for the image, e.g. myrepo/image:v1.0.</td>
+            </tr>
+            
+            <tr>
+                <td >Registry URL</td>
+                <td>Registry URL (if not specified, Dockerhub will be used).</td>
+            </tr>
+            
+            <tr>
+                <td >Username and Password</td>
+                <td>Username and password to connect to Docker registry.</td>
+            </tr>
+            
+            <tr>
+                <td >Base Image</td>
+                <td>Base Image for the DockerFile. If not specified, the default base image for the artifact will be used.
+        </td>
+            </tr>
+            
+            <tr>
+                <td >Ports</td>
+                <td>The ports to list in the EXPOSE instruction in the DockerFile. If not specified, the default port defined in the template DockerFile for the artifact will be used.
+        </td>
+            </tr>
+            
+            <tr>
+                <td >Command</td>
+                <td>Command instruction for the DockerFile. E.g., "executable","param1","param2". If not specified, the default command defined in the template DockerFile for the artifact will be used.
+        </td>
+            </tr>
+            
+            <tr>
+                <td >Environment Variables</td>
+                <td>Multi-line name=value pairs. If specified, merge with any existing environment variables defined in the template DockerFile for the artifact.
+        </td>
+            </tr>
+            
+            </tbody>
+        </table>
+        
+    </div>
 
-        <h2>EC-Docker-1.0.1</h2>
-        <ul>
-            <li>Discover procedure has been added.</li>
-        </ul>
+    
+    <div id="CreateIngress">
+        <h2>Create Ingress</h2>
+        <p>Configures default ingress network in Docker Swarm cluster</p>
+        
+        <h3>Create Ingress Parameters</h3>
+        <table class="grid">
+            <thead>
+            <tr>
+                <th>Parameter</th>
+                <th>Description</th>
+            </tr>
+            </thead>
+            <tbody>
+            
+            <tr>
+                <td class="required">Configuration</td>
+                <td>Name of plugin configuration to use.</td>
+            </tr>
+            
+            <tr>
+                <td class="required">Name</td>
+                <td>Name of ingress network to create.</td>
+            </tr>
+            
+            <tr>
+                <td >Subnets</td>
+                <td>Comma separated (CSV) list of subnets to create in ingress network. </td>
+            </tr>
+            
+            <tr>
+                <td >Gateways</td>
+                <td>Comma separated (CSV) list of gateways for subnets mentioned in "Subnets" field.</td>
+            </tr>
+            
+            <tr>
+                <td >Enable IPv6</td>
+                <td>Enable IPv6 on the network</td>
+            </tr>
+            
+            <tr>
+                <td >MTU</td>
+                <td>MTU to set to ingress network</td>
+            </tr>
+            
+            <tr>
+                <td >Labels</td>
+                <td>Comma separated list of key=value pairs to assign to ingress network.</td>
+            </tr>
+            
+            </tbody>
+        </table>
+        
+    </div>
 
-        <h2>EC-Docker-1.0.0</h2>
+    
+    <div id="DeleteNetwork">
+        <h2>Delete Network</h2>
+        <p>Deletes a network</p>
+        
+        <h3>Delete Network Parameters</h3>
+        <table class="grid">
+            <thead>
+            <tr>
+                <th>Parameter</th>
+                <th>Description</th>
+            </tr>
+            </thead>
+            <tbody>
+            
+            <tr>
+                <td class="required">Configuration</td>
+                <td>Name of plugin configuration to use.</td>
+            </tr>
+            
+            <tr>
+                <td class="required">Network Name</td>
+                <td>Name of the network to delete.</td>
+            </tr>
+            
+            </tbody>
+        </table>
+        
+    </div>
 
-        <ul>
+    
+    <div id="ImportMicroservices">
+        <h2>Import Microservices</h2>
+        <p>Import microcervices using Docker Compose file and creates corresponding application models for them in ElectricFlow</p>
+        
+        <h3>Import Microservices Parameters</h3>
+        <table class="grid">
+            <thead>
+            <tr>
+                <th>Parameter</th>
+                <th>Description</th>
+            </tr>
+            </thead>
+            <tbody>
+            
+            <tr>
+                <td class="required">Docker Compose file</td>
+                <td>Docker Compose file contents</td>
+            </tr>
+            
+            <tr>
+                <td class="required">Project Name</td>
+                <td>The name of project in which the application or the services will be created.</td>
+            </tr>
+            
+            <tr>
+                <td >Create application-scoped microservices</td>
+                <td>Whether all the services defined in the Docker Compose file should be created within one application in ElectricFlow. If checked, then the application name must be provided.</td>
+            </tr>
+            
+            <tr>
+                <td >Application Name</td>
+                <td>The name of the application to create, within which the microservices will be created. Required if 'Create application-scoped microservices' is checked.</td>
+            </tr>
+            
+            <tr>
+                <td class="required">Environment Project Name</td>
+                <td>The name of project that the environment belongs to.</td>
+            </tr>
+            
+            <tr>
+                <td class="required">Environment Name</td>
+                <td>The name of the environment containing the cluster where the newly created microservice(s) will be deployed.</td>
+            </tr>
+            
+            <tr>
+                <td class="required">Cluster Name</td>
+                <td>The name of the EC-Docker backed cluster within the environment where the newly created microservice(s) will be deployed.</td>
+            </tr>
+            
+            </tbody>
+        </table>
+        
+    </div>
 
-            <li>Introduced the EC-Docker plugin.</li>
+    
 
-        </ul>
+    
 
-        </div>
-   </body>
+    
 
+    <h1 id="releaseNotes">Release Notes</h1>
+    
+    <h3>@PLUGIN_KEY@ 1.3.0</h3>
+    <ul>
+        
+        <li>Added <i>Import Microservices</i> procedure.</li>
+        
+    </ul>
+    
+    <h3>@PLUGIN_KEY@ 1.2.2</h3>
+    <ul>
+        
+        <li>Registered the <i>Undeploy Service</i> procedure as an <i>undeployService</i> operation to enable undeploying micro-services modeled in ElectricFlow from Docker using the service process.</li>
+        
+        <li>Added <i>Create Ingress</i> and <i>Delete Network</i> procedures.</li>
+        
+        <li>Added support for container update on standalone docker engine.</li>
+        
+        <li>Added support for attaching additional networks during container update.</li>
+        
+    </ul>
+    
+    <h3>@PLUGIN_KEY@ 1.2.1</h3>
+    <ul>
+        
+        <li>Added support for Docker network creation
+<ul>
+    <li>For Stand-alone Docker instances, <i>Deploy Service</i> procedure creates a user defined bridge network if network name given in service mapping page. Procedure uses this network to deploy containers.</li>
+    <li>For Docker Swarm instances, <i>Deploy Service</i> procedure creates a user defined overlay network if network name given in service mapping page. Procedure uses this network to deploy Docker Swarm services.</li>
+</ul>
+</li>
+        
+    </ul>
+    
+    <h3>@PLUGIN_KEY@ 1.2.0</h3>
+    <ul>
+        
+        <li>Added support for deploying micro-services modeled in ElectricFlow to Docker. Deploying micro-services to the following Docker environments are supported:
+<ul>
+  <li>Stand-alone Docker instances</li>
+  <li>Docker Swarm</li>
+  <li>Docker Enterprise Edition</li>
+  <li>Windows Docker containers on Windows 2016</li>
+</ul>
+</li>
+        
+        <li>Added procedure <i>Undeploy Service</i> to undeploy a previously deployed service.</li>
+        
+        <li>Added procedure <i>Remove Docker Service</i> to remove a service running on a stand-alone Docker host or a Docker Swarm cluster.</li>
+        
+        <li>Removed support for using EC-Docker as a 'component' plugin. Micro-services based applications should be modeled as applications with services. The services can then be deployed using the native ElectricFlow services deployment capability.</li>
+        
+    </ul>
+    
+    <h3>@PLUGIN_KEY@ 1.0.1</h3>
+    <ul>
+        
+        <li>Discover procedure has been added.</li>
+        
+    </ul>
+    
+    <h3>@PLUGIN_KEY@ 1.0.0</h3>
+    <ul>
+        
+        <li>Introduced the EC-Docker plugin.</li>
+        
+    </ul>
+    
+</div>
+</body>
 </html>
-
