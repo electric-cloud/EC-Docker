@@ -1,6 +1,7 @@
 /**
  * ElectricFlow API client
  */
+
 public class EFClient extends BaseClient {
     static final String REST_VERSION = 'v1.0'
 
@@ -30,6 +31,11 @@ public class EFClient extends BaseClient {
         doHttpRequest(PUT, getServerUrl(), requestUri, ['Cookie': "sessionId=$sessionId"], failOnErrorCode, requestBody, query)
     }
 
+    Object doRestPost(String requestUri, Map payload, boolean failOnErrorCode = true, def query = null) {
+        def json = payloadToJson(payload)
+        doHttpPost(requestUri, json, failOnErrorCode, query)
+    }
+
     private def payloadToJson(payload) {
         def refinedPayload = [:]
         payload.each {k, v ->
@@ -37,7 +43,13 @@ public class EFClient extends BaseClient {
                 refinedPayload[k] = v
             }
         }
-        JsonOutput.toJson(refinedPayload)
+        def json = JsonOutput.toJson(refinedPayload)
+    }
+
+    def getApplication(def projectName, def applicationName) {
+
+        def result = doHttpGet("/rest/v1.0/projects/$projectName/applications/$applicationName", /*failOnErrorCode*/ false)
+        result.data
     }
 
     Object doRestPost(String requestUri, Map payload, boolean failOnErrorCode = true, def query = null) {
@@ -288,9 +300,59 @@ public class EFClient extends BaseClient {
         payload = JsonOutput.toJson(payload)
         doHttpPut("/rest/v1.0/properties/${propertyName}", /* request body */ payload)
     }
-
-
-    def updateJobSummary(String message) {
+	
+	// Import Microservices
+	 /*def createService(projName, payload, appName = null) {
+        if (appName) {
+            payload.applicationName = appName
+        }
+        def result = doRestPost("/rest/${REST_VERSION}/projects/${projName}/services", *//* request body *//* payload,
+                *//*failOnErrorCode*//* true)
+        result?.data
+    }*/
+	
+	def getEnvMaps(projectName, serviceName) {
+        def result = doHttpGet("/rest/${REST_VERSION}/projects/${projectName}/services/${serviceName}/environmentMaps")
+        result?.data
+    }
+	
+	def createEnvMap(projName, serviceName, payload) {
+        def result = doRestPost("/rest/${REST_VERSION}/projects/${projName}/services/${serviceName}/environmentMaps", payload, true)
+        result?.data
+    }
+	
+	def createProcess(projName, serviceName, payload) {
+        def result = doRestPost("/rest/${REST_VERSION}/projects/${projName}/services/${serviceName}/processes", payload, false)
+        result?.data
+    }
+	
+	def createProcessStep(projName, serviceName, processName, payload) {
+        def result = doRestPost("/rest/${REST_VERSION}/projects/${projName}/services/${serviceName}/processes/${processName}/processSteps", payload, false)
+        result?.data
+    }
+	
+	def createServiceMapDetails(projName, serviceName, envMapName, serviceClusterMapName, payload) {
+        def result = doRestPost("/rest/${REST_VERSION}/projects/${projName}/services/${serviceName}/environmentMaps/${envMapName}/serviceClusterMappings/${serviceClusterMapName}/serviceMapDetails", payload, false)
+        result?.data
+    }
+	
+	def createServiceClusterMapping(projName, serviceName, envMapName, payload) {
+        def result = doRestPost("/rest/${REST_VERSION}/projects/${projName}/services/${serviceName}/environmentMaps/${envMapName}/serviceClusterMappings", payload, true)
+        result?.data
+    }
+	
+	def getContainers(projectName, serviceName, applicationName = null) {
+        def query = [
+            serviceName: serviceName
+        ]
+        if (applicationName) {
+            query.applicationName = applicationName
+        }
+        def result = doHttpGet("/rest/${REST_VERSION}/projects/${projectName}/containers", false, query)
+        result?.data?.container
+    }
+	
+	def updateJobSummary(String message) {
         def jobStepId = System.getenv('COMMANDER_JOBSTEPID')
         def summary = getEFProperty('/myJob/summary', true)?.value
         def lines = []

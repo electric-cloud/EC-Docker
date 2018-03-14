@@ -111,36 +111,49 @@ public class ImportMicroservices extends EFClient {
         // Service Fields
 		efService.service.defaultCapacity = serviceConfig.deploy?.replicas
 		efService.service.minCapacity = serviceConfig.deploy?.updateConfig?.parallelism
-		
-		// image
-		def image = ''
-		def version = ''
-		def repositoryName = '' 
-		String imageInfo = serviceConfig?.image
-		if (imageInfo != null) {
-			if (imageInfo.contains("/")) {
-                //TODO: Handle registry urls of the form:
-                // ecdocker/motorbike:v1 - this is a public DockerHub registry example so no need to specify the registry url
-                // gcr.io/google_samples/gb-redisslave:v1 - this is a Google Container registry url url/user/image:version
-				String[] parts = imageInfo.split('/')
-				repositoryName = parts[0]
-				if (parts.length > 1 && parts[1].contains(":")) {
-					String[] imageParts = parts[1].split(':')
-					image = imageParts[0]
-					version = imageParts[1]
-				} else {
-					image = parts[1]
-				}
-			} else {
-				String[] parts = imageInfo.split(':')
-				image = parts[0]
-				if (parts.length > 1) {
-					version = parts[1]
-				}
-			}
-		} 
-		
-		// ENV variables
+
+        // image
+        def image = ''
+        def version = ''
+        def url = ''
+        def repositoryName = ''
+        String imageInfo = serviceConfig?.image
+        if (imageInfo != null) {
+            if (imageInfo.contains('/')) {
+                String[] parts = imageInfo.split('/')
+                if (parts.length > 2) {
+                    url = parts[0]
+                    repositoryName = parts[1]
+                    if(parts[2].contains(':')) {
+                        String[] imageParts = parts[2].split(':')
+                        image = imageParts[0]
+                        version = imageParts[1]
+                    } else {
+                        image = parts[2]
+                    }
+
+                }
+                else if (parts.length > 1) {
+                    repositoryName = parts[0]
+                    if (parts[1].contains(':')) {
+                        String[] imageParts = parts[1].split(':')
+                        image = imageParts[0]
+                        version = imageParts[1]
+                    } else {
+                        image = parts[1]
+                    }
+
+                }
+            } else {
+                String[] parts = imageInfo.split(':')
+                image = parts[0]
+                if (parts.length > 1) {
+                    version = parts[1]
+                }
+            }
+        }
+
+        // ENV variables
         def envVars = serviceConfig.environment.entries?.collect{
 			[environmentVariableName: it.key, type: 'string', value: it.value]
         }
@@ -171,18 +184,21 @@ public class ImportMicroservices extends EFClient {
         }
 		
 		def container = [
-            containerName: efServiceName,
-            command: serviceConfig.command?.parts?.join(',') ?: null,
-            entryPoint: serviceConfig.entrypoint ?: null,
-            registryUri: repositoryName,
-            imageName: image,
-            imageVersion: version,
-            memoryLimit: convertToMBs(serviceConfig.deploy?.resources?.limits?.memory),
-            memorySize: convertToMBs(serviceConfig.deploy?.resources?.reservations?.memory),
-            cpuLimit: serviceConfig.deploy?.resources?.limits?.nanoCpus,
-            cpuCount: serviceConfig.deploy?.resources?.reservations?.nanoCpus,
-            volumeMount: containerVolumeValue,
-            ports: containerPorts
+            container: [
+                containerName: efServiceName,
+				command: serviceConfig.command?.parts?.join(',') ?: null,
+				entryPoint: serviceConfig.entrypoint ?: null,
+                url: url,
+				repositoryName: repositoryName,
+                image: image,
+                version: version,
+                memoryLimit: convertToMBs(serviceConfig.deploy?.resources?.limits?.memory),
+				memorySize: convertToMBs(serviceConfig.deploy?.resources?.reservations?.memory),
+				cpuLimit: serviceConfig.deploy?.resources?.limits?.nanoCpus,
+				cpuCount: serviceConfig.deploy?.resources?.reservations?.nanoCpus,
+				volumeMount: containerVolumeValue,
+				port: containerPort
+            ]
         ]
 		
 		efService.container = container
@@ -440,10 +456,6 @@ public class ImportMicroservices extends EFClient {
         ef.createService(projectName: projectName , serviceName: payload?.serviceName, addDeployProcess: payload?.addDeployProcess, applicationName:  applicationName,
                 defaultCapacity: payload?.defaultCapacity, description: payload?.description, maxCapacity: payload?.maxCapacity, minCapacity: payload?.minCapacity,
                 volume: payload?.volume)
-        //_createService (args.projectName, args.serviceName, args.addDeployProcess, args.applicationName, args.defaultCapacity, args.description,
-        // args.maxCapacity, args.minCapacity, args.volume, onSuccess, onFailure)
-        //def result = createService(projectName, payload)
-        //result
     }
 	
 	def equalNames(String oneName, String anotherName) {
