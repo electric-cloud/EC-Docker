@@ -1,6 +1,7 @@
 /**
  * ElectricFlow API client
  */
+
 public class EFClient extends BaseClient {
 
 	static final String REST_VERSION = 'v1.0'
@@ -35,6 +36,21 @@ public class EFClient extends BaseClient {
     Object doHttpPut(String requestUri, Object requestBody, boolean failOnErrorCode = true, def query = null) {
         def sessionId = System.getenv('COMMANDER_SESSIONID')
         doHttpRequest(PUT, getServerUrl(), requestUri, ['Cookie': "sessionId=$sessionId"], failOnErrorCode, requestBody, query)
+    }
+
+    Object doRestPost(String requestUri, Map payload, boolean failOnErrorCode = true, def query = null) {
+        def json = payloadToJson(payload)
+        doHttpPost(requestUri, json, failOnErrorCode, query)
+    }
+
+    private def payloadToJson(payload) {
+        def refinedPayload = [:]
+        payload.each {k, v ->
+            if (v != null) {
+                refinedPayload[k] = v
+            }
+        }
+        def json = JsonOutput.toJson(refinedPayload)
     }
 
     def getApplication(def projectName, def applicationName) {
@@ -288,14 +304,14 @@ public class EFClient extends BaseClient {
     }
 	
 	// Import Microservices
-	def createService(projName, payload, appName = null) {
+	 /*def createService(projName, payload, appName = null) {
         if (appName) {
             payload.applicationName = appName
         }
-        def result = doRestPost("/rest/${REST_VERSION}/projects/${projName}/services", /* request body */ payload,
-                /*failOnErrorCode*/ true)
+        def result = doRestPost("/rest/${REST_VERSION}/projects/${projName}/services", *//* request body *//* payload,
+                *//*failOnErrorCode*//* true)
         result?.data
-    }
+    }*/
 	
 	def getEnvMaps(projectName, serviceName) {
         def result = doHttpGet("/rest/${REST_VERSION}/projects/${projectName}/services/${serviceName}/environmentMaps")
