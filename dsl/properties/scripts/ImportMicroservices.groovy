@@ -294,6 +294,11 @@ public class ImportMicroservices extends EFClient {
          createEFContainer(projectName, serviceName, service.container)
          createEFPorts(projectName, serviceName, service.container, service.service)
 
+        service.containers.each { container ->
+            createOrUpdateContainer(projectName, serviceName, container, efContainers)
+            mapContainerPorts(projectName, serviceName, container, service)
+        }
+
         if (service.serviceMapping && envProjectName && envName && clusterName) {
             createOrUpdateMapping(projectName, envProjectName, envName, clusterName, serviceName, service)
         }
