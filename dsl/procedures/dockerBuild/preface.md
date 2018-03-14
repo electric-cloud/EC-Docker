@@ -1,0 +1,1 @@
+<p><b>Note:</b> This procedure does not use the plugin configuration to connect to a Docker host. It uses the Docker command line <i>docker</i> on the resource that the procedure step is running on to interact with the Docker engine. The procedure expects any required Docker client config files to be available in the default location at $HOME/.docker on the resource.</p>
