@@ -296,7 +296,7 @@ public class ImportMicroservices extends EFClient {
             mapContainerPorts(projectName, serviceName, container, service)
         }
 
-        if (service.serviceMapping) {
+        if (service.serviceMapping && envProjectName && envName && clusterName) {
             createOrUpdateMapping(projectName, envProjectName, envName, clusterName, serviceName, service)
         }
 
