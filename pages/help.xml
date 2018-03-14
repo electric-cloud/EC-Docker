@@ -637,6 +637,87 @@ For more information on docker networking, see <a href="https://docs.docker.com/
         <h2>Artifact2Image</h2>
         <p>Creates and pushes a new docker image from the existing artifact</p>
         
+            <p>The following artifacts are supported:</p>
+<ul>
+<li>.war (will be treated as web application and image will be built with Jetty image as base)</li>
+<li>.jar (will be treated as Springboot application)</li>
+<li>.NET (built application with web.config and *.dll is expected).</li>
+<li>.csproj (will be built)</li>
+</ul>
+<p>For .csproj artifact one needs to specify Command field.</p>
+<h2>Jetty</h2>
+<p>If .war file is found in the artifact folder, the artifact will be treated as web application.
+Dockerfile will look like below:</p>
+<pre><code>FROM ${BASE_IMAGE:'jetty:9.4.7-jre8-alpine'} # Will use Base Image parameter or jetty:9.4.7-jre8-alpine by default
+
+COPY ${FILENAME} /var/lib/jetty/webapps/ROOT.war # FILENAME is the filename of artifact, e.g. hello-world.war
+EXPOSE ${PORTS:8080} # Will use Ports parameter or 8080 by default
+&lt;% if (ENV) { %&gt; # Will use Environment Variables parameter if provided
+ENV ${ENV}
+&lt;% } %&gt;
+
+&lt;% if (COMMAND) { %&gt; # Will use Command parameter if provided
+CMD [${COMMAND}]
+&lt;% } %&gt;
+</code></pre>
+<h2>Springboot</h2>
+<p>If .jar file is found in the artifact folder, the artifact wil be treated as Springboot application.
+Dockerfile will look like below:</p>
+<pre><code>FROM ${BASE_IMAGE:'openjdk:8-jdk-alpine'}
+
+ADD ${FILENAME} app.jar
+EXPOSE ${PORTS:8080}
+&lt;% if (ENV) { %&gt;
+ENV ${ENV}
+&lt;% } %&gt;
+
+CMD [${COMMAND:'&quot;java&quot;, &quot;-jar&quot;, &quot;/app.jar&quot;'}]
+</code></pre>
+<h2>ASP.NET</h2>
+<p>If web.config is found in the artifact folder, the artifact will be treated as .NET application.
+Dockerfile will look like below:</p>
+<pre><code>FROM ${BASE_IMAGE:'microsoft/aspnetcore:2.0'}
+
+EXPOSE ${PORTS:80}
+&lt;% if (ENV) { %&gt;
+ENV ${ENV}
+&lt;% } %&gt;
+
+WORKDIR /app
+COPY . .
+RUN rm Dockerfile
+
+&lt;%
+DEFAULT_COMMAND = '&quot;dotnet&quot;, ' + '&quot;' + FILENAME + '&quot;'
+%&gt;
+ENTRYPOINT [${COMMAND:DEFAULT_COMMAND}]
+</code></pre>
+<h2>CSPROJ</h2>
+<p>If .csproj file is found in the artifact folder, the artifact will be treated as raw .NET application.
+<em>NB</em>: In this case Command field will be needed in order to build a correct Dockerfile.</p>
+<pre><code>FROM microsoft/aspnetcore-build:2.0 AS build-env
+WORKDIR /app
+
+COPY ${FILENAME} ./
+RUN dotnet restore
+
+COPY . ./
+RUN dotnet publish -c Release -o out
+
+# build runtime image
+FROM ${BASE_IMAGE:'microsoft/aspnetcore:2.0'}
+WORKDIR /app
+COPY --from=build-env /app/out .
+
+EXPOSE ${PORTS:80}
+&lt;% if (ENV) { %&gt;
+ENV ${ENV}
+&lt;% } %&gt;
+
+CMD [${COMMAND}]
+</code></pre>
+
+        
         <h3>Artifact2Image Parameters</h3>
         <table class="grid">
             <thead>
@@ -853,6 +934,8 @@ For more information on docker networking, see <a href="https://docs.docker.com/
     <ul>
         
         <li>Added <i>Import Microservices</i> procedure.</li>
+        
+        <li>Added __Artifact2Image__procedure.</li>
         
     </ul>
     
