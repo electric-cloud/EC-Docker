@@ -671,7 +671,7 @@ public class DockerClient extends BaseClient {
     
     def buildImage(String tag, InputStream tar) {
         def response = dockerClient.build(tar, new BuildConfig(query: [t: tag]))
-        logger INFO, "Created image $tag. Response $response\n"
+        logger INFO, "Created image $tag.\n"
         return response
     }
 
