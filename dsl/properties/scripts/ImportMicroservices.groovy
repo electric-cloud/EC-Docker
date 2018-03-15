@@ -248,7 +248,11 @@ public class ImportMicroservices extends EFClient {
         efNetwork
 	}
 	
-	def saveToEF(services, projectName, envProjectName, envName, clusterName, applicationName) {
+	def saveToEF(services, projectName, envProjectName, envName, clusterName, applicationName = null) {
+        if (applicationName && !getExistingApp(applicationName, projectName)){
+            logger INFO, "Application ${applicationName} has been created"
+            createApplication(projectName, applicationName)
+        }
         def efServices = getServices(projectName)
         services.each { service ->
 			if (service?.network == null) {
@@ -259,13 +263,17 @@ public class ImportMicroservices extends EFClient {
         def lines = ["Imported services: ${importedSummary.size()}"]
         importedSummary.each { serviceName, containers ->
             def containerNames = containers.collect { k -> k }
-            lines.add("${serviceName}: ${containerNames.join(', ')}")
+            if (applicationName) {
+                lines.add("${applicationName}: ${serviceName}: ${containerNames.join(', ')}")
+            } else {
+                lines.add("${serviceName}: ${containerNames.join(', ')}")
+            }
         }
 
         updateJobSummary(lines.join("\n"))
     }
 	
-	 def createOrUpdateService(def projectName, def envProjectName, def envName, def clusterName, def efServices, def service, def applicationName) {
+	 def createOrUpdateService(def projectName, def envProjectName, def envName, def clusterName, def efServices, def service, def applicationName = null) {
         def existingService = efServices.find { s ->
             equalNames(s.serviceName, service.service.serviceName)
             logger INFO, "createOrUpdateService: efServices.find = ${s.serviceName}"
@@ -292,19 +300,19 @@ public class ImportMicroservices extends EFClient {
         def efContainers = getContainers(projectName, serviceName)
 
         service.containers.each { container ->
-            createOrUpdateContainer(projectName, serviceName, container, efContainers)
-            mapContainerPorts(projectName, serviceName, container, service)
+            createOrUpdateContainer(projectName, serviceName, container, efContainer, applicationName)
+            mapContainerPorts(projectName, serviceName, container, service, applicationName)
         }
 
         if (service.serviceMapping && envProjectName && envName && clusterName) {
-            createOrUpdateMapping(projectName, envProjectName, envName, clusterName, serviceName, service)
+            createOrUpdateMapping(projectName, envProjectName, envName, clusterName, serviceName, service, applicationName)
         }
 
         // Add deploy process
-        createDeployProcess(projectName, serviceName)			
+        createDeployProcess(projectName, serviceName, applicationName)
     }
 	
-	def mapContainerPorts(projectName, serviceName, container, service) {
+	def mapContainerPorts(projectName, serviceName, container, service, applicationName = null) {
         container.ports?.each { containerPort ->
             service.ports?.each { servicePort ->
                 prettyPrint(servicePort)
@@ -317,23 +325,44 @@ public class ImportMicroservices extends EFClient {
                         subcontainer: container.container.containerName,
                         subport: containerPort.portName
                     ]
-                    createPort(projectName, serviceName, generatedPort)
+                    createPort(projectName, serviceName, generatedPort, null, false, applicationName)
                     logger INFO, "Port ${generatedPortName} has been created for service ${serviceName}, listener port: ${generatedPort.listenerPort}, container port: ${generatedPort.subport}"
                 }
             }
         }
     }
+
+    def getExistingApp(applicationName, projectName){
+        def applications = getApplications(projectName)
+        def existingApplication = applications?.find {
+            it.applicationName == applicationName && it.projectName == projectName
+        }
+        existingApplication
+    }
 	
-	def createOrUpdateMapping(projName, envProjName, envName, clusterName, serviceName, service) {
+	def createOrUpdateMapping(projName, envProjName, envName, clusterName, serviceName, service, applicationName = null) {
         def mapping = service.serviceMapping
 
-        def envMaps = getEnvMaps(projName, serviceName)
-        def existingMap = getExistingMapping(projName, serviceName, envProjName, envName)
+        //def envMaps = getEnvMaps(projName, serviceName)
+        def existingMap = getExistingMapping(projName, serviceName, envProjName, envName, applicationName)
 
         def envMapName
-        if (existingMap) {
+        if (existingMap && !applicationName) {
             logger INFO, "Environment map already exists for service ${serviceName} and cluster ${clusterName}"
             envMapName = existingMap.environmentMapName
+        } else if(existingMap && applicationName){
+            logger INFO, "Environment map already exists for service ${serviceName} in application ${applicationName} and cluster ${clusterName}"
+            envMapName = existingMap.tierMapName
+        } else if (applicationName){
+            def payload = [
+                    environmentProjectName: envProjName,
+                    environmentName: envName,
+                    tierMapName: "${applicationName}-${envName}",
+                    description: CREATED_DESCRIPTION,
+            ]
+
+            def result = createTierMap(projName, applicationName, payload)
+            envMapName = result.tierMap?.tierMapName
         }
         else {
             def payload = [
@@ -350,6 +379,7 @@ public class ImportMicroservices extends EFClient {
 
         def existingClusterMapping = existingMap?.serviceClusterMappings?.serviceClusterMapping?.find {
             it.clusterName == clusterName
+            it.serviceName == serviceNam
         }
 
         def serviceClusterMappingName
@@ -357,6 +387,7 @@ public class ImportMicroservices extends EFClient {
             logger INFO, "Cluster mapping already exists"
             serviceClusterMappingName = existingClusterMapping.serviceClusterMappingName
         }
+        // TODO
         else {
             def payload = [
                 clusterName: clusterName,
@@ -373,33 +404,54 @@ public class ImportMicroservices extends EFClient {
                 }
                 payload.actualParameter = actualParameters
             }
-            def result = createServiceClusterMapping(projName, serviceName, envMapName, payload)
-            logger INFO, "Created Service Cluster Mapping for ${serviceName} and ${clusterName}"
-            serviceClusterMappingName = result.serviceClusterMapping.serviceClusterMappingName
+            if(applicationName) {
+                payload.serviceName = "${serviceName}"
+                payload.serviceClusterMappingName = "${clusterName}-${serviceName}"
+                result = createAppServiceClusterMapping(projName, applicationName, envMapName, payload)
+                logger INFO, "Created Service Cluster Mapping for ${serviceName} in application ${applicationName} and ${clusterName}"
+                serviceClusterMappingName = result.serviceClusterMapping.serviceClusterMappingName
+            } else {
+                def result = createServiceClusterMapping(projName, serviceName, envMapName, payload, applicationName)
+                logger INFO, "Created Service Cluster Mapping for ${serviceName} and ${clusterName}"
+                serviceClusterMappingName = result.serviceClusterMapping.serviceClusterMappingName
+            }
         }
 
         assert serviceClusterMappingName
-
+        //TODO: add whole payload
         service.containers?.each { container ->
             createServiceMapDetails(
                 projName,
                 serviceName,
                 envMapName,
                 serviceClusterMappingName,
-                [containerName: container.container.containerName]
+                [containerName: container.container.containerName],
+                applicationName
             )
         }
     }
-	
-	def getExistingMapping(projectName, serviceName, envProjectName, envName) {
-        def envMaps = getEnvMaps(projectName, serviceName)
-        def existingMap = envMaps.environmentMap?.find {
-            it.environmentProjectName == envProjectName && it.projectName == projectName && it.serviceName == serviceName && it.environmentName == envName
+
+    def getExistingTierMap(envName, envProjectName, projectName, applicationName){
+        def tierMaps = getTierMaps(projectName, applicationName)
+        def existingTierMap = tierMaps?.find {
+            it.applicationName == applicationName && it.environmentName == envName &&
+                    it.environmentProjectName == envProjectName && it.projectName == projectName
         }
-        existingMap
+        existingTierMap
+    }
+
+    def getExistingMapping(projectName, serviceName, envProjectName, envName, applicationName = null) {
+        def existingServiceMapping
+        if (applicationName){
+            existingServiceMapping = getExistingTierMap(envName, envProjectName, projectName, applicationName)
+        }
+        else{
+            existingServiceMapping = getExistingEnvMap(projectName, serviceName, envProjectName, envName)
+        }
+        existingServiceMapping
     }
 	
-	def createOrUpdateContainer(projectName, serviceName, container, efContainers) {
+	def createOrUpdateContainer(projectName, serviceName, container, efContainers, applicationName = null) {
         def existingContainer = efContainers.find {
             equalNames(it.containerName, container.container.containerName)
         }
@@ -415,7 +467,7 @@ public class ImportMicroservices extends EFClient {
             containerName = container.container.containerName
             logger INFO, "Going to create container ${serviceName}/${containerName}"
             logger INFO, pretty(container.container)
-            result = createContainer(projectName, serviceName, container.container)
+            result = createContainer(projectName, serviceName, container.container, applicationName)
             logger INFO, "Container ${serviceName}/${containerName} has been created"
             discoveredSummary[serviceName][containerName] = [:]
         }
@@ -423,31 +475,32 @@ public class ImportMicroservices extends EFClient {
         assert containerName
         def efPorts = getPorts(projectName, serviceName, /* appName */ null, containerName)
         container.ports.each { port ->
-            createPort(projectName, serviceName, port, containerName)
+            createPort(projectName, serviceName, port, containerName, null, false, applicationName)
             logger INFO, "Port ${port.portName} has been created for container ${containerName}, container port: ${port.containerPort}"
         }
 
         if (container.env) {
             container.env.each { env ->
-                createEnvironmentVariable(projectName, serviceName, containerName, env)
+                createEnvironmentVariable(projectName, serviceName, containerName, env, false, applicationName)
                 logger INFO, "Environment variable ${env.environmentVariableName} has been created"
             }
         }
     }
 	
-	def createDeployProcess(projectName, serviceName) {
+	def createDeployProcess(projectName, serviceName, applicationName = null) {
         def processName = 'Deploy'
         def process = createProcess(projectName, serviceName, [processName: processName, processType: 'DEPLOY'])
         logger INFO, "Process ${processName} has been created for ${serviceName}"
         def processStepName = 'deployService'
         def processStep = createProcessStep(projectName, serviceName, processName, [
             processStepName: processStepName,
-            processStepType: 'service', subservice: serviceName
-        ])
+            processStepType: 'service', subservice: serviceName],
+            applicationName
+        )
         logger INFO, "Process step ${processStepName} has been created for process ${processName} in service ${serviceName}"
     }
 	
-	def createEFService(projectName, service, applicationName) {
+	def createEFService(projectName, service, applicationName = null) {
         def payload = service.service
         payload.description = "Created by EF Import Microservices"
         ElectricFlow ef  = new ElectricFlow();
