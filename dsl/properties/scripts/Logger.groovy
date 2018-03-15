@@ -1,4 +1,3 @@
-import static Logger.*
 
 /**
  * Log levels supported by the plugin procedures

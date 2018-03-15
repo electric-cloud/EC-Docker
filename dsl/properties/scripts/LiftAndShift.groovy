@@ -3,8 +3,7 @@ import groovy.text.Template
 import de.gesellix.docker.client.builder.BuildContextBuilder
 import groovy.json.JsonBuilder
 import org.apache.commons.lang.RandomStringUtils
-import sun.reflect.generics.reflectiveObjects.NotImplementedException
-
+import static Logger.*
 
 class LiftAndShift extends BaseClient {
 

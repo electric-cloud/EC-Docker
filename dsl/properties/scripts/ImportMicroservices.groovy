@@ -13,6 +13,7 @@
  *	image: redis
  */
 import com.electriccloud.client.groovy.ElectricFlow
+import groovy.json.JsonBuilder
 
 public class ImportMicroservices extends EFClient {
 

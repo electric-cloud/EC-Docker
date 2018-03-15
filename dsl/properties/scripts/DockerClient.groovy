@@ -2,16 +2,16 @@
  * Docker API client
  */
 
-//@Grab("de.gesellix:docker-client:2017-08-17T20-47-30")
-//@Grab("de.gesellix:docker-client:2018-01-26T21-28-05")
-//@Grab(group='ch.qos.logback', module='logback-classic', version='1.0.13')
-//@GrabExclude(group='org.codehaus.groovy', module='groovy', version='2.4.11')
+@Grab("de.gesellix:docker-client:2018-01-26T21-28-05")
+@Grab(group='ch.qos.logback', module='logback-classic', version='1.0.13')
+@GrabExclude(group='org.codehaus.groovy', module='groovy', version='2.4.11')
 
 import de.gesellix.docker.client.DockerClientImpl
 import de.gesellix.docker.client.DockerClientException
 import de.gesellix.docker.client.image.BuildConfig
 import de.gesellix.docker.compose.ComposeFileReader
 import de.gesellix.docker.compose.types.ComposeConfig
+import groovy.json.JsonBuilder
 
 public class DockerClient extends BaseClient {
 
