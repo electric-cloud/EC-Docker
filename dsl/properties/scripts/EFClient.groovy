@@ -71,6 +71,11 @@ public class EFClient extends BaseClient {
         result?.data
     }
 
+    def getClusters(projName, envName) {
+        def result = doHttpGet("/rest/${REST_VERSION}/projects/${projName}/environments/${envName}/clusters")
+        result?.data?.cluster
+    }
+
     def deleteApplication(def projectName, def applicationName) {
 
         doHttpDelete("/rest/v1.0/projects/$projectName/applications/$applicationName")
@@ -316,14 +321,14 @@ public class EFClient extends BaseClient {
     }
 	
 	// Import Microservices
-	 /*def createService(projName, payload, appName = null) {
+	 def createService(projName, payload, appName = null) {
         if (appName) {
             payload.applicationName = appName
         }
-        def result = doRestPost("/rest/${REST_VERSION}/projects/${projName}/services", *//* request body *//* payload,
-                *//*failOnErrorCode*//* true)
+        def result = doRestPost("/rest/${REST_VERSION}/projects/${projName}/services", /* request body */ payload,
+             /*failOnErrorCode*/ true)
         result?.data
-    }*/
+    }
 
     def getAppEnvMaps(projectName, applicationName, tierMapName) {
         def result = doHttpGet("/rest/${REST_VERSION}/projects/${projectName}/applications/${applicationName}/tierMaps/${tierMapName}/serviceClusterMappings")
