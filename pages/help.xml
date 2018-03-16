@@ -928,7 +928,6 @@ CMD [${COMMAND}]
     <ul>
         <li>Added <i>Import Microservices</i> procedure.</li>
         <li>Added __Artifact2Image__procedure.</li>
-        <li>Internal improvements for 8.3 release.</li>
     </ul>
     <h3>@PLUGIN_KEY@ 1.2.2</h3>
     <ul>
