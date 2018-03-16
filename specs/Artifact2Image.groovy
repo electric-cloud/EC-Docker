@@ -13,10 +13,12 @@ class Artifact2Image extends DockerHelper {
         ]
     }
 
+    @Unroll
     def "war to image"() {
         given:
-        def artifactName = 'com.mycompany:HelloWorldWar:1.0.0'
+        def artifactName = 'ec-specs:HelloWorldWar:1.0.0'
         def imageName = "${getUsername()}/hello-world-war"
+        publishArtifact('ec-specs:HelloWorldWar', '1.0.0', 'hello-world.war')
         when:
         def result = runProcedureDsl """
 runProcedure(
@@ -26,7 +28,11 @@ runProcedure(
         ecp_docker_credential: 'ecp_docker_credential',
         config: '$configName',
         ecp_docker_imageName: '$imageName',
-        ecp_docker_artifactName: '$artifactName'
+        ecp_docker_artifactName: '$artifactName',
+        ecp_docker_ports: '$ports',
+        ecp_docker_env: '$env',
+        ecp_docker_command: '$command',
+        ecp_docker_baseImage: '$baseImage'
     ],
     credential: [
         credentialName: 'ecp_docker_credential',
@@ -45,8 +51,29 @@ runProcedure(
         assert imageId
         def dockerfile = readDockerfile(result.jobId, artifactName)
         logger.debug(dockerfile)
-        assert dockerfile =~ /jetty/
-        assert dockerfile =~ /8080/
+        if (ports) {
+            assert dockerfile =~ /$ports/
+        }
+        else {
+            assert dockerfile =~ /8080/
+        }
+
+        if (baseImage) {
+            assert dockerfile =~ /$baseImage/
+        }
+        else {
+            assert dockerfile =~ /jetty/
+        }
+        if (command) {
+            assert dockerfile =~ /$command/
+        }
+        if (env) {
+            assert dockerfile =~ /$env/
+        }
+        where:
+        ports      | baseImage       |  command      | env
+        '8081'     | 'tomcat'        | ''            | 'var=value'
+        ''         | ''              | 'ls /tmp'     | ''
     }
 
 
@@ -80,5 +107,35 @@ runProcedure(
         def dockerfile = getJobProperty("/myJob/dockerfile", res.jobId)
         assert dockerfile
         dockerfile
+    }
+
+    def runCommand(command) {
+        logger.info("Command: $command")
+        def process = command.execute()
+        process.waitFor()
+        String text = process.text
+        logger.info(text)
+        assert process.exitValue() == 0
+        text
+    }
+
+    def publishArtifact(String artifactName, String version, String resName) {
+        File resource = new File(this.getClass().getResource("/resources/${resName}").toURI())
+
+        String commanderServer = System.getProperty("COMMANDER_SERVER") ?: 'localhost'
+        String username = System.getProperty('COMMANDER_USER') ?: 'admin'
+        String password = System.getProperty('COMMANDER_PASSWORD') ?: 'changeme'
+
+        runCommand("ectool --server $commanderServer login $username $password")
+        runCommand("ectool --server $commanderServer deleteArtifactVersion ${artifactName}:${version}")
+
+        String publishCommand = "ectool --server ${commanderServer} publishArtifactVersion --version $version --artifactName ${artifactName} "
+        if (resource.directory) {
+            publishCommand += "--fromDirectory ${resource}"
+        }
+        else {
+            publishCommand += "--fromDirectory ${resource.parentFile} --includePatterns $resName"
+        }
+        runCommand(publishCommand)
     }
 }
