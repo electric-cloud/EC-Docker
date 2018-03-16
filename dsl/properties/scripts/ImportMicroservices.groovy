@@ -16,101 +16,102 @@ import com.electriccloud.client.groovy.ElectricFlow
 
 public class ImportMicroservices extends EFClient {
 
-	def composeConfig
-	// For networks params
-	def yamlConfig
+    def composeConfig
+    // For networks params
+    def yamlConfig
     def importedSummary = [:]
-	
-	static final String CREATED_DESCRIPTION = "Created by Container ImportMicroservices"
-	
-	def ImportMicroservices(def composeConfig, def yamlConfig) {
-		this.composeConfig = composeConfig
-		this.yamlConfig = yamlConfig
+
+    static final String CREATED_DESCRIPTION = "Created by Container ImportMicroservices"
+
+    def ImportMicroservices(def composeConfig, def yamlConfig) {
+        this.composeConfig = composeConfig
+        this.yamlConfig = yamlConfig
     }
-	
-	def buildServicesDefinitions(def projectName, def applicationName) {
-		def efServices = []
-	
-		//Networks
-		yamlConfig.each { networksConfig ->
-			networksConfig.networks.each { name, networkConfig ->
-				def efNetwork = buildServiceMapping(name, networkConfig)
-				efServices.push(efNetwork)
-			}
-		}
-		
-		// Services
-		composeConfig.services.each { name, serviceConfig ->
-			checkForUnsupportedParameters(name, serviceConfig)
-			def efService = buildServiceDefinition(name, serviceConfig)
-			efServices.push(efService)
+
+    def buildServicesDefinitions(def projectName, def applicationName) {
+        def efServices = []
+
+        //Networks
+        yamlConfig.each { networksConfig ->
+            networksConfig.networks.each { name, networkConfig ->
+                def efNetwork = buildServiceMapping(name, networkConfig)
+                efServices.push(efNetwork)
+            }
         }
-		
-		efServices
-	}
-	
-	def checkForUnsupportedParameters(def name, def serviceConfig) {
-		if(serviceConfig.capAdd != null) {
-			logger WARNING, "Service ${name} has unsupported option cap_add: ${serviceConfig.capAdd}"
-		}
-		if(serviceConfig.envFile != null) {
-			logger WARNING, "Service ${name} has unsupported option env_file: ${serviceConfig.envFile}"
-		} 
-		if(serviceConfig.extraHosts != null) {
-			logger WARNING, "Service ${name} has unsupported option extra_hosts: ${serviceConfig.extraHosts}"
-		}
-		if(serviceConfig.healthcheck != null) {
-			logger WARNING, "Service ${name} has unsupported option healthcheck: ${serviceConfig.healthcheck}"
-		}
-		if(serviceConfig.hostname != null) {
-			logger WARNING, "Service ${name} has unsupported option hostname: ${serviceConfig.hostname}"
-		}
-		if(serviceConfig.labels != null) {
-			logger WARNING, "Service ${name} has unsupported option labels: ${serviceConfig.labels}"
-		}
-		if(serviceConfig.logging != null) {
-			logger WARNING, "Service ${name} has unsupported option logging: ${serviceConfig.logging}"
-		}
-		if(serviceConfig.pid != null) {
-			logger WARNING, "Service ${name} has unsupported option pid: ${serviceConfig.pid}"
-		}
-		if(serviceConfig.secrets != null) {
-			logger WARNING, "Service ${name} has unsupported option secrets: ${serviceConfig.secrets}"
-		}
-		if(serviceConfig.stdinOpen != null) {
-			logger WARNING, "Service ${name} has unsupported option stdin_open: ${serviceConfig.stdinOpen}"
-		}
-		if(serviceConfig.stopGracePeriod != null) {
-			logger WARNING, "Service ${name} has unsupported option stop_grace_period: ${serviceConfig.stopGracePeriod}"
-		}
-		if(serviceConfig.stopSignal != null) {
-			logger WARNING, "Service ${name} has unsupported option stop_signal: ${serviceConfig.stopSignal}"
-		}
-		if(serviceConfig.tty != null) {
-			logger WARNING, "Service ${name} has unsupported option tty: ${serviceConfig.tty}"
-		}
-		if(serviceConfig.ulimits != null) {
-			logger WARNING, "Service ${name} has unsupported option ulimits: ${serviceConfig.ulimits}"
-		}
-		if(serviceConfig.user != null) {
-			logger WARNING, "Service ${name} has unsupported option user: ${serviceConfig.user}"
-		}
-		if(serviceConfig.workingDir != null) {
-			logger WARNING, "Service ${name} has unsupported option working_dir: ${serviceConfig.workingDir}"
-		}
-	}
-	
-	def buildServiceDefinition(def name, def serviceConfig) {
+
+        // Services
+        composeConfig.services.each { name, serviceConfig ->
+            checkForUnsupportedParameters(name, serviceConfig)
+            logger INFO, "VOLUME CLASS: ${serviceConfig.volumes?.source.getClass()}"
+            def efService = buildServiceDefinition(name, serviceConfig)
+            efServices.push(efService)
+        }
+
+        efServices
+    }
+
+    def checkForUnsupportedParameters(def name, def serviceConfig) {
+        if(serviceConfig.capAdd != null) {
+            logger WARNING, "Service ${name} has unsupported option cap_add: ${serviceConfig.capAdd}"
+        }
+        if(serviceConfig.envFile != null) {
+            logger WARNING, "Service ${name} has unsupported option env_file: ${serviceConfig.envFile}"
+        }
+        if(serviceConfig.extraHosts != null) {
+            logger WARNING, "Service ${name} has unsupported option extra_hosts: ${serviceConfig.extraHosts}"
+        }
+        if(serviceConfig.healthcheck != null) {
+            logger WARNING, "Service ${name} has unsupported option healthcheck: ${serviceConfig.healthcheck}"
+        }
+        if(serviceConfig.hostname != null) {
+            logger WARNING, "Service ${name} has unsupported option hostname: ${serviceConfig.hostname}"
+        }
+        if(serviceConfig.labels != null) {
+            logger WARNING, "Service ${name} has unsupported option labels: ${serviceConfig.labels}"
+        }
+        if(serviceConfig.logging != null) {
+            logger WARNING, "Service ${name} has unsupported option logging: ${serviceConfig.logging}"
+        }
+        if(serviceConfig.pid != null) {
+            logger WARNING, "Service ${name} has unsupported option pid: ${serviceConfig.pid}"
+        }
+        if(serviceConfig.secrets != null) {
+            logger WARNING, "Service ${name} has unsupported option secrets: ${serviceConfig.secrets}"
+        }
+        if(serviceConfig.stdinOpen != null) {
+            logger WARNING, "Service ${name} has unsupported option stdin_open: ${serviceConfig.stdinOpen}"
+        }
+        if(serviceConfig.stopGracePeriod != null) {
+            logger WARNING, "Service ${name} has unsupported option stop_grace_period: ${serviceConfig.stopGracePeriod}"
+        }
+        if(serviceConfig.stopSignal != null) {
+            logger WARNING, "Service ${name} has unsupported option stop_signal: ${serviceConfig.stopSignal}"
+        }
+        if(serviceConfig.tty != null) {
+            logger WARNING, "Service ${name} has unsupported option tty: ${serviceConfig.tty}"
+        }
+        if(serviceConfig.ulimits != null) {
+            logger WARNING, "Service ${name} has unsupported option ulimits: ${serviceConfig.ulimits}"
+        }
+        if(serviceConfig.user != null) {
+            logger WARNING, "Service ${name} has unsupported option user: ${serviceConfig.user}"
+        }
+        if(serviceConfig.workingDir != null) {
+            logger WARNING, "Service ${name} has unsupported option working_dir: ${serviceConfig.workingDir}"
+        }
+    }
+
+    def buildServiceDefinition(def name, def serviceConfig) {
         def efServiceName = name
         def efService = [
             service: [
                 serviceName: efServiceName
             ]
         ]
-	
+
         // Service Fields
-		efService.service.defaultCapacity = serviceConfig.deploy?.replicas
-		efService.service.minCapacity = serviceConfig.deploy?.updateConfig?.parallelism
+        efService.service.defaultCapacity = serviceConfig.deploy?.replicas
+        efService.service.minCapacity = serviceConfig.deploy?.updateConfig?.parallelism
 
         // image
         def image = ''
@@ -155,21 +156,20 @@ public class ImportMicroservices extends EFClient {
 
         // ENV variables
         def envVars = serviceConfig.environment.entries?.collect{
-			[environmentVariableName: it.key, type: 'string', value: it.value]
+            [environmentVariableName: it.key, type: 'string', value: it.value]
         }
 
-		 // port config
-        logger INFO, "Reading port configs: " + prettyPrint(serviceConfig.ports)
-        def containerPorts = []
-        def servicePorts = []
-        serviceConfig.ports?.portConfigs?.each { port ->
-            containerPorts << port.target
-            servicePorts << port.published
+         // port config
+        def containerPort = ""
+        def servicePort = ""
+        if(serviceConfig.ports){
+            containerPort = serviceConfig.ports.portConfigs?.target
+            servicePort = serviceConfig.ports.portConfigs?.published
         }
-		
-		efService.service.ports = servicePorts
-		
-		// Volumes
+
+        efService.service.port = servicePort
+
+        // Volumes
         String serviceVolumeValue = null
         def servicesVolumes = serviceConfig.volumes?.source
         if(servicesVolumes != null) {
@@ -182,52 +182,50 @@ public class ImportMicroservices extends EFClient {
         if(containerVolumes != null) {
             containerVolumeValue = containerVolumes.first()
         }
-		
-		def container = [
+
+        def container = [
             container: [
                 containerName: efServiceName,
-				command: serviceConfig.command?.parts?.join(',') ?: null,
-				entryPoint: serviceConfig.entrypoint ?: null,
+                command: serviceConfig.command?.parts?.join(',') ?: null,
+                entryPoint: serviceConfig.entrypoint ?: null,
                 url: url,
-				repositoryName: repositoryName,
+                repositoryName: repositoryName,
                 image: image,
                 version: version,
                 memoryLimit: convertToMBs(serviceConfig.deploy?.resources?.limits?.memory),
-				memorySize: convertToMBs(serviceConfig.deploy?.resources?.reservations?.memory),
-				cpuLimit: serviceConfig.deploy?.resources?.limits?.nanoCpus,
-				cpuCount: serviceConfig.deploy?.resources?.reservations?.nanoCpus,
-				volumeMount: containerVolumeValue,
-				port: containerPort
+                memorySize: convertToMBs(serviceConfig.deploy?.resources?.reservations?.memory),
+                cpuLimit: serviceConfig.deploy?.resources?.limits?.nanoCpus,
+                cpuCount: serviceConfig.deploy?.resources?.reservations?.nanoCpus,
+                volumeMount: containerVolumeValue,
+                port: containerPort
             ]
         ]
-		
-		efService.container = container
-		efService.container.env = envVars
-		
-		// dependencies
-        def processDependency = serviceConfig.dependsOn?.collect {
-			[processDependencyName: it.dependency, targetProcessStepName: name, branchType: 'ALWAYS']
-        }
-		efService.service.processDependency = processDependency
 
-        logger INFO, "Service definition read from the Docker Compose file:"
-        logger INFO, prettyPrint(efService)
+        efService.container = container
+        efService.container.env = envVars
+
+        // dependencies
+        def processDependency = serviceConfig.dependsOn?.collect {
+            [processDependencyName: it.dependency, targetProcessStepName: name, branchType: 'ALWAYS']
+        }
+        efService.service.processDependency = processDependency
+
         efService
     }
-	
-	def buildServiceMapping(def name, def networkConfig) {
-		
-		def efNetworkName = name
-		def efNetwork = [
+
+    def buildServiceMapping(def name, def networkConfig) {
+
+        def efNetworkName = name
+        def efNetwork = [
             network: [
                 networkName: efNetworkName
             ],
             serviceMapping: [:]
         ]
-		
-		def driver = networkConfig?.driver
+
+        def driver = networkConfig?.driver
         def subnet = null
-		def gateway = null
+        def gateway = null
 
         if(networkConfig.ipam?.config) {
             networkConfig.ipam.config.subnet?.each{ param ->
@@ -242,22 +240,25 @@ public class ImportMicroservices extends EFClient {
                 }
             }
         }
-		
-		efNetwork.serviceMapping.driver = driver
-		efNetwork.serviceMapping.subnet = subnet
-		efNetwork.serviceMapping.gateway = gateway
-		
+
+        efNetwork.serviceMapping.driver = driver
+        efNetwork.serviceMapping.subnet = subnet
+        efNetwork.serviceMapping.gateway = gateway
+
         efNetwork
-	}
-	
-	def saveToEF(services, projectName, envProjectName, envName, clusterName, applicationName = null) {
+    }
+
+    def saveToEF(services, projectName, envProjectName, envName, clusterName, applicationName = null) {
+        logger INFO, "Application name: !!!!! saveToEF"
         if (applicationName && !getExistingApp(applicationName, projectName)){
             logger INFO, "Application ${applicationName} has been created"
             createApplication(projectName, applicationName)
         }
         def efServices = getServices(projectName)
         services.each { service ->
-            createService(projectName, envProjectName, envName, clusterName, efServices, service, applicationName)
+            if (service?.network == null) {
+                createOrUpdateService(projectName, envProjectName, envName, clusterName, efServices, service, applicationName)
+            }
         }
 
         def lines = ["Imported services: ${importedSummary.size()}"]
@@ -272,8 +273,8 @@ public class ImportMicroservices extends EFClient {
 
         updateJobSummary(lines.join("\n"))
     }
-	
-	 def createOrUpdateService(def projectName, def envProjectName, def envName, def clusterName, def efServices, def service, def applicationName = null) {
+
+     def createOrUpdateService(def projectName, def envProjectName, def envName, def clusterName, def efServices, def service, def applicationName = null) {
         def existingService = efServices.find { s ->
             logger INFO, "createService: efServices.find = ${s.serviceName}"
             equalNames(s.serviceName, service.service.serviceName)
@@ -287,7 +288,6 @@ public class ImportMicroservices extends EFClient {
         if (existingService) {
             serviceName = existingService.serviceName
             logger WARNING, "Service ${existingService.serviceName} already exists, skipping"
-            // return since we do not want to update an existing service.
             return
         }
         else {
@@ -314,8 +314,8 @@ public class ImportMicroservices extends EFClient {
         // Add deploy process
         createDeployProcess(projectName, serviceName, applicationName)
     }
-	
-	def mapContainerPorts(projectName, serviceName, container, service, applicationName = null) {
+
+    def mapContainerPorts(projectName, serviceName, container, service, applicationName = null) {
         container.ports?.each { containerPort ->
             service.ports?.each { servicePort ->
                 prettyPrint(servicePort)
@@ -336,14 +336,16 @@ public class ImportMicroservices extends EFClient {
     }
 
     def getExistingApp(applicationName, projectName){
+        logger DEBUG, "getApplications:"
         def applications = getApplications(projectName)
+        logger DEBUG, "getExistingApp: applicationName ${applicationName} // projectName: ${projectName} // applications: ${applications}"
         def existingApplication = applications?.find {
             it.applicationName == applicationName && it.projectName == projectName
         }
         existingApplication
     }
-	
-	def createOrUpdateMapping(projName, envProjName, envName, clusterName, serviceName, service, applicationName = null) {
+
+    def createOrUpdateMapping(projName, envProjName, envName, clusterName, serviceName, service, applicationName = null) {
         def mapping = service.serviceMapping
 
         //def envMaps = getEnvMaps(projName, serviceName)
@@ -453,8 +455,8 @@ public class ImportMicroservices extends EFClient {
         }
         existingServiceMapping
     }
-	
-	def createOrUpdateContainer(projectName, serviceName, container, efContainers, applicationName = null) {
+
+    def createOrUpdateContainer(projectName, serviceName, container, efContainers, applicationName = null) {
         def existingContainer = efContainers.find {
             equalNames(it.containerName, container.container.containerName)
         }
@@ -490,8 +492,8 @@ public class ImportMicroservices extends EFClient {
             }
         }
     }
-	
-	def createDeployProcess(projectName, serviceName, applicationName = null) {
+
+    def createDeployProcess(projectName, serviceName, applicationName = null) {
         def processName = 'Deploy'
         def process = createProcess(projectName, serviceName, [processName: processName, processType: 'DEPLOY'])
         logger INFO, "Process ${processName} has been created for ${serviceName}"
@@ -503,18 +505,19 @@ public class ImportMicroservices extends EFClient {
         )
         logger INFO, "Process step ${processStepName} has been created for process ${processName} in service ${serviceName}"
     }
-	
-	def createEFService(projectName, service, applicationName = null) {
+
+    def createEFService(projectName, service, applicationName = null) {
         def payload = service.service
         payload.description = "Created by EF Import Microservices"
         ElectricFlow ef  = new ElectricFlow();
-        if(applicationName.equals('')) applicationName = null
         ef.createService(projectName: projectName , serviceName: payload?.serviceName, addDeployProcess: payload?.addDeployProcess, applicationName:  applicationName,
                 defaultCapacity: payload?.defaultCapacity, description: payload?.description, maxCapacity: payload?.maxCapacity, minCapacity: payload?.minCapacity,
                 volume: payload?.volume)
+        /*def result = createService(projectName, payload, appName)
+        result*/
     }
-	
-	def equalNames(String oneName, String anotherName) {
+
+    def equalNames(String oneName, String anotherName) {
         assert oneName
         assert anotherName
         def normalizer = { name ->
@@ -523,5 +526,9 @@ public class ImportMicroservices extends EFClient {
         }
         return normalizer(oneName) == normalizer(anotherName)
     }
-	
+
+    def prettyPrint(object) {
+        println new JsonBuilder(object).toPrettyString()
+    }
+
 }
