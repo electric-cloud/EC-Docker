@@ -71,6 +71,17 @@ class ContainerHelper extends PluginSpockTestSupport {
 
     }
 
+    def getJobWorkspace(jobId) {
+        def details = dsl """
+            getJobDetails(jobId: '$jobId')
+        """
+        def workspace = details?.job?.workspace
+        logger.debug(objectToJson(workspace))
+        def path = workspace.unix[0]
+        logger.debug(objectToJson(path))
+        path
+    }
+
     def readJobLogs(jobId) {
         def details = dsl """
             getJobDetails(jobId: '$jobId')
