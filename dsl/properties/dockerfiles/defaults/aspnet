@@ -1,0 +1,15 @@
+FROM ${BASE_IMAGE:'microsoft/aspnetcore:2.0'}
+
+EXPOSE ${PORTS:80}
+<% if (ENV) { %>
+ENV ${ENV}
+<% } %>
+
+WORKDIR /app
+COPY . .
+RUN rm Dockerfile
+
+<%
+DEFAULT_COMMAND = '"dotnet", ' + '"' + FILENAME + '"'
+%>
+ENTRYPOINT [${COMMAND:DEFAULT_COMMAND}]

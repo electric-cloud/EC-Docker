@@ -1,0 +1,9 @@
+FROM ${BASE_IMAGE:'openjdk:8-jdk-alpine'}
+
+ADD ${FILENAME} app.jar
+EXPOSE ${PORTS:8080}
+<% if (ENV) { %>
+ENV ${ENV}
+<% } %>
+
+CMD [${COMMAND:'"java", "-jar", "/app.jar"'}]

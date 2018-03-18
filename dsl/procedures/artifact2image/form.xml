@@ -1,0 +1,87 @@
+<!--
+
+     Copyright 2016 Electric Cloud, Inc.
+
+     Licensed under the Apache License, Version 2.0 (the "License");
+     you may not use this file except in compliance with the License.
+     You may obtain a copy of the License at
+
+         http://www.apache.org/licenses/LICENSE-2.0
+
+     Unless required by applicable law or agreed to in writing, software
+     distributed under the License is distributed on an "AS IS" BASIS,
+     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+     See the License for the specific language governing permissions and
+     limitations under the License.
+
+-->
+<editor>
+    <formElement>
+        <type>entry</type>
+        <label>Configuration Name:</label>
+        <property>config</property>
+        <required>1</required>
+        <documentation>Previously defined configuration.</documentation>
+    </formElement>
+    <formElement>
+        <type>entry</type>
+        <label>Artifact Name:</label>
+        <property>ecp_docker_artifactName</property>
+        <required>1</required>
+        <documentation>Artifact name in form group:artifact:version. Artifact will be taken from EF repository.</documentation>
+    </formElement>
+    <formElement>
+        <type>entry</type>
+        <required>1</required>
+        <property>ecp_docker_imageName</property>
+        <label>Image Name:</label>
+        <documentation>Name for the image, e.g. myrepo/image:v1.0.</documentation>
+    </formElement>
+    <formElement>
+        <type>entry</type>
+        <required>0</required>
+        <label>Registry URL:</label>
+        <property>ecp_docker_registryUrl</property>
+        <documentation>Registry URL (if not specified, Dockerhub will be used).</documentation>
+    </formElement>
+    <formElement>
+        <type>credential</type>
+        <required>0</required>
+        <property>ecp_docker_credential</property>
+        <label>Username and Password:</label>
+        <attachedAsParameterToStep>artifact2image</attachedAsParameterToStep>
+        <documentation>Username and password to connect to Docker registry.</documentation>
+    </formElement>
+    <formElement>
+        <type>entry</type>
+        <required>0</required>
+        <property>ecp_docker_baseImage</property>
+        <label>Base Image:</label>
+        <documentation>Base Image for the DockerFile. If not specified, the default base image for the artifact will be used.
+        </documentation>
+    </formElement>
+    <formElement>
+        <type>textarea</type>
+        <required>0</required>
+        <documentation>The ports to list in the EXPOSE instruction in the DockerFile. If not specified, the default port defined in the template DockerFile for the artifact will be used.
+        </documentation>
+        <label>Ports:</label>
+        <property>ecp_docker_ports</property>
+    </formElement>
+    <formElement>
+        <type>textarea</type>
+        <label>Command:</label>
+        <property>ecp_docker_command</property>
+        <documentation>Command instruction for the DockerFile. E.g., "executable","param1","param2". If not specified, the default command defined in the template DockerFile for the artifact will be used.
+        </documentation>
+        <required>0</required>
+    </formElement>
+    <formElement>
+        <type>textarea</type>
+        <property>ecp_docker_env</property>
+        <label>Environment Variables:</label>
+        <required>0</required>
+        <documentation>Multi-line name=value pairs. If specified, merge with any existing environment variables defined in the template DockerFile for the artifact.
+        </documentation>
+    </formElement>
+</editor>

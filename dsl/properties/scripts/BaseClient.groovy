@@ -16,6 +16,7 @@ import static groovyx.net.http.Method.DELETE
 import static groovyx.net.http.Method.GET
 import static groovyx.net.http.Method.POST
 import static groovyx.net.http.Method.PUT
+import static Logger.*
 
 /**
  * Groovy client with common utility functions used in a plugin procedure
