@@ -43,7 +43,7 @@ public class EFClient extends BaseClient {
                 refinedPayload[k] = v
             }
         }
-        def json = JsonOutput.toJson(refinedPayload)
+        JsonOutput.toJson(refinedPayload)
     }
 
     def getApplication(def projectName, def applicationName) {
@@ -70,6 +70,9 @@ public class EFClient extends BaseClient {
     }
 
     def deleteApplication(def projectName, def applicationName) {
+
+        doHttpDelete("/rest/v1.0/projects/$projectName/applications/$applicationName")
+    }
 
     Object doRestPut(String requestUri, Map payload, boolean failOnErrorCode = true, def query = null) {
         def json = payloadToJson(payload)
@@ -315,16 +318,6 @@ public class EFClient extends BaseClient {
         doHttpPut("/rest/v1.0/properties/${propertyName}", /* request body */ payload)
     }
 	
-	// Import Microservices
-	 def createService(projName, payload, appName = null) {
-        if (appName) {
-            payload.applicationName = appName
-        }
-        def result = doRestPost("/rest/${REST_VERSION}/projects/${projName}/services", /* request body */ payload,
-             /*failOnErrorCode*/ true)
-        result?.data
-    }
-
     def getAppEnvMaps(projectName, applicationName, tierMapName) {
         def result = doHttpGet("/rest/${REST_VERSION}/projects/${projectName}/applications/${applicationName}/tierMaps/${tierMapName}/serviceClusterMappings")
         result?.data?.serviceClusterMapping
@@ -343,14 +336,14 @@ public class EFClient extends BaseClient {
         result?.data
     }
 
-    def createEnvironmentVariable(projName, serviceName, containerName, payload, failOnError = false, applicationName = null) {
+    def createEnvironmentVariable(projName, serviceName, containerName, payload, applicationName = null) {
         if (applicationName) {
             payload.applicationName = applicationName
         }
         payload.containerName = containerName
         payload.serviceName = serviceName
         def json = JsonOutput.toJson(payload)
-        def result = doHttpPost("/rest/${REST_VERSION}/projects/${projName}/containers/${containerName}/environmentVariables", json, failOnError)
+        def result = doHttpPost("/rest/${REST_VERSION}/projects/${projName}/containers/${containerName}/environmentVariables", json)
         result?.data
     }
 
@@ -363,25 +356,28 @@ public class EFClient extends BaseClient {
         result?.data
     }
 	
-	def getEnvMaps(projectName, serviceName) {
-        def result = doHttpGet("/rest/${REST_VERSION}/projects/${projectName}/services/${serviceName}/environmentMaps")
+	def createEnvironmentMap(projName, serviceName, payload) {
+        def result = doRestPost("/rest/${REST_VERSION}/projects/${projName}/services/${serviceName}/environmentMaps", payload)
         result?.data
     }
-	
-	def createEnvMap(projName, serviceName, payload) {
-        def result = doRestPost("/rest/${REST_VERSION}/projects/${projName}/services/${serviceName}/environmentMaps", payload, true)
+
+    def createAppProcess(projName, applicationName, payload) {
+        def result = doRestPost("/rest/${REST_VERSION}/projects/${projName}/applications/${applicationName}/processes", payload)
         result?.data
     }
-	
+
 	def createProcess(projName, serviceName, payload) {
-        def result = doRestPost("/rest/${REST_VERSION}/projects/${projName}/services/${serviceName}/processes", payload, false)
+        def result = doRestPost("/rest/${REST_VERSION}/projects/${projName}/services/${serviceName}/processes", payload)
         result?.data
     }
-	
-	def createProcessStep(projName, serviceName, processName, payload, applicationName = null) {
-        if (applicationName) {
-            payload.applicationName = applicationName
-        }
+
+
+    def createAppProcessStep(projName, applicationName, processName, payload) {
+        def result = doRestPost("/rest/${REST_VERSION}/projects/${projName}/applications/${applicationName}/processes/${processName}/processSteps", payload, false)
+        result?.data
+    }
+
+	def createProcessStep(projName, serviceName, processName, payload) {
         def result = doRestPost("/rest/${REST_VERSION}/projects/${projName}/services/${serviceName}/processes/${processName}/processSteps", payload, false)
         result?.data
     }
@@ -393,12 +389,14 @@ public class EFClient extends BaseClient {
         def result = doRestPost("/rest/${REST_VERSION}/projects/${projName}/services/${serviceName}/environmentMaps/${envMapName}/serviceClusterMappings/${serviceClusterMapName}/serviceMapDetails", payload, false)
         result?.data
     }
-	
-	def createServiceClusterMapping(projName, serviceName, envMapName, payload, applicationName = null) {
-        if (applicationName) {
-            payload.applicationName = applicationName
-        }
-        def result = doRestPost("/rest/${REST_VERSION}/projects/${projName}/services/${serviceName}/environmentMaps/${envMapName}/serviceClusterMappings", payload, true)
+
+    def createAppServiceClusterMapping(projName, applicationName, tierMapName, payload) {
+        def result = doRestPost("/rest/${REST_VERSION}/projects/${projName}/applications/${applicationName}/tierMaps/${tierMapName}/serviceClusterMappings", payload)
+        result?.data
+    }
+
+	def createServiceClusterMapping(projName, serviceName, envMapName, payload) {
+        def result = doRestPost("/rest/${REST_VERSION}/projects/${projName}/services/${serviceName}/environmentMaps/${envMapName}/serviceClusterMappings", payload)
         result?.data
     }
 	
@@ -424,16 +422,8 @@ public class EFClient extends BaseClient {
         setEFProperty('/myJob/summary', lines.join("\n"))
     }
 
-    def getEFProperty(String propertyName, boolean ignoreError = false) {
-        // Get the property in the context of a job-step by default
-        def jobStepId = '$[/myJobStep/jobStepId]'
-
-        doHttpGet("/rest/v1.0/properties/${propertyName}",
-                /* failOnErrorCode */ !ignoreError, [jobStepId: jobStepId])
-    }
-
     def createTierMap(projName, applicationName, payload){
-        def result = doRestPost("/rest/${REST_VERSION}/projects/${projName}/applications/${applicationName}/tierMaps", payload, false)
+        def result = doRestPost("/rest/${REST_VERSION}/projects/${projName}/applications/${applicationName}/tierMaps", payload)
         result?.data
     }
 
@@ -513,28 +503,6 @@ public class EFClient extends BaseClient {
         result?.data
     }
 
-    def createEnvironmentVariable(projName, serviceName, containerName, payload, failOnError = false, appName = null) {
-        if (appName) {
-            payload.applicationName = appName
-        }
-        payload.containerName = containerName
-        payload.serviceName = serviceName
-        def json = JsonOutput.toJson(payload)
-        def result = doHttpPost("/rest/${REST_VERSION}/projects/${projName}/containers/${containerName}/environmentVariables", json, failOnError)
-        result?.data
-    }
-
-    def getContainers(projectName, serviceName, applicationName = null) {
-        def query = [
-                serviceName: serviceName
-        ]
-        if (applicationName) {
-            query.applicationName = applicationName
-        }
-        def result = doHttpGet("/rest/${REST_VERSION}/projects/${projectName}/containers", false, query)
-        result?.data?.container
-    }
-
     def updateContainer(String projectName, String serviceName, String containerName, payload, appName = null) {
         payload.serviceName = serviceName
         if (appName) {
@@ -542,50 +510,6 @@ public class EFClient extends BaseClient {
         }
         def result = doRestPut("/rest/${REST_VERSION}/projects/${projectName}/containers/${containerName}", payload, true)
         result?.data
-    }
-
-    def createContainer(String projectName, String serviceName, payload, appName = null) {
-        payload.serviceName = serviceName
-        if (appName) {
-            payload.appName = appName
-        }
-        def result = doRestPost("/rest/${REST_VERSION}/projects/${projectName}/containers", payload)
-        result?.data
-    }
-
-    def getEnvMaps(projectName, serviceName) {
-        def result = doHttpGet("/rest/${REST_VERSION}/projects/${projectName}/services/${serviceName}/environmentMaps")
-        result?.data
-    }
-
-    def createEnvMap(projName, serviceName, payload) {
-        def result = doRestPost("/rest/${REST_VERSION}/projects/${projName}/services/${serviceName}/environmentMaps", payload)
-        result?.data
-    }
-
-    def createServiceClusterMapping(projName, serviceName, envMapName, payload) {
-        def result = doRestPost("/rest/${REST_VERSION}/projects/${projName}/services/${serviceName}/environmentMaps/${envMapName}/serviceClusterMappings", payload)
-        result?.data
-    }
-
-    def createServiceMapDetails(projName, serviceName, envMapName, serviceClusterMapName, payload) {
-        def result = doRestPost("/rest/${REST_VERSION}/projects/${projName}/services/${serviceName}/environmentMaps/${envMapName}/serviceClusterMappings/${serviceClusterMapName}/serviceMapDetails", payload)
-        result?.data
-    }
-
-    def createProcess(projName, serviceName, payload) {
-        def result = doRestPost("/rest/${REST_VERSION}/projects/${projName}/services/${serviceName}/processes", payload)
-        result?.data
-    }
-
-    def createProcessStep(projName, serviceName, processName, payload) {
-        def result = doRestPost("/rest/${REST_VERSION}/projects/${projName}/services/${serviceName}/processes/${processName}/processSteps", payload)
-        result?.data
-    }
-
-    def getClusters(projName, envName) {
-        def result = doHttpGet("/rest/${REST_VERSION}/projects/${projName}/environments/${envName}/clusters")
-        result?.data?.cluster
     }
 
     def createCredential(projName, credName, userName, password) {
