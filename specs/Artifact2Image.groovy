@@ -14,7 +14,6 @@ class Artifact2Image extends DockerHelper {
     }
 
     @Unroll
-    @Ignore
     def "war to image"() {
         given:
         def artifactName = 'ec-specs:HelloWorldWar:1.0.0'
@@ -77,7 +76,6 @@ runProcedure(
     }
 
     @Unroll
-    @Ignore
     def "jar to image"() {
         given:
         def artifactName = "ec-specs:HelloSpringBoot:1.0.0"
@@ -215,7 +213,7 @@ runProcedure(
         where:
         ports      | baseImage                             |  command          | env
         '8081'     | 'microsoft/aspnetcore:2.1.0-preview1' | './aspnetapp.dll' | 'var=value'
-        ''         | ''                                    | 'ls /tmp'         | ''
+        ''         | ''                                    | 'ls /tmp'     | ''
     }
 
 
