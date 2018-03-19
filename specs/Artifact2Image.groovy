@@ -14,6 +14,7 @@ class Artifact2Image extends DockerHelper {
     }
 
     @Unroll
+    @Ignore
     def "war to image"() {
         given:
         def artifactName = 'ec-specs:HelloWorldWar:1.0.0'
@@ -42,7 +43,6 @@ runProcedure(
 )
 """
         then:
-        assert true
         def logs = readJobLogs(result.jobId)
 
         logger.info(logs)
@@ -72,10 +72,79 @@ runProcedure(
         }
         where:
         ports      | baseImage       |  command      | env
-        '8081'     | 'tomcat'        | ''            | 'var=value'
+        '8081'     | 'tomcat:alpine' | ''            | 'var=value'
         ''         | ''              | 'ls /tmp'     | ''
     }
 
+    @Unroll
+    def "jar to image"() {
+        given:
+        def artifactName = "ec-specs:HelloSpringBoot:1.0.0"
+        def imageName = "${getUsername()}/hello-spring-boot"
+        publishArtifact("ec-specs:HelloSpringBoot", "1.0.0", "hello-spring-boot.jar")
+        def client = new DockerHubClient(this, getUsername(), getPassword())
+        try {
+            client.deleteRepository("hello-spring-boot")
+        } catch (Throwable e) {
+            logger.debug(e.getMessage())
+        }
+        when:
+        def result = runProcedureDsl """
+runProcedure(
+    projectName: '/plugins/EC-Docker/project',
+    procedureName: 'Artifact2Image',
+    actualParameter: [
+        ecp_docker_credential: 'ecp_docker_credential',
+        config: '$configName',
+        ecp_docker_imageName: '$imageName',
+        ecp_docker_artifactName: '$artifactName',
+        ecp_docker_ports: '$ports',
+        ecp_docker_env: '$env',
+        ecp_docker_command: '$command',
+        ecp_docker_baseImage: '$baseImage'
+    ],
+    credential: [
+        credentialName: 'ecp_docker_credential',
+        userName: '${getUsername()}',
+        password: '${getPassword()}'
+    ]
+)
+"""
+        then:
+        def logs = readJobLogs(result.jobId)
+        logger.info(logs)
+        assert logs =~ /Image has been built/
+        def imageId = getJobProperty("/myJob/parent/${imageName}/imageId", result.jobId)
+        assert imageId
+        def dockerfile = readDockerfile(result.jobId, artifactName)
+        logger.debug(dockerfile)
+
+        def repoData = client.getRepository("hello-spring-boot")
+        assert repoData
+        if (ports) {
+            assert dockerfile =~ /$ports/
+        }
+        else {
+            assert dockerfile =~ /8080/
+        }
+
+        if (baseImage) {
+            assert dockerfile =~ /$baseImage/
+        }
+        else {
+            assert dockerfile =~ /openjdk/
+        }
+        if (command) {
+            assert dockerfile =~ /$command/
+        }
+        if (env) {
+            assert dockerfile =~ /$env/
+        }
+        where:
+        ports      | baseImage            |  command      | env
+        '8081'     | 'openjdk:8-jre-slim' | ''            | 'var=value'
+        ''         | ''                   | 'ls /tmp'     | ''
+    }
 
     def getUsername() {
         def username = System.getenv('EC_DOCKERHUB_USER')

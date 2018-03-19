@@ -107,7 +107,6 @@ class DockerHelper extends ContainerHelper {
         jobCompleted(result)
     }
 
-
     static def request(requestUrl, requestUri, method, queryArgs, requestHeaders, requestBody) {
         def http = new RESTClient(requestUrl)
         http.ignoreSSLIssues()
@@ -146,4 +145,78 @@ class DockerHelper extends ContainerHelper {
         assert endpoint
         endpoint
     }
+
+
+
+
+    class DockerHubClient {
+        def token
+        def username
+        static final def DOCKERHUB_URL = "https://hub.docker.com"
+
+
+        DockerHubClient(username, password) {
+            this.token = auth(username, password)
+            this.username = username
+        }
+
+
+        def listRepositories() {
+            def data = dockerhubRequest("/v2/repositories/${username}")
+            data
+        }
+
+        def deleteRepository(name) {
+            dockerhubRequest("/v2/repositories/${username}/${name}", DELETE)
+        }
+
+        def getRepository(name) {
+            dockerhubRequest("/v2/repositories/${username}/${name}")
+        }
+
+        static def auth(username, password) {
+            def body = """{"username": "$username", "password": "$password"}"""
+            def data = request(DOCKERHUB_URL, "/v2/users/login/", POST, null, ["Content-Type": "application/json"], body)?.data
+            assert data
+            assert data.token
+            data.token
+        }
+
+        def dockerhubRequest(uri, method = GET,  headers = [:], query = [:], body = null) {
+            headers["Authorization"] = "JWT ${token}"
+            request(DOCKERHUB_URL, uri, method, query, headers, body)?.data
+        }
+
+        static def request(requestUrl, requestUri, method, queryArgs, requestHeaders, requestBody) {
+            def http = new RESTClient(requestUrl)
+            http.ignoreSSLIssues()
+
+            http.request(method, JSON) {
+                if (requestUri) {
+                    uri.path = requestUri
+                }
+                if (queryArgs) {
+                    uri.query = queryArgs
+                }
+                headers = requestHeaders
+                body = requestBody
+
+                response.success = { resp, json ->
+                    [statusLine: resp.statusLine,
+                     status    : resp.status,
+                     data      : json]
+                }
+
+                response.failure = { resp, reader ->
+                    println resp
+                    println reader
+                    throw new RuntimeException("Request failed")
+                }
+
+            }
+        }
+    }
+
+
+
 }
