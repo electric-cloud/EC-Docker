@@ -33,14 +33,38 @@ class LiftAndShift extends BaseClient {
         Template template = new SimpleTemplateEngine().createTemplate(templateText)
         def map = details
         map.FILENAME = artifact.entrypoint.name
-        logger DEBUG, "Template parameters: ${map}"
-        String dockerfile = template.make(map)
+
+        String dockerfile = makeDockerfile(templateText, map)
 
         logger INFO, "Dockefile: ${dockerfile}"
         File workspace = artifact.entrypoint.parentFile
         new File(workspace, "Dockerfile").write(dockerfile)
         logger INFO, "Saved Dockerfile under ${workspace}/Dockerfile"
         return workspace
+    }
+
+    String makeDockerfile(String tmpl, Map params) {
+        def defaults = [:]
+        def lines = []
+        tmpl.eachLine { line ->
+            def match = (line =~ /\$\{([^${}:]+):([^}]+)\}/)
+            if (match.hasGroup() && match.size() == 1 && match[0].size() >= 2) {
+                def variable = match[0][1]
+                def defaultValue = match[0][2]
+                defaultValue = defaultValue.replaceAll(/^['"]/, '').replaceAll(/["']$/, '')
+                defaults[variable] = defaultValue
+                line = (line =~ /\:['"]?$defaultValue['"]?/).replaceFirst('')
+            }
+            lines << line
+        }
+        tmpl = lines.join("\n")
+        Template template = new SimpleTemplateEngine().createTemplate(tmpl)
+        params.keySet().each { key ->
+            if (!params[key]) {
+                params[key] = defaults[key]
+            }
+        }
+        template.make(params)
     }
 
     String buildImage(String tag, File workspace) {
