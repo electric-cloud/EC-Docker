@@ -1,0 +1,129 @@
+apply plugin: "groovy"
+
+version = "1.0"
+description = "EC-Docker Specs"
+
+sourceCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+    maven {
+        url 'http://localhost:8081/artifactory/libs-snapshot-local'
+    }
+    maven {
+        url 'https://oss.sonatype.org/content/repositories/snapshots'
+    }
+}
+
+dependencies {
+    compile 'org.codehaus.groovy:groovy-all:2.4.5:indy'
+    compile 'org.spockframework:spock-core:1.1-groovy-2.4-SNAPSHOT'
+    compile 'com.electriccloud:commander-spec-tests:latest.integration'
+    compile 'com.jayway.restassured:rest-assured:2.4.0'
+}
+
+
+buildDir = new File(projectDir, 'build')
+def specFile = project.findProperty('specFile') ?: ''
+def currentDir = project.findProperty('currentDir') ?: projectDir
+buildDir.delete()
+
+
+sourceSets {
+    def testFile
+    if (!java.nio.file.Paths.get(specFile).absolute) {
+        testFile = new File(currentDir, specFile)
+    }
+    else {
+        testFile = new File(specFile)
+    }
+    if (!testFile.exists()) {
+        ant.fail("Spec file ${testFile.absolutePath} does not exist")
+    }
+
+    def includeDir
+    def includeFiles
+    if (testFile.directory) {
+        includeDir = testFile.absolutePath
+        includeFiles = "**/*.groovy"
+    }
+    else {
+        includeDir = testFile.parent
+        includeFiles = testFile.name
+    }
+
+    test {
+        output.resourcesDir = "${buildDir.absolutePath}/classes/main"
+        output.classesDir = "${buildDir.absolutePath}/classes/main"
+        groovy {
+            srcDir includeDir
+            include includeFiles
+            include '**/*Helper.groovy'
+        }
+        resources {
+            srcDir includeDir
+            include "**/*.dsl"
+            include "resources/**"
+        }
+        compileClasspath += sourceSets.main.runtimeClasspath
+    }
+
+}
+
+test {
+    if (!specFile) {
+        ant.fail('Please provide the specification file to test')
+    }
+    workingDir = projectDir.parentFile
+
+    testLogging {
+        showStandardStreams = true
+        exceptionFormat = 'full'
+    }
+
+    //always run tests
+    outputs.upToDateWhen { false }
+
+    def commanderServer = project.findProperty('commanderServer')
+    if (commanderServer) {
+        systemProperties['COMMANDER_SERVER'] = commanderServer
+    }
+    def commanderUser = project.findProperty('commanderUser')
+    if (commanderUser) {
+        systemProperties['COMMANDER_USER'] = commanderUser
+    }
+    def commanderPassword = project.findProperty('commanderPassword')
+    if (commanderPassword) {
+        systemProperties['COMMANDER_PASSWORD'] = commanderPassword
+    }
+
+    systemProperties['EC_SPECS_CLI'] = true
+
+    def envFilePath = project.findProperty('envFile')
+    if (envFilePath) {
+        def envFile
+        if (!java.nio.file.Paths.get(envFilePath).absolute) {
+            envFile = new File(currentDir, envFilePath)
+        }
+        else {
+            envFile = new File(envFilePath)
+        }
+        if (envFile.exists()) {
+            envFile.eachLine { line ->
+                def match = (line =~ /^([^=]+)\s*=\s*"?([^"]+)"?$/)
+                assert match.size() > 0
+                def envName = match[0][1]
+                def envValue = match[0][2]
+                environment envName, envValue
+            }
+        }
+        else {
+            println "Env file ${envFile.absolutePath} does not exist"
+        }
+    }
+
+    reports {
+        def testReportDir = new File(currentDir, "report")
+        html.destination = testReportDir
+    }
+}

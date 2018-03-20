@@ -1,37 +1,31 @@
-
 1.0.0:
   - Introduced the EC-Docker plugin.
 1.0.1:
   - Discover procedure has been added.
 1.2.0:
-  - |
-    Added support for deploying micro-services modeled in ElectricFlow to Docker. Deploying micro-services to the following Docker environments are supported:
-    <ul>
-      <li>Stand-alone Docker instances</li>
-      <li>Docker Swarm</li>
-      <li>Docker Enterprise Edition</li>
-      <li>Windows Docker containers on Windows 2016</li>
-    </ul>
+  - Added support for deploying micro-services modeled in ElectricFlow to Docker. Deploying micro-services to the following Docker environments are supported:
+        Stand-alone Docker instances
+        Docker Swarm
+        Docker Enterprise Edition
+        Windows Docker containers on Windows 2016
+        Docker Swarm
+        Docker Enterprise Edition
+        Windows Docker containers on Windows 2016
   - Added procedure <i>Undeploy Service</i> to undeploy a previously deployed service.
   - Added procedure <i>Remove Docker Service</i> to remove a service running on a stand-alone Docker host or a Docker Swarm cluster.
   - Removed support for using EC-Docker as a 'component' plugin. Micro-services based applications should be modeled as applications with services. The services can then be deployed using the native ElectricFlow services deployment capability.
-
 1.2.1:
-  - |
-    Added support for Docker network creation
-    <ul>
-        <li>For Stand-alone Docker instances, <i>Deploy Service</i> procedure creates a user defined bridge network if network name given in service mapping page. Procedure uses this network to deploy containers.</li>
-        <li>For Docker Swarm instances, <i>Deploy Service</i> procedure creates a user defined overlay network if network name given in service mapping page. Procedure uses this network to deploy Docker Swarm services.</li>
-    </ul>
+  - Added support for Docker network creation.
+  - For Stand-alone Docker instances, <i>Deploy Service</i> procedure creates a user defined bridge network if network name given in service mapping page. Procedure uses this network to deploy containers.
+  - For Docker Swarm instances, <i>Deploy Service</i> procedure creates a user defined overlay network if network name given in service mapping page. Procedure uses this network to deploy Docker Swarm services.
 1.2.2:
-  - Registered the <i>Undeploy Service</i> procedure as an <i>undeployService</i> operation to enable undeploying micro-services modeled in ElectricFlow from Docker using the service process.
+  - Registered the <i>Undeploy Service</i> procedure as an <i>Undeploy Service</i> operation to enable undeploying micro-services modeled in ElectricFlow from Docker using the service process.        
   - Added <i>Create Ingress</i> and <i>Delete Network</i> procedures.
   - Added support for container update on standalone docker engine.
-  - Added support for attaching additional networks during container update.
-
+  - Added support for attaching additional networks during container update. 
 1.3.0:
   - Added <i>Import Microservices</i> procedure.
-  - Added __Artifact2Image__procedure.
+  - Added <i>Artifact2Image<i> procedure.
   - Configured the plugin to allow the ElectricFlow UI to render the plugin procedure parameters entirely using the configured form XMLs.
   - Enabled the plugin for managing the plugin configurations in-line when defining an application process step or a pipeline stage task.
 

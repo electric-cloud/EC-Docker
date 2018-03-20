@@ -1,31 +1,69 @@
 $[/myProject/scripts/preamble]
 
 // Input parameters
-def dockerComposeContent = '''$[ec_docker_compose_file_content]'''
-def projectName = '$[ec_docker_project]'
-def applicationScoped = '$[ec_docker_application_scoped]'
-def applicationName = '$[ec_docker_application]'
-def environmentProjectName = '$[ec_docker_environment_project]'
-def environmentName = '$[ec_docker_environment]'
-def clusterName = '$[ec_docker_cluster]'
+def dockerComposeContent = '''$[docker_compose_file_content]'''
+def projectName = '$[docker_project]'
+def applicationScoped = '$[docker_application_scoped]'
+def applicationName = '$[docker_application]'
+def environmentProjectName = '$[docker_environment_project]'
+def environmentName = '$[docker_environment]'
+def clusterName = '$[docker_cluster]'
 
 EFClient efClient = new EFClient()
+if(efClient.toBoolean(applicationScoped)) {
+    if (!applicationName) {
+        println "Application name is required for creating application-scoped microservices"
+        System.exit(-1)
+    }
+} else {
+	//reset application name since its not relevant if application_scoped is not set
+    applicationName = null
+}
+
+if (environmentProjectName && environmentName && clusterName) {
+    def clusters = efClient.getClusters(environmentProjectName, environmentName)
+    def cluster = clusters.find {
+        it.clusterName == clusterName
+    }
+    if (!cluster) {
+        println "Cluster '${clusterName}' does not exist in '${environmentName}' environment."
+        System.exit(-1)
+    }
+    if (cluster.pluginKey != 'EC-Docker') {
+        println "Wrong cluster type: ${cluster.pluginKey}"
+        println "ElectricFlow cluster '${clusterName}' in '${environmentName}' environment is not backed by a Docker-based cluster."
+        System.exit(-1)
+    }
+} else if (environmentProjectName || environmentName || clusterName) {
+    // If any of the environment parameters are specified then *all* of them must be specified.
+    println "Either specify all the parameters required to identify the Docker-backed ElectricFlow cluster (environment project name, environment name, and cluster name) where the newly created microservice(s) will be deployed. Or do not specify any of the cluster related parameters in which case the service mapping to a cluster will not be created for the microservice(s)."
+    System.exit(-1)
+}
+
+
 
 // write out the docker compose to the workspace directory
 String dir = System.getenv('COMMANDER_WORKSPACE')
 File composeFile = new File(dir, 'docker-compose.yml')
 composeFile << dockerComposeContent
 
-def composeConfig = DockerClient.readCompose(composeFile)
+def composeConfig
+try {
+    composeConfig = DockerClient.readCompose(composeFile)
+} catch (Exception ex) {
+    println("ERROR: Failed to read the Docker Compose file contents")
+    ex.printStackTrace();
+    System.exit(-1)
+}
 
 // read the yaml file to collect networks params
 Yaml parser = new Yaml()
-def DELIMITER = "#" 
+def DELIMITER = "#"
 def parsedYamlConfigList = []
-def configList = dockerComposeContent.split(DELIMITER)  
-configList.each { config ->   
-	def parsedConfig = parser.load(config)   
-	parsedYamlConfigList.push(parsedConfig)  
+def configList = dockerComposeContent.split(DELIMITER)
+configList.each { config ->
+    def parsedConfig = parser.load(config)
+    parsedYamlConfigList.push(parsedConfig)
 }
 
 def importServices = new ImportMicroservices(composeConfig, parsedYamlConfigList)
