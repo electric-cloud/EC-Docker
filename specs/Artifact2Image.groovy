@@ -265,11 +265,17 @@ runProcedure(
         String commanderServer = System.getProperty("COMMANDER_SERVER") ?: 'localhost'
         String username = System.getProperty('COMMANDER_USER') ?: 'admin'
         String password = System.getProperty('COMMANDER_PASSWORD') ?: 'changeme'
+        String commanderHome = System.getenv('COMMANDER_HOME')
+        assert commanderHome
 
-        runCommand("ectool --server $commanderServer login $username $password")
-        runCommand("ectool --server $commanderServer deleteArtifactVersion ${artifactName}:${version}")
+        String ectool = new File(commanderHome, "bin/ectool")
+        assert ectool.exists()
+        logger.debug(ectool.absolutePath.toString())
 
-        String publishCommand = "ectool --server ${commanderServer} publishArtifactVersion --version $version --artifactName ${artifactName} "
+        runCommand("${ectool.absolutePath} --server $commanderServer login $username $password")
+        runCommand("${ectool.absolutePath} --server $commanderServer deleteArtifactVersion ${artifactName}:${version}")
+
+        String publishCommand = "${ectool.absolutePath} --server ${commanderServer} publishArtifactVersion --version $version --artifactName ${artifactName} "
         if (resource.directory) {
             publishCommand += "--fromDirectory ${resource}"
         }
