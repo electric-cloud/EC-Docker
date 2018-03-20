@@ -1,0 +1,15 @@
+<module>
+    <entry-point class="ecplugins.EC_Docker.client.Artifact2ImageFactory"/>
+    <inherits name="com.google.gwt.resources.Resources"/>
+    <inherits name="com.google.gwt.i18n.I18N"/>
+    <inherits name="com.electriccloud.commander.gwt.ComponentBase"/>
+    <inherits name="ecinternal.ECInternal"/>
+
+    <!-- Reduce JAR size by restricting locales to build: remove this if the plugin is localized -->
+    <set-property name="locale" value="default"/>
+
+
+    <inherits name="com.google.gwt.logging.Logging"/>
+
+
+</module>
