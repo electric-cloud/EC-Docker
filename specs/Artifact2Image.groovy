@@ -268,7 +268,7 @@ runProcedure(
         String commanderHome = System.getenv('COMMANDER_HOME')
         assert commanderHome
 
-        String ectool = new File(commanderHome, "bin/ectool")
+        File ectool = new File(commanderHome, "bin/ectool")
         assert ectool.exists()
         logger.debug(ectool.absolutePath.toString())
 
