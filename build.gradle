@@ -72,21 +72,26 @@ if(project.gwt.modules.size() == 0) {
     ]
 }
 
-//version = '1.3.0'
-//group = 'com.electriccloud'
+task cleanHtdocs {
+    delete "htdocs/war"
+}
 
-//compileGwt {
+compileGwt {
+    dependsOn cleanHtdocs
+    copy {
+        from outputs
+        into "htdocs/war"
+    }
+
+    delete "htdocs/war/WEB-INF"
+//    new File("htdocs/war/WEB-INF").delete()
+}
+
+//
+//task buildGwt {
+//    dependsOn compileGwt
 //    copy {
-//        from outputs
+//        from tasks.compileGwt.outputs
 //        into "htdocs/war"
 //    }
 //}
-
-
-task buildGwt {
-    dependsOn compileGwt
-    copy {
-        from tasks.compileGwt.outputs
-        into "htdocs/war"
-    }
-}

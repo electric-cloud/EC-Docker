@@ -26,14 +26,14 @@ my @retrievedArtifactVersions = $am->retrieve({
     toDirectory => $destination,
 });
 
-if (scalar @$retrievedArtifactVersions != 1) {
-    if (scalar @$retrievedArtifactVersions == 0) {
+if (scalar @retrievedArtifactVersions != 1) {
+    if (scalar @retrievedArtifactVersions == 0) {
         print "No artifact versions found!\n";
         exit -1;
     }
     else {
         print "More than one version found!\n";
-        for my $v (@$retrievedArtifactVersions) {
+        for my $v (@retrievedArtifactVersions) {
             print $v->diagnostics() . "\n";
         }
         exit -1;

@@ -35,6 +35,7 @@
         <label>Version Range:</label>
         <required>0</required>
         <property>ecp_docker_versionRange</property>
+        <documentation>Version range for artifact retrieval.</documentation>
     </formElement>
     <formElement>
         <type>entry</type>

@@ -15,17 +15,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
-import com.electriccloud.commander.client.CommanderRequestManager;
-import com.electriccloud.commander.gwt.client.protocol.xml.CommanderRequestManagerImpl;
-import com.electriccloud.commander.gwt.client.ui.impl.CredentialEditorImpl;
 import com.google.gwt.user.client.ui.*;
 import ecinternal.client.ui.CredentialParameter;
 import org.jetbrains.annotations.NonNls;
 
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.logical.shared.ValueChangeEvent;
-import com.google.gwt.event.logical.shared.ValueChangeHandler;
 
 import com.electriccloud.commander.client.ChainedCallback;
 import com.electriccloud.commander.client.domain.Artifact;
@@ -60,6 +53,9 @@ public class Artifact2ImageParameterPanel
     static final String REGISTRY_URL_ID = "ecp_docker_registryUrl";
     static final String COMMAND_ID = "ecp_docker_command";
     static final String ENV_ID = "ecp_docker_env";
+
+    static final int TEXTAREA_HEIGHT = 10;
+    static final int TEXTAREA_WIDTH = 150;
 
 
     Logger log = Logger.getLogger("info");
@@ -269,12 +265,18 @@ public class Artifact2ImageParameterPanel
         getForm().addFormRow(BASE_IMAGE_ID, getMessages().baseImageLabel(), m_baseImage, false, getMessages().baseImageDoc());
 
         m_ports = new TextArea();
+        m_ports.setCharacterWidth(TEXTAREA_WIDTH);
+        m_ports.setVisibleLines(TEXTAREA_HEIGHT);
         getForm().addFormRow(PORTS_ID, getMessages().portsLabel(), m_ports, false, getMessages().portsDoc());
 
         m_command = new TextArea();
+        m_command.setCharacterWidth(TEXTAREA_WIDTH);
+        m_command.setVisibleLines(TEXTAREA_HEIGHT);
         getForm().addFormRow(COMMAND_ID, getMessages().commandLabel(), m_command, false, getMessages().commandDoc());
 
         m_env = new TextArea();
+        m_env.setCharacterWidth(TEXTAREA_WIDTH);
+        m_env.setVisibleLines(TEXTAREA_HEIGHT);
         getForm().addFormRow(ENV_ID, getMessages().envLabel(), m_env, false, getMessages().envDoc());
     }
 
