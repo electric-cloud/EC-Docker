@@ -3,6 +3,10 @@ import java.io.File
 procedure 'Artifact2Image',
 	description: 'Creates and pushes a new docker image from the existing artifact', {
 
+
+	property 'customType', value: '@PLUGIN_KEY@-@PLUGIN_VERSION@/Artifact2Image'
+
+
 	step 'setup',
       subproject: '',
       subprocedure: 'Setup',
@@ -17,7 +21,8 @@ procedure 'Artifact2Image',
 
 	step 'download artifact',
 		command: new File(pluginDir, 'dsl/procedures/artifact2image/steps/downloadArtifact.pl').text,
-		shell: 'ec-perl'
+		shell: 'ec-perl',
+		errorHandling: 'abortProcedureNow'
  
 	step 'artifact2image',
 	  command: new File(pluginDir, 'dsl/procedures/artifact2image/steps/artifact2image.groovy').text,

@@ -17,31 +17,9 @@ public interface DockerMessages
 
     //~ Methods ----------------------------------------------------------------
 
-    String addDependentArtifactVersion();
-
-    String addExcludePattern();
-
-    String addFilter();
-
-    String addIncludePattern();
-
     String artifactLabel();
 
-    String dependentArtifactVersionsLabel();
-
-    String enableCompressionLabel();
-
     String exactLabel();
-
-    String excludePatternsLabel();
-
-    String filtersLabel();
-
-    String followSymlinksLabel();
-
-    String fromDirectoryLabel();
-
-    String includePatternsLabel();
 
     String inclusiveLabel();
 
@@ -51,60 +29,44 @@ public interface DockerMessages
 
     String minimumLabel();
 
-    String pubArtifactDesc();
-
-    String pubCompressDesc();
-
-    String pubDependentArtifactsDesc();
-
-    String pubExcludePatternsDesc();
-
-    String pubFollowSymlinksDesc();
-
-    String pubFromDirectoryDesc();
-
-    String pubIncludePatternsDesc();
-
-    String pubRepositoryDesc();
-
-    String pubVersionDesc();
-
     String rangeLabel();
 
-    String repositoryLabel();
-
     String retArtifactDesc();
-
-    String retFiltersDesc();
-
-    String retLocationPropDesc();
-
-    String retrievedArtifactLocationPropertyLabel();
-
-    String retrieveToDirectory();
-
-    String retrieveToDirectoryDesc();
 
     String retVersionDesc();
 
     String versionLabel();
 
-    String targetRepositoryLabel();
+    String imageName();
 
-    String targetRepositoryDesc();
+    String registryURL();
 
-    String sourceRepositoryLabel();
+    String imageNameDescription();
 
-    String sourceRepositoryDesc();
+    String envLabel();
 
-    String addTargetRepoPanel();
+    String envDoc();
 
-    String overwriteLabel();
+    String configLabel();
 
-    String overwriteDesc();
+    String configDoc();
 
-    String parallelUploadLabel();
+    String registryUrlDoc();
 
-    String parallelUploadDesc();
+    String credLabel();
+
+    String credDoc();
+
+    String baseImageLabel();
+
+    String baseImageDoc();
+
+    String portsLabel();
+
+    String portsDoc();
+
+    String commandLabel();
+
+    String commandDoc();
 
 }

@@ -10,25 +10,22 @@
 package ecplugins.EC_Docker.client;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
 
+import com.electriccloud.commander.client.CommanderRequestManager;
+import com.electriccloud.commander.gwt.client.protocol.xml.CommanderRequestManagerImpl;
+import com.electriccloud.commander.gwt.client.ui.impl.CredentialEditorImpl;
+import com.google.gwt.user.client.ui.*;
+import ecinternal.client.ui.CredentialParameter;
 import org.jetbrains.annotations.NonNls;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
-import com.google.gwt.user.client.ui.CheckBox;
-import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.Label;
-import com.google.gwt.user.client.ui.ListBox;
-import com.google.gwt.user.client.ui.SimplePanel;
-import com.google.gwt.user.client.ui.SuggestBox;
-import com.google.gwt.user.client.ui.TextBox;
-import com.google.gwt.user.client.ui.Widget;
 
 import com.electriccloud.commander.client.ChainedCallback;
 import com.electriccloud.commander.client.domain.Artifact;
@@ -39,7 +36,6 @@ import com.electriccloud.commander.client.responses.CommanderError;
 import com.electriccloud.commander.client.util.StringUtil;
 import com.electriccloud.commander.gwt.client.ui.FormTable;
 
-import ecinternal.client.ui.FormElementGroup;
 
 import static com.electriccloud.commander.gwt.client.ui.FormBuilder.MISSING_REQUIRED_ERROR_MESSAGE;
 
@@ -47,45 +43,58 @@ import static ecinternal.client.ui.NamedObjectSuggestPicker.loadOptions;
 
 public class Artifact2ImageParameterPanel
         extends DockerParameterPanel
-        implements ChainedCallback
-{
+        implements ChainedCallback {
 
     //~ Static fields/initializers ---------------------------------------------
 
-    /** Form row IDs. */
-    static final String ARTIFACT_NAME_ID                      = "artifactName";
-    static final String VERSION_RANGE_ID                      = "versionRange";
-    static final String ARTIFACT_VERSION_LOCATION_PROPERTY_ID =
-            "artifactVersionLocationProperty";
-    static final String FILTER_LIST_ID                        = "filterList";
-    static final String RETRIEVE_DIRECTORY_ID                 =
-            "retrieveToDirectory";
-    static final String OVERWRITE_ID                          = "overwrite";
-    static final String ADD_FILTER_ID                         = "addFilter";
+    /**
+     * Form row IDs.
+     */
+    static final String ARTIFACT_NAME_ID = "ecp_docker_artifactName";
+    static final String VERSION_RANGE_ID = "ecp_docker_versionRange";
+    static final String CONFIG_ID = "config";
+    static final String CREDENTIAL_ID = "ecp_docker_credential";
+    static final String IMAGE_NAME_ID = "ecp_docker_imageName";
+    static final String BASE_IMAGE_ID = "ecp_docker_baseImage";
+    static final String PORTS_ID = "ecp_docker_ports";
+    static final String REGISTRY_URL_ID = "ecp_docker_registryUrl";
+    static final String COMMAND_ID = "ecp_docker_command";
+    static final String ENV_ID = "ecp_docker_env";
+
+
+    Logger log = Logger.getLogger("info");
 
     //~ Instance fields --------------------------------------------------------
 
-    /** Form elements. */
-    private SuggestBox          m_artifactName;
-    private VersionRange        m_versionRange;
-    private TextBox             m_artifactVersionLocationProperty;
-    private FormElementGroup<?> m_filters;
-    private CheckBox            m_retrieveToDirectory;
-    private TextBox             m_downloadDirectory;
-    private ListBox             m_overwrite;
+    /**
+     * Form elements.
+     */
+    private SuggestBox m_artifactName;
+    private TextBox m_config;
+    private TextBox m_imageName;
+    private TextBox m_registryUrl;
+    private CredentialParameter m_credential;
+    private TextArea m_ports;
+    private VersionRange m_versionRange;
+    private TextArea m_command;
+    private TextArea m_env;
+    private TextBox m_baseImage;
 
-    /** Info from Commander. */
+    /**
+     * Info from Commander.
+     */
     private List<Artifact> m_artifacts;
 
-    /** Internals. */
+    /**
+     * Internals.
+     */
     private boolean m_awaitingResponse;
     private boolean m_renderOnResponse;
 
-    private final List<String> overwriteValues = Arrays.asList( "true", "update", "false" );
     //~ Methods ----------------------------------------------------------------
 
-    @Override public Widget doInit()
-    {
+    @Override
+    public Widget doInit() {
         final Widget widget = super.doInit();
 
         m_awaitingResponse = true;
@@ -95,8 +104,8 @@ public class Artifact2ImageParameterPanel
         return widget;
     }
 
-    @Override public void onComplete()
-    {
+    @Override
+    public void onComplete() {
         m_awaitingResponse = false;
 
         if (m_renderOnResponse) {
@@ -105,8 +114,13 @@ public class Artifact2ImageParameterPanel
         }
     }
 
-    @Override public void render()
-    {
+    public static native void console(String text)
+/*-{
+    console.log(text);
+}-*/;
+
+    @Override
+    public void render() {
 
         if (m_awaitingResponse) {
 
@@ -130,6 +144,11 @@ public class Artifact2ImageParameterPanel
 
         if (actualParams != null) {
 
+            String config = actualParams.get(CONFIG_ID);
+            if (config != null) {
+                m_config.setValue(config);
+            }
+
             // Artifact
             String artifactName = actualParams.get(ARTIFACT_NAME_ID);
 
@@ -144,41 +163,47 @@ public class Artifact2ImageParameterPanel
                 m_versionRange.setValue(actualParams.get(VERSION_RANGE_ID));
             }
 
-            // Retrieve to Directory
-            String retrieveToDirectory = actualParams.get(
-                    RETRIEVE_DIRECTORY_ID);
-
-            if (retrieveToDirectory != null && !retrieveToDirectory.isEmpty()) {
-                m_retrieveToDirectory.setValue(true, true);
-                m_downloadDirectory.setValue(retrieveToDirectory);
+//            Credential
+            String credential = actualParams.get(CREDENTIAL_ID);
+            if (credential != null) {
+                m_credential.setValue(credential);
             }
 
-            // ArtifactVersion Location Property
-            String artifactVersionLocationProperty = actualParams.get(
-                    ARTIFACT_VERSION_LOCATION_PROPERTY_ID);
-
-            if (artifactVersionLocationProperty != null) {
-                m_artifactVersionLocationProperty.setValue(
-                        artifactVersionLocationProperty);
+            String registryUrl = actualParams.get(REGISTRY_URL_ID);
+            if (registryUrl != null) {
+                m_registryUrl.setValue(registryUrl);
             }
 
-            // Filters
-            String filters = actualParams.get(FILTER_LIST_ID);
-
-            if (filters != null) {
-                m_filters.setValue(Arrays.asList(filters.split("\n")));
+            String imageName = actualParams.get(IMAGE_NAME_ID);
+            if (imageName != null) {
+                m_imageName.setValue(imageName);
             }
 
-            // Overwrite
-            String actualOverwriteValue = actualParams.get(OVERWRITE_ID);
-            if(actualOverwriteValue != null) {
-                m_overwrite.setSelectedIndex(overwriteValues.indexOf(actualOverwriteValue));
+            String baseImage = actualParams.get(BASE_IMAGE_ID);
+            if (baseImage != null) {
+                m_baseImage.setValue(baseImage);
             }
+
+            String ports = actualParams.get(PORTS_ID);
+            if (ports != null) {
+                m_ports.setValue(ports);
+            }
+
+            String command = actualParams.get(COMMAND_ID);
+            if (command != null) {
+                m_command.setValue(command);
+            }
+
+            String env = actualParams.get(ENV_ID);
+            if (env != null) {
+                m_env.setValue(env);
+            }
+
         }
     }
 
-    @Override public boolean validate()
-    {
+    @Override
+    public boolean validate() {
         FormTable form = getForm();
 
         form.clearAllErrors();
@@ -193,12 +218,28 @@ public class Artifact2ImageParameterPanel
             return false;
         }
 
+        String imageName = m_imageName.getValue();
+        if (StringUtil.isEmpty(imageName)) {
+            form.setErrorMessage(IMAGE_NAME_ID, MISSING_REQUIRED_ERROR_MESSAGE);
+            return false;
+        }
+
+        String config = m_config.getValue();
+        if (StringUtil.isEmpty(config)) {
+            form.setErrorMessage(CONFIG_ID, MISSING_REQUIRED_ERROR_MESSAGE);
+            return false;
+        }
+
         return true;
     }
 
-    @Override protected void initForm()
-    {
+    @Override
+    protected void initForm() {
         DockerStyles css = getResources().css();
+
+//        Config
+        m_config = new TextBox();
+        getForm().addFormRow(CONFIG_ID, getMessages().configLabel(), m_config, true, getMessages().configDoc());
 
         // Artifact picker
         m_artifactName = new SuggestBox();
@@ -211,114 +252,38 @@ public class Artifact2ImageParameterPanel
         getForm().addFormRow(VERSION_RANGE_ID, getMessages().versionLabel(),
                 m_versionRange, false, getMessages().retVersionDesc());
 
-        // Retrieve to Directory entry
-        m_retrieveToDirectory = new CheckBox();
-        m_retrieveToDirectory.addValueChangeHandler(
-                new ValueChangeHandler<Boolean>() {
-                    @Override public void onValueChange(
-                            ValueChangeEvent<Boolean> event)
-                    {
+//        Image name
+        m_imageName = new TextBox();
+        getForm().addFormRow(IMAGE_NAME_ID, getMessages().imageName(), m_imageName, true, getMessages().imageNameDescription());
 
-                        if (event.getValue()) {
-                            m_downloadDirectory.setEnabled(true);
-                        }
-                        else {
-                            m_downloadDirectory.setValue("");
-                            m_downloadDirectory.setEnabled(false);
-                        }
-                    }
-                });
-        m_downloadDirectory = new TextBox();
-        m_downloadDirectory.setEnabled(false);
-        m_overwrite = new ListBox();
-        for(String value: overwriteValues ) {
-            m_overwrite.addItem(value, value);
-        }
-        m_overwrite.setSelectedIndex(1);
+//        Docker details
+        m_registryUrl = new TextBox();
+        getForm().addFormRow(REGISTRY_URL_ID, getMessages().registryURL(), m_registryUrl, false, getMessages().registryUrlDoc());
 
-        FlowPanel flowPanel = new FlowPanel();
+        m_credential = (CredentialParameter) getUIFactory().createCredentialParameter("password");
+        getForm().addFormRow(CREDENTIAL_ID, getMessages().credLabel(), m_credential, false, getMessages().credDoc());
 
-        flowPanel.add(m_retrieveToDirectory);
-        flowPanel.add(m_downloadDirectory);
 
-        Label label = new Label("Overwrite:");
+//        Image details
+        m_baseImage = new TextBox();
+        getForm().addFormRow(BASE_IMAGE_ID, getMessages().baseImageLabel(), m_baseImage, false, getMessages().baseImageDoc());
 
-        label.setStyleName(getResources().css()
-                .overwriteLabel(), true);
-        flowPanel.add(label);
-        flowPanel.add(m_overwrite);
-        getForm().addFormRow(RETRIEVE_DIRECTORY_ID,
-                getMessages().retrieveToDirectory(), flowPanel, false,
-                getMessages().retrieveToDirectoryDesc());
+        m_ports = new TextArea();
+        getForm().addFormRow(PORTS_ID, getMessages().portsLabel(), m_ports, false, getMessages().portsDoc());
 
-        // ArtifactVersion Location Property entry
-        m_artifactVersionLocationProperty = new TextBox();
-        m_artifactVersionLocationProperty.addStyleName(css.longInput());
-        m_artifactVersionLocationProperty.setValue(
-                "/myJob/retrievedArtifactVersions/$[assignedResourceName]");
-        getForm().addFormRow(ARTIFACT_VERSION_LOCATION_PROPERTY_ID,
-                getMessages().retrievedArtifactLocationPropertyLabel(),
-                m_artifactVersionLocationProperty, false,
-                getMessages().retLocationPropDesc());
+        m_command = new TextArea();
+        getForm().addFormRow(COMMAND_ID, getMessages().commandLabel(), m_command, false, getMessages().commandDoc());
 
-        // Filter list
-        m_filters = getUIFactory().createSearchFilterGroup();
-        m_filters.addValueChangeHandler(new ValueChangeHandler<List<String>>() {
-            @Override public void onValueChange(
-                    ValueChangeEvent<List<String>> event)
-            {
-
-                // If the list is empty, hide the row
-                setFormRowVisibility(FILTER_LIST_ID, !m_filters.isEmpty());
-            }
-        });
-        getForm().addFormRow(FILTER_LIST_ID, getMessages().filtersLabel(),
-                m_filters, false, getMessages().retFiltersDesc());
-        setFormRowVisibility(FILTER_LIST_ID, false);
-
-        // Add Filter link
-        SimplePanel addFilterPanel = new SimplePanel();
-
-        addFilterPanel.addStyleName(css.addListElement());
-        addFilterPanel.setWidget(getUIFactory().createLinkTable(
-                getUIFactory().getInternalResources()
-                        .addIconSmall(), getMessages().addFilter(),
-                new ClickHandler() {
-                    @Override public void onClick(ClickEvent event)
-                    {
-                        m_filters.addElement();
-                    }
-                }));
-        getForm().addRow(ADD_FILTER_ID, new Label(), addFilterPanel);
+        m_env = new TextArea();
+        getForm().addFormRow(ENV_ID, getMessages().envLabel(), m_env, false, getMessages().envDoc());
     }
 
-    SuggestBox getArtifactName()
-    {
+    SuggestBox getArtifactName() {
         return m_artifactName;
     }
 
-    TextBox getArtifactVersionLocationProperty()
-    {
-        return m_artifactVersionLocationProperty;
-    }
 
-    TextBox getDownloadDirectory()
-    {
-        return m_downloadDirectory;
-    }
-
-    FormElementGroup<?> getFilters()
-    {
-        return m_filters;
-    }
-
-    ListBox getOverwrite()
-    {
-        return m_overwrite;
-    }
-
-    List<CommanderRequest<?>> getRequests()
-    {
+    List<CommanderRequest<?>> getRequests() {
         List<CommanderRequest<?>> requests =
                 new ArrayList<CommanderRequest<?>>();
 
@@ -327,13 +292,13 @@ public class Artifact2ImageParameterPanel
                 .createGetArtifactsRequest();
 
         getArtifactsRequest.setCallback(new ArtifactListCallback() {
-            @Override public void handleError(CommanderError error)
-            {
+            @Override
+            public void handleError(CommanderError error) {
                 getCommanderErrorHandler().handleError(error);
             }
 
-            @Override public void handleResponse(List<Artifact> response)
-            {
+            @Override
+            public void handleResponse(List<Artifact> response) {
                 m_artifacts = response;
             }
         });
@@ -342,35 +307,25 @@ public class Artifact2ImageParameterPanel
         return requests;
     }
 
-    CheckBox getRetrieveToDirectory()
-    {
-        return m_retrieveToDirectory;
-    }
 
-    @Override public Map<String, String> getValues()
-    {
+    @Override
+    public Map<String, String> getValues() {
         Map<String, String> values = new HashMap<String, String>();
 
         values.put(ARTIFACT_NAME_ID, m_artifactName.getValue());
         values.put(VERSION_RANGE_ID, m_versionRange.getValue());
-        values.put(ARTIFACT_VERSION_LOCATION_PROPERTY_ID,
-                m_artifactVersionLocationProperty.getValue());
-
-        if (m_retrieveToDirectory.getValue()) {
-            values.put(RETRIEVE_DIRECTORY_ID, m_downloadDirectory.getValue());
-        } else {
-            values.put(RETRIEVE_DIRECTORY_ID, "");
-        }
-
-        values.put(OVERWRITE_ID,
-                m_overwrite.getValue(m_overwrite.getSelectedIndex()));
-        values.put(FILTER_LIST_ID, StringUtil.join(m_filters.getValue(), "\n"));
+        values.put(CONFIG_ID, m_config.getValue());
+        values.put(CREDENTIAL_ID, m_credential.getValue());
+        values.put(IMAGE_NAME_ID, m_imageName.getValue());
+        values.put(REGISTRY_URL_ID, m_registryUrl.getValue());
+        values.put(PORTS_ID, m_ports.getValue());
+        values.put(COMMAND_ID, m_command.getValue());
+        values.put(ENV_ID, m_env.getValue());
 
         return values;
     }
 
-    VersionRange getVersionRange()
-    {
+    VersionRange getVersionRange() {
         return m_versionRange;
     }
 }

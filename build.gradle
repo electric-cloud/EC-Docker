@@ -75,18 +75,18 @@ if(project.gwt.modules.size() == 0) {
 //version = '1.3.0'
 //group = 'com.electriccloud'
 
-compileGwt {
-    copy {
-        from outputs
-        into "htdocs/war"
-    }
-}
-
-//
-//task buildGwt {
-//    dependsOn compileGwt
+//compileGwt {
 //    copy {
-//        from tasks.compileGwt.outputs
+//        from outputs
 //        into "htdocs/war"
 //    }
 //}
+
+
+task buildGwt {
+    dependsOn compileGwt
+    copy {
+        from tasks.compileGwt.outputs
+        into "htdocs/war"
+    }
+}
