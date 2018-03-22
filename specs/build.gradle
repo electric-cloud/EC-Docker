@@ -8,17 +8,18 @@ sourceCompatibility = 1.8
 repositories {
     mavenCentral()
     maven {
-        url 'http://localhost:8081/artifactory/libs-snapshot-local'
-    }
-    maven {
         url 'https://oss.sonatype.org/content/repositories/snapshots'
     }
+    maven {
+        url  "https://dl.bintray.com/ecpluginsdev/maven"
+    }
+
 }
 
 dependencies {
     compile 'org.codehaus.groovy:groovy-all:2.4.5:indy'
     compile 'org.spockframework:spock-core:1.1-groovy-2.4-SNAPSHOT'
-    compile 'com.electriccloud:commander-spec-tests:latest.integration'
+    compile 'com.electriccloud:commander-spec-tests:latest.release'
     compile 'com.jayway.restassured:rest-assured:2.4.0'
 }
 
