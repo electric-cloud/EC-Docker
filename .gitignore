@@ -2,3 +2,4 @@ out/*
 .idea/*
 EC-Docker.jar
 build/*
+.DS_Store
