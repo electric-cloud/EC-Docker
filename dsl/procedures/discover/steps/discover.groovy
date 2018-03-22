@@ -6,6 +6,8 @@ def projectName = '$[project]'
 def applicationName = '$[application]'
 def recreateApplication = '$[recreate_application]'
 
+logger WARNING, "URL: The \"Discover\" procedure has been deprecated. Use the \"Import Microservices\" procedure to create microservice models based on the given Docker Compose file contents."
+
 EFClient efClient = new EFClient()
 def app = efClient.getApplication(projectName, applicationName)
 if (app) {
@@ -32,4 +34,3 @@ println "Application DSL for the Docker Compose content:\n $dslStr"
 
 //4. run eval dsl for application
 efClient.evalDsl(dslStr)
-

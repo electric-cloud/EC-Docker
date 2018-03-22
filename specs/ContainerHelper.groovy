@@ -36,6 +36,47 @@ class ContainerHelper extends PluginSpockTestSupport {
         [jobId: result.jobId, logs: logs, outcome: jobStatus(result.jobId).outcome]
     }
 
+    def deployService(projectName, serviceName, actualParameters) {
+        def processName = 'Deploy'
+        def map = getEnvMap(projectName, serviceName)
+        def envName = map.environmentName
+        def envProjectName = map.environmentProjectName
+        assert envName
+        assert envProjectName
+
+        def paramLines = actualParameters.collect {k, v ->
+            """$k: '$v'"""
+        }
+        def actualParamDsl = paramLines.join(",\n")
+        def result = dsl """
+            runServiceProcess(
+                projectName: '$projectName',
+                serviceName: '$serviceName',
+                environmentName: '$envName',
+                environmentProjectName: '$envProjectName',
+                processName: '$processName',
+                actualParameter: [
+                    $actualParamDsl
+                ]
+            )
+        """
+        logger.debug(objectToJson(result))
+        logger.debug("Polling job")
+        def timeout = 400
+        def time = 0
+        def delay = 30
+        while(jobStatus(result.jobId).status != 'completed' && time < timeout) {
+            sleep(delay * 1000)
+            time += delay
+        }
+
+        jobCompleted(result)
+        def logs = readJobLogs(result.jobId)
+        assert jobStatus(result.jobId).outcome == 'success'
+
+        [jobId: result.jobId, logs: logs]
+    }
+
     def undeployService(projectName, serviceName) {
         def processName = 'Undeploy'
         def map = getEnvMap(projectName, serviceName)
