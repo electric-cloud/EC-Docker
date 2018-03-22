@@ -15,6 +15,7 @@ String baseImage = '$[ecp_docker_baseImage]'
 String ports = '''$[ecp_docker_ports]'''.trim()
 String command = '''$[ecp_docker_command]'''.trim()
 String env = '''$[ecp_docker_env]'''.trim()
+boolean removeAfterPush = '$[ecp_docker_removeAfterPush]'.trim() == "true"
 
 ElectricFlow ef = new ElectricFlow()
 EFClient efClient = new EFClient()
@@ -78,6 +79,9 @@ try {
     liftAndShift.pushImage(imageName, registryUrl, userName, password)
     ef.setProperty(propertyName: '/myJobStep/summary', value: "Image ID: ${imageId}")
     ef.setProperty(propertyName: "${resultPropertySheet}/${imageName}/imageId", value: imageId)
+    if (removeAfterPush) {
+        liftAndShift.removeImage(imageId)
+    }
 
 } catch (PluginException e) {
     efClient.handleProcedureError(e.getMessage())
@@ -117,3 +121,4 @@ def parseEnvVariables(String env) {
     }
     envVars
 }
+

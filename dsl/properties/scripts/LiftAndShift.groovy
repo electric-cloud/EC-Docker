@@ -109,9 +109,25 @@ class LiftAndShift extends BaseClient {
             auth = json.toString().bytes.encodeBase64().toString()
         }
         def response = dockerClient.pushImage(imageName, auth, registryURL)
-        def content = response.content
-        content.each {
-            logger INFO, "${it}"
+        if (response.status.success) {
+            def content = response.content
+            content.each {
+                logger INFO, "${it}"
+            }
+        }
+        else {
+            throw new PluginException("Cannot push image: ${response.content}")
+        }
+    }
+
+
+    def removeImage(String imageId) {
+        def response = dockerClient.removeImage(imageId)
+        if (response.status.success) {
+            logger INFO, "The image ${imageId} has been removed"
+        }
+        else {
+            logger WARNING, "Cannot remove image: ${response.content.message}"
         }
     }
 

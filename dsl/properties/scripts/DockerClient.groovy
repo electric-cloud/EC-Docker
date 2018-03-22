@@ -681,6 +681,12 @@ public class DockerClient extends BaseClient {
         return response
     }
 
+    def removeImage(String imageId) {
+        def response = dockerClient.rmi(imageId)
+        logger INFO, "Removed image ${imageId}. Response ${response}."
+        return response
+    }
+
     def awaitServiceRemoved(def name,def timeout) {
         def service = findService(name)
         def timespent = 0 
