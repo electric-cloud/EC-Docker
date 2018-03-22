@@ -20,26 +20,26 @@
         <type>entry</type>
         <label>Configuration Name:</label>
         <property>config</property>
-        <required>0</required>
+        <required>1</required>
         <documentation>Previously defined configuration.</documentation>
     </formElement>
     <formElement>
         <type>entry</type>
         <label>Artifact Name:</label>
         <property>ecp_docker_artifactName</property>
-        <required>0</required>
-        <documentation>Artifact name in form group:artifact:version. Artifact will be taken from EF repository.</documentation>
+        <required>1</required>
+        <documentation>Artifact name in form group:artifact. Artifact will be taken from EF repository.</documentation>
     </formElement>
     <formElement>
         <type>entry</type>
-        <label>Version Range:</label>
+        <label>Artifact Version:</label>
         <required>0</required>
         <property>ecp_docker_versionRange</property>
-        <documentation>Version range for artifact retrieval.</documentation>
+        <documentation>Artifact version for retrieval, e.g. 0.0.1. If left empty, latest artifact version will be retrieved.</documentation>
     </formElement>
     <formElement>
         <type>entry</type>
-        <required>0</required>
+        <required>1</required>
         <property>ecp_docker_imageName</property>
         <label>Image Name:</label>
         <documentation>Name for the image, e.g. myrepo/image:v1.0.</documentation>

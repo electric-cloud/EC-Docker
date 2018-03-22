@@ -9,13 +9,4 @@
   <configure>ec_config</configure>
   <label>EC-Docker</label>
   <version>1.3.0</version>
-
-  <customTypes>
-    <customType name="Artifact2Image">
-      <parameterPanel>
-        <javascript>war/ecplugins.EC_Docker.Artifact2ImageParameterPanel/ecplugins.EC_Docker.Artifact2ImageParameterPanel.nocache.js</javascript>
-        <help>/commander/pages/@PLUGIN_KEY@-@PLUGIN_VERSION@/EC-Docker_help#Artifact2Image</help>
-      </parameterPanel>
-    </customType>
-  </customTypes>
 </plugin>

@@ -3,10 +3,6 @@ import java.io.File
 procedure 'Artifact2Image',
 	description: 'Creates and pushes a new docker image from the existing artifact', {
 
-
-	property 'customType', value: '@PLUGIN_KEY@-@PLUGIN_VERSION@/Artifact2Image'
-
-
 	step 'setup',
       subproject: '',
       subprocedure: 'Setup',
