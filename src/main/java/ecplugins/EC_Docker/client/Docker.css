@@ -1,0 +1,60 @@
+@external .gwt-RadioButton;
+
+table.artifactVersionForm input {
+   /* padding: 2px; */
+}
+
+table.artifactVersionForm input.shortInput {
+    width: 150px;
+}
+
+table.artifactVersionForm input.mediumInput {
+    width: 250px;
+}
+
+table.artifactVersionForm input.longInput {
+    width: 450px;
+}
+
+table.artifactVersionForm td.formLabel {
+    padding-right: 5px;
+    padding-top: 10px;
+    text-align: right;
+    vertical-align: top;
+    width: 150px;
+}
+
+table.requiredField div.requiredLabel {
+    padding-left: 5px;
+    padding-top: 10px;
+}
+
+table.artifactVersionForm div.addListElement {
+    padding-top: 7px;
+}
+
+table.versionRange .gwt-RadioButton label {
+    padding-left: 2px;
+    padding-right: 5px;
+}
+
+table.versionRange div.formLabel {
+    padding-left: 14px;
+    padding-right: 3px;
+    padding-top: 6px;
+    vertical-align: top;
+}
+
+table.versionRange td.inclusive {
+    padding-left: 5px;
+    padding-top: 2px;
+}
+
+table.versionRange td.inclusive label {
+    padding-left: 3px;
+}
+
+.overwriteLabel {
+    display: inline;
+    padding-left: 1em;
+}

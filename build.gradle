@@ -1,0 +1,97 @@
+
+apply plugin: 'idea'
+apply plugin: 'java'
+apply plugin: 'eclipse'
+apply plugin: 'gwt-compiler'
+
+buildscript {
+
+    repositories {
+        mavenCentral()
+        jcenter()
+        maven { url 'http://dl.bintray.com/ecpluginsdev/maven' }
+        maven {
+            url "https://oss.sonatype.org/content/repositories/snapshots/"
+        }
+    }
+    dependencies {
+        classpath 'de.richsource.gradle.plugins:gwt-gradle-plugin:0.6'
+    }
+
+}
+
+repositories {
+    mavenCentral()
+    jcenter()
+    maven { url 'http://dl.bintray.com/ecpluginsdev/maven' }
+    maven {
+        url "https://oss.sonatype.org/content/repositories/snapshots/"
+    }
+}
+
+dependencies {
+
+    compile "com.electriccloud:commander-sdk:6.+"
+    compile "com.electriccloud:commander-client:6.+"
+    compile "com.electriccloud:ec_internal:6.+"
+
+    compile 'com.intellij:annotations:132.839-PATCH1'
+    compile 'com.google.guava:guava-gwt:16.+'
+    compile 'com.google.gwt.inject:gin:1.5.+'
+    compile 'com.gwtplatform:gwtp-all:0.8-PATCH5'
+    compile 'com.google.gwt:gwt-dev:2.5.+'
+    compile 'com.google.gwt:gwt-servlet:2.5.+'
+    compile 'com.google.gwt:gwt-user:2.5.+'
+}
+
+
+gwt {
+    // Setup reasonable memory defaults for GWT compiler
+    minHeapSize '512M'
+    maxHeapSize '1024M'
+    gwtVersion '2.5.0'
+}
+
+
+def resources = project.sourceSets.main.resources
+def gwtModules = resources.matching { include '**/*.gwt.xml' }.collect {
+    def path = it.path
+    resources.srcDirs.each { dir ->
+        path -= dir.path
+    }
+
+    path = (path.substring(1) - '.gwt.xml')
+    path.replace(File.separator, '.')
+}
+
+project.gwt.modules = gwtModules.toArray(new String[0])
+
+if(project.gwt.modules.size() == 0) {
+    project.tasks.jar.dependsOn = [
+        project.tasks.processProjectXml
+    ]
+}
+
+task cleanHtdocs {
+    delete "htdocs/war"
+}
+
+compileGwt {
+    dependsOn cleanHtdocs
+    copy {
+        from outputs
+        into "htdocs/war"
+    }
+
+    delete "htdocs/war/WEB-INF"
+//    new File("htdocs/war/WEB-INF").delete()
+}
+
+//
+//task buildGwt {
+//    dependsOn compileGwt
+//    copy {
+//        from tasks.compileGwt.outputs
+//        into "htdocs/war"
+//    }
+//}
