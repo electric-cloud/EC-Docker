@@ -11,5 +11,8 @@ RUN rm Dockerfile
 
 <%
 DEFAULT_COMMAND = '"dotnet", ' + '"' + FILENAME + '"'
+if (!COMMAND) {
+    COMMAND = DEFAULT_COMMAND;
+}
 %>
-ENTRYPOINT [${COMMAND:DEFAULT_COMMAND}]
+ENTRYPOINT [${COMMAND}]
