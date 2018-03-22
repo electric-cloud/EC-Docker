@@ -11,27 +11,27 @@ import static groovyx.net.http.Method.PUT
 
 
 class DockerHelper extends ContainerHelper {
-//
-//    def createCluster(projectName, envName, clusterName, configName) {
-//        createConfig(configName)
-//        dsl """
-//            project '$projectName', {
-//                environment '$envName', {
-//                    cluster '$clusterName', {
-//                        pluginKey = 'EC-Kubernetes'
-//                        provisionParameter = [
-//                            config: '$configName'
-//                        ]
-//                        provisionProcedure = 'Check Cluster'
-//                    }
-//                }
-//            }
-//        """
-//    }
+
+    def createCluster(projectName, envName, clusterName, configName) {
+        createConfig(configName)
+        dsl """
+            project '$projectName', {
+                environment '$envName', {
+                    cluster '$clusterName', {
+                        pluginKey = 'EC-Dcoker'
+                        provisionParameter = [
+                            config: '$configName'
+                        ]
+                        provisionProcedure = 'Check Cluster'
+                    }
+                }
+            }
+        """
+   }
 
 
     def deleteConfig(configName) {
-        deleteConfiguration('EC-Kubernetes', configName)
+        deleteConfiguration('EC-Docker', configName)
     }
 
     def createConfig(configName) {
@@ -39,8 +39,9 @@ class DockerHelper extends ContainerHelper {
         assert endpoint
         def pluginConfig = [
             endpoint  : endpoint,
-            testConnection   : 'false',
-            logLevel         : '2'
+            dockerVersion: '17.12.0-ce',
+            testConnection: 'false',
+            logLevel: '1'
         ]
         def props = [:]
         if (System.getenv('RECREATE_CONFIG')) {
@@ -139,6 +140,31 @@ class DockerHelper extends ContainerHelper {
         }
     }
 
+    static def createService(endpoint, token, payload) {
+        def namespace = 'default'
+        def uri = "/api/v1/namespaces/${namespace}/services"
+        request(getEndpoint(), uri, POST, null, ["Authorization": "Bearer ${getToken()}"], new JsonBuilder(payload).toPrettyString())
+    }
+
+
+    static def getService(name) {
+        def uri = "/api/v1/namespaces/default/services/${name}"
+        request(
+                getEndpoint(), uri, GET,
+                null, ["Authorization": "Bearer ${getToken()}"], null).data
+    }
+
+    static def getDeployment(name) {
+        def uri = "/apis/apps/v1beta1/namespaces/default/deployments/${name}"
+        request(
+                getEndpoint(), uri, GET,
+                null, ["Authorization": "Bearer ${getToken()}"], null).data
+    }
+
+    static def deleteService(serviceName) {
+        def uri = "/api/v1/namespaces/default/services/$serviceName"
+        request(getEndpoint(), uri, DELETE, null, ["Authorization": "Bearer ${getToken()}"], null)
+    }
 
     static def getEndpoint() {
         def endpoint = System.getenv('EF_DOCKER_ENDPOINT')
