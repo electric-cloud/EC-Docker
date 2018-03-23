@@ -112,7 +112,11 @@ public class ImportMicroservices extends EFClient {
 
         // Service Fields
         efService.service.defaultCapacity = serviceConfig.deploy?.replicas
-        efService.service.minCapacity = serviceConfig.deploy?.updateConfig?.parallelism
+        if (serviceConfig.deploy?.replicas && serviceConfig.deploy?.updateConfig?.parallelism) {
+            efService.service.minCapacity = serviceConfig.deploy?.updateConfig?.parallelism - serviceConfig.deploy?.replicas
+        } else {
+            efService.service.minCapacity = serviceConfig.deploy?.updateConfig?.parallelism
+        }
 
         // image
         def image = ''
@@ -266,7 +270,9 @@ public class ImportMicroservices extends EFClient {
         }
         def efServices = applicationName ? [] : getServices(projectName)
         services.each { service ->
-            createService(projectName, envProjectName, envName, clusterName, efServices, service, applicationName)
+            if (service?.network == null) {
+                createService(projectName, envProjectName, envName, clusterName, efServices, service, applicationName)
+            }
         }
 
         def lines = ["Imported services: ${importedSummary.size()}"]
