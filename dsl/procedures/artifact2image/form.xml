@@ -91,4 +91,13 @@
         <documentation>Multi-line name=value pairs. If specified, merge with any existing environment variables defined in the template DockerFile for the artifact.
         </documentation>
     </formElement>
+    <formElement>
+        <type>checkbox</type>
+        <label>Remove Image After Push?:</label>
+        <property>ecp_docker_removeAfterPush</property>
+        <required>0</required>
+        <checkedValue>true</checkedValue>
+        <uncheckedValue>false</uncheckedValue>
+        <documentation>If checked, the built image will be removed from the machine after it is pushed to the registry.</documentation>
+    </formElement>
 </editor>
