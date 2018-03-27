@@ -39,7 +39,6 @@ class DockerHelper extends ContainerHelper {
         assert endpoint
         def pluginConfig = [
             endpoint  : endpoint,
-            dockerVersion: '17.12.0-ce',
             testConnection: 'false',
             logLevel: '1'
         ]
