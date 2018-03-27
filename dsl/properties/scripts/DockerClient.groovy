@@ -575,8 +575,7 @@ public class DockerClient extends BaseClient {
  
         
         int replicas = args.defaultCapacity?args.defaultCapacity.toInteger():1
-        
-        int updateParallelism = args.minCapacity?args.minCapacity.toInteger():1
+        int updateParallelism = args.minCapacity? replicas - args.minCapacity.toInteger() : replicas - 1
         
         def networkList = getNetworkList(args)
 
