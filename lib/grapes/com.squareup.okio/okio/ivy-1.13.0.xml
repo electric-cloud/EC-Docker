@@ -1,12 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ivy-module version="2.0" xmlns:m="http://ant.apache.org/ivy/maven">
-	<info organisation="com.squareup.okio"
-		module="okio"
-		revision="1.13.0"
-		status="release"
-		publication="20170512092419"
-	>
-		<description homepage="" />
+	<info organisation="com.squareup.okio" module="okio" revision="1.13.0" status="release" publication="20170512192419">
+		<description homepage=""/>
 		<m:properties__jmh.version>1.4.1</m:properties__jmh.version>
 		<m:properties__java.version>1.7</m:properties__java.version>
 		<m:properties__project.build.sourceEncoding>UTF-8</m:properties__project.build.sourceEncoding>

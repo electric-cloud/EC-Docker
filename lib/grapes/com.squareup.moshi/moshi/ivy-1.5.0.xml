@@ -1,12 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ivy-module version="2.0" xmlns:m="http://ant.apache.org/ivy/maven">
-	<info organisation="com.squareup.moshi"
-		module="moshi"
-		revision="1.5.0"
-		status="release"
-		publication="20170514192103"
-	>
-		<description homepage="" />
+	<info organisation="com.squareup.moshi" module="moshi" revision="1.5.0" status="release" publication="20170515052103">
+		<description homepage=""/>
 		<m:properties__kotlin.version>1.1.1</m:properties__kotlin.version>
 		<m:properties__java.version>1.7</m:properties__java.version>
 		<m:properties__project.build.sourceEncoding>UTF-8</m:properties__project.build.sourceEncoding>

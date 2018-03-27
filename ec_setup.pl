@@ -125,7 +125,7 @@ if ( !$errorMessage ) {
         my $artifactVersion = $am->publish(
             {   groupId         => "com.electriccloud",
                 artifactKey     => "EC-Docker-Grapes",
-                version         => "1.0.2",
+                version         => "1.0.3",
                 includePatterns => "**",
                 fromDirectory   => "$tempDir/lib",
                 description => "JARs that EC-Docker plugin procedures depend on"
