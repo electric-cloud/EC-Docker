@@ -1,13 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ivy-module version="2.0" xmlns:m="http://ant.apache.org/ivy/maven">
-	<info organisation="ch.qos.logback"
-		module="logback-classic"
-		revision="1.0.13"
-		status="release"
-		publication="20130510053446"
-	>
-		<license name="Eclipse Public License - v 1.0" url="http://www.eclipse.org/legal/epl-v10.html" />
-		<license name="GNU Lesser General Public License" url="http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html" />
+	<info organisation="ch.qos.logback" module="logback-classic" revision="1.0.13" status="release" publication="20130510153446">
+		<license name="Eclipse Public License - v 1.0" url="http://www.eclipse.org/legal/epl-v10.html"/>
+		<license name="GNU Lesser General Public License" url="http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html"/>
 		<description homepage="http://logback.qos.ch">
 		logback-classic module
 		</description>
@@ -68,7 +63,7 @@
 		<dependency org="org.slf4j" name="slf4j-api" rev="1.7.5" force="true" conf="compile->compile(*),master(*);runtime->runtime(*)"/>
 		<dependency org="org.slf4j" name="slf4j-ext" rev="1.7.5" force="true" conf="test->runtime(*),master(*)"/>
 		<dependency org="org.slf4j" name="slf4j-api" rev="1.7.5" force="true" conf="test->runtime(*),master(*)">
-			<artifact name="slf4j-api" type="test-jar" ext="jar" conf="" m:classifier="tests"/>
+			
 		</dependency>
 		<dependency org="org.slf4j" name="log4j-over-slf4j" rev="1.7.5" force="true" conf="test->runtime(*),master(*)"/>
 		<dependency org="org.slf4j" name="jul-to-slf4j" rev="1.7.5" force="true" conf="test->runtime(*),master(*)"/>
@@ -81,7 +76,7 @@
 		<dependency org="org.codehaus.janino" name="janino" rev="2.6.1" force="true" conf="optional->compile(*),master(*)"/>
 		<dependency org="org.codehaus.groovy" name="groovy-all" rev="2.0.7" force="true" conf="optional->compile(*),master(*)"/>
 		<dependency org="ch.qos.logback" name="logback-core" rev="1.0.13" force="true" conf="test->runtime(*),master(*)">
-			<artifact name="logback-core" type="test-jar" ext="jar" conf="" m:classifier="tests"/>
+			
 		</dependency>
 		<dependency org="org.slf4j" name="integration" rev="1.7.5" force="true" conf="test->runtime(*),master(*)"/>
 		<dependency org="org.apache.geronimo.specs" name="geronimo-jms_1.1_spec" rev="1.0" force="true" conf="optional->compile(*),master(*)"/>

@@ -43,7 +43,7 @@ sub main() {
     my $ec = ElectricCommander->new();
     $ec->abortOnError(1);
 
-    retrieveGrapeDependency($ec, 'com.electriccloud:EC-Docker-Grapes:1.0.2');
+    retrieveGrapeDependency($ec, 'com.electriccloud:EC-Docker-Grapes:1.0.3');
     if ($::gAdditionalArtifactVersion ne '') {
         retrieveGrapeDependency($ec, $::gAdditionalArtifactVersion);
     }
