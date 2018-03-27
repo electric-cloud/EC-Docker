@@ -255,8 +255,10 @@ runProcedure(
         process.waitFor()
         String text = process.text
         logger.info(text)
+        if (text) {
+            return text
+        }
         assert process.exitValue() == 0
-        text
     }
 
     def publishArtifact(String artifactName, String version, String resName) {

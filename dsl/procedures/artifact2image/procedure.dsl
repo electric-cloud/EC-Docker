@@ -18,15 +18,17 @@ procedure 'Artifact2Image',
 	step 'download artifact',
 		command: new File(pluginDir, 'dsl/procedures/artifact2image/steps/downloadArtifact.pl').text,
 		shell: 'ec-perl',
-		errorHandling: 'abortProcedureNow'
+		errorHandling: 'abortProcedureNow',
+		condition: '$[ecp_docker_artifactName]'
+
  
 	step 'artifact2image',
-	  command: new File(pluginDir, 'dsl/procedures/artifact2image/steps/artifact2image.groovy').text,
-	  errorHandling: 'failProcedure',
-	  exclusiveMode: 'none',
-	  postProcessor: 'postp',
-	  releaseMode: 'none',
-	  shell: 'ec-groovy',
-	  timeLimitUnits: 'minutes'
+		command: new File(pluginDir, 'dsl/procedures/artifact2image/steps/artifact2image.groovy').text,
+		errorHandling: 'failProcedure',
+		exclusiveMode: 'none',
+		postProcessor: 'postp',
+		releaseMode: 'none',
+		shell: 'ec-groovy',
+		timeLimitUnits: 'minutes'
 	
 }
