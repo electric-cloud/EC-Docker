@@ -273,11 +273,12 @@ runProcedure(
         File ectool = new File(commanderHome, "bin/ectool")
         assert ectool.exists()
         logger.debug(ectool.absolutePath.toString())
+        String command = "${ectool.absolutePath} --server $commanderServer --ignoreEnvironment 1 "
 
-        runCommand("${ectool.absolutePath} --server $commanderServer login $username $password")
-        runCommand("${ectool.absolutePath} --server $commanderServer deleteArtifactVersion ${artifactName}:${version}")
+        runCommand("${command} login $username $password")
+        runCommand("${command} deleteArtifactVersion ${artifactName}:${version}")
 
-        String publishCommand = "${ectool.absolutePath} --server ${commanderServer} publishArtifactVersion --version $version --artifactName ${artifactName} "
+        String publishCommand = "${command} publishArtifactVersion --version $version --artifactName ${artifactName} "
         if (resource.directory) {
             publishCommand += "--fromDirectory ${resource}"
         }
