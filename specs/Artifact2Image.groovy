@@ -272,14 +272,7 @@ runProcedure(
         assert ectool.exists()
         logger.debug(ectool.absolutePath.toString())
 
-        File sessionFile
-        if (System.getenv('COMMANDER_WORKSPACE')) {
-            sessionFile = new File(System.getenv('COMMANDER_WORKSPACE'), '.ecsession')
-        }
-        else {
-            sessionFile = new File('.ecsession')
-        }
-        String command = "sh -c COMMANDER_SESSIONFILE=${sessionFile} ${ectool.absolutePath} " +
+        String command = "${ectool.absolutePath} " +
             "--server $commanderServer --ignoreEnvironment 1 "
         runCommand("${command} login ${username} ${password}")
 
