@@ -272,8 +272,7 @@ runProcedure(
         assert ectool.exists()
         logger.debug(ectool.absolutePath.toString())
 
-        String command = "${ectool.absolutePath} " +
-            "--server $commanderServer --ignoreEnvironment 1 "
+        String command = "${ectool.absolutePath} --server $commanderServer"
         runCommand("${command} login ${username} ${password}")
 
         runCommand("${command} deleteArtifactVersion ${artifactName}:${version}")
