@@ -279,10 +279,10 @@ runProcedure(
         else {
             sessionFile = new File('.ecsession')
         }
-        String command = "COMMANDER_SESSIONFILE=${sessionFile} ${ectool.absolutePath} " +
+        String command = "sh -c COMMANDER_SESSIONFILE=${sessionFile} ${ectool.absolutePath} " +
             "--server $commanderServer --ignoreEnvironment 1 "
         runCommand("${command} login ${username} ${password}")
-        
+
         runCommand("${command} deleteArtifactVersion ${artifactName}:${version}")
 
         String publishCommand = "${command} publishArtifactVersion --version $version --artifactName ${artifactName} "
