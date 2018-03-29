@@ -1,6 +1,7 @@
 import spock.lang.*
 import com.electriccloud.spec.*
 
+@Ignore
 class ImportMicroservices extends DockerHelper {
     static def dockerYAMLFile
     /*static def projectName = 'EC-Docker Specs Import Microservices'
