@@ -271,9 +271,16 @@ runProcedure(
         File ectool = new File(commanderHome, "bin/ectool")
         assert ectool.exists()
         logger.debug(ectool.absolutePath.toString())
-        String command = "${ectool.absolutePath} --server $commanderServer --ignoreEnvironment 1 "
 
-        runCommand("${command} login $username $password")
+        File sessionFile
+        if (System.getenv('COMMANDER_WORKSPACE')) {
+            sessionFile = new File(System.getenv('COMMANDER_WORKSPACE'), '.ecsession')
+        }
+        else {
+            sessionFile = new File('.ecsession')
+        }
+        String command = "COMMANDER_SESSIONFILE=${sessionFile} ${ectool.absolutePath} " +
+            "--server $commanderServer --ignoreEnvironment 1 "
         runCommand("${command} deleteArtifactVersion ${artifactName}:${version}")
 
         String publishCommand = "${command} publishArtifactVersion --version $version --artifactName ${artifactName} "
