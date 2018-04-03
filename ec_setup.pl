@@ -68,7 +68,7 @@ if ( !$errorMessage ) {
     # This is here because we cannot do publishArtifactVersion in dsl today
 
     # delete artifact if it exists first
-    $commander->deleteArtifactVersion("com.electriccloud:EC-Docker-Grapes:1.0.2");
+    $commander->deleteArtifactVersion("com.electriccloud:EC-Docker-Grapes:1.0.3");
 
     my $dependenciesProperty = '/projects/@PLUGIN_NAME@/ec_groovyDependencies';
     my $base64 = '';
