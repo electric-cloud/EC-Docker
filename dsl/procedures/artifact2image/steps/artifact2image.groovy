@@ -8,6 +8,9 @@ import groovy.json.JsonException
 
 String configName = '$[config]'
 String artifactName = '$[ecp_docker_artifactName]'
+if (!artifactName) {
+    artifactName = '$[ecp_docker_artifactoryArtifactName]'
+}
 String imageName = '$[ecp_docker_imageName]'
 String registryUrl = '$[ecp_docker_registryUrl]'
 String credentialName = '$[ecp_docker_credential]'

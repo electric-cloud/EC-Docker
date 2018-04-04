@@ -39,6 +39,55 @@
     </formElement>
     <formElement>
         <type>entry</type>
+        <label>Artifactory Configuration Name:</label>
+        <property>ecp_docker_artifactoryConfigName</property>
+        <documentation></documentation>
+        <required>0</required>
+    </formElement>
+    <formElement>
+        <type>entry</type>
+        <label>Artifactory Repository Key:</label>
+        <property>ecp_docker_artifactoryRepoKey</property>
+        <documentation></documentation>
+        <required>0</required>
+    </formElement>
+    <formElement>
+        <type>entry</type>
+        <label>Artifactory Organization Path:</label>
+        <property>ecp_docker_artifactoryOrgPath</property>
+        <documentation></documentation>
+        <required>0</required>
+    </formElement>
+    <formElement>
+        <type>entry</type>
+        <label>Artifactory Artifact Name:</label>
+        <property>ecp_docker_artifactoryArtifactName</property>
+        <documentation></documentation>
+        <required>0</required>
+    </formElement>
+    <formElement>
+        <type>entry</type>
+        <label>Artifactory Artifact Version:</label>
+        <property>ecp_docker_artifactoryVersion</property>
+        <documentation></documentation>
+        <required>0</required>
+    </formElement>
+    <formElement>
+        <type>entry</type>
+        <label>Artifactory Extension:</label>
+        <property>ecp_docker_artifactoryExtension</property>
+        <documentation></documentation>
+        <required>0</required>
+    </formElement>
+    <formElement>
+        <type>entry</type>
+        <label>Repository Type:</label>
+        <property>ecp_docker_artifactoryRepoType</property>
+        <documentation></documentation>
+        <required>0</required>
+    </formElement>
+    <formElement>
+        <type>entry</type>
         <required>1</required>
         <property>ecp_docker_imageName</property>
         <label>Image Name:</label>
