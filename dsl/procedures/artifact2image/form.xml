@@ -45,6 +45,25 @@
         <required>0</required>
     </formElement>
     <formElement>
+        <type>select</type>
+        <label>Repository Type:</label>
+        <property>ecp_docker_artifactoryRepoType</property>
+        <documentation></documentation>
+        <required>0</required>
+        <option>
+            <value>Maven</value>
+            <name>Maven</name>
+        </option>
+        <option>
+            <name>NuGet</name>
+            <value>NuGet</value>
+        </option>
+        <option>
+            <value>Generic</value>
+            <name>Generic</name>
+        </option>
+    </formElement>
+    <formElement>
         <type>entry</type>
         <label>Artifactory Repository Key:</label>
         <property>ecp_docker_artifactoryRepoKey</property>
@@ -76,13 +95,6 @@
         <type>entry</type>
         <label>Artifactory Extension:</label>
         <property>ecp_docker_artifactoryExtension</property>
-        <documentation></documentation>
-        <required>0</required>
-    </formElement>
-    <formElement>
-        <type>entry</type>
-        <label>Repository Type:</label>
-        <property>ecp_docker_artifactoryRepoType</property>
         <documentation></documentation>
         <required>0</required>
     </formElement>

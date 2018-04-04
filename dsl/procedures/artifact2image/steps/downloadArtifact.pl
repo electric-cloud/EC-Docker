@@ -74,6 +74,14 @@ sub retrieveArtifactFromArtifactory {
         value => $destination,
     };
 
+    my $repoType = getParam("artifactoryRepoType");
+    if ($repoType eq 'NuGet' || $repoType eq 'Generic') {
+        push @$actualParameters, {
+            value               => '1',
+            actualParameterName => 'extract'
+        };
+    }
+
     my $version = getParam('artifactoryVersion');
     if ($version) {
         push @$actualParameters, {
