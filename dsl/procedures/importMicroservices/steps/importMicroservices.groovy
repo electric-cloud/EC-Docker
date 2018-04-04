@@ -51,8 +51,8 @@ composeFile << composeContent.replace('#','').replace("\t", "")
 
 def composeConfig
 try {
-    if(composeFile?.version && (composeFile?.version == '2' || composeFile?.version == '1')) {
-        println("ERROR: unsupported version of compose file: version " + composeFile.version + ". Please use version 3 or above for import procedure.")
+    if(composeFile?.version && (composeFile?.version == '3' || composeFile?.version == '2')) {
+        println("ERROR: unsupported version of compose file: version " + composeFile.version + ". Please use version 3.5 for import procedure.")
         System.exit(-1)
     } else {
         composeConfig = DockerClient.readCompose(composeFile)
