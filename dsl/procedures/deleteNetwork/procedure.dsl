@@ -8,7 +8,7 @@ procedure 'Delete Network',
       subprocedure: 'Setup',
       command: null,
       errorHandling: 'failProcedure',
-      exclusiveMode: 'none',
+      exclusiveMode: 'call',
       postProcessor: 'postp',
       releaseMode: 'none',
       timeLimitUnits: 'minutes', {
@@ -21,6 +21,7 @@ procedure 'Delete Network',
       errorHandling: 'abortProcedure',
       exclusiveMode: 'none',
       releaseMode: 'none',
+      resourceName: '$[grabbedResource]',
       shell: 'ec-groovy',
       timeLimitUnits: 'minutes'
    }

@@ -3,11 +3,16 @@ import groovy.text.Template
 import de.gesellix.docker.client.builder.BuildContextBuilder
 import groovy.json.JsonBuilder
 import org.apache.commons.lang.RandomStringUtils
+
+import java.nio.file.Files
+import java.nio.file.Paths
+
+
 import static Logger.*
 
 class LiftAndShift extends BaseClient {
 
-    File artifactCacheDirectory
+    Artifact artifact
     DockerClient dockerClient
 
     /**
@@ -21,7 +26,7 @@ class LiftAndShift extends BaseClient {
      * ]
      * @return
      */
-    File generateDockerfile(Artifact artifact, Map details, String templateText) {
+    File generateDockerfile(Map details, String templateText) {
         logger INFO, "Artifact type: ${artifact.type}"
         logger INFO, "Main file: ${artifact.entrypoint}"
         logger INFO, "Dockefile template: ${templateText}"
@@ -30,7 +35,6 @@ class LiftAndShift extends BaseClient {
             logger WARNING, "No command specified in details for .csproj"
         }
 
-        Template template = new SimpleTemplateEngine().createTemplate(templateText)
         def map = details
         map.FILENAME = artifact.entrypoint.name
 
@@ -68,11 +72,11 @@ class LiftAndShift extends BaseClient {
     }
 
     String buildImage(String tag, File workspace) {
-        String charset = (('A'..'Z') + ('0'..'9')).join()
-        Integer length = 9
-        String prefix = RandomStringUtils.random(length, charset.toCharArray())
+        if (!workspace.directory) {
+            throw new RuntimeException("Workspace must be a directory")
+        }
 
-        File destination = new File(workspace.parentFile, "${prefix}_image.tar")
+        File destination = new File(workspace.parentFile, "${randomString()}_image.tar")
         logger INFO, "Packing workspace: ${workspace.absolutePath} to ${destination.absolutePath}"
         BuildContextBuilder.archiveTarFilesRecursively(
             workspace,
@@ -89,7 +93,16 @@ class LiftAndShift extends BaseClient {
         }
         destination.delete()
         logger INFO, "Deleted ${destination.absolutePath}"
+//        workspace.deleteDir()
+//        logger INFO, "Deleted workspace ${workspace.absolutePath}"
         return imageId
+    }
+
+    static String randomString() {
+        String charset = (('A'..'Z') + ('0'..'9')).join()
+        Integer length = 9
+        String prefix = RandomStringUtils.random(length, charset.toCharArray())
+        prefix
     }
 
 
@@ -109,9 +122,25 @@ class LiftAndShift extends BaseClient {
             auth = json.toString().bytes.encodeBase64().toString()
         }
         def response = dockerClient.pushImage(imageName, auth, registryURL)
-        def content = response.content
-        content.each {
-            logger INFO, "${it}"
+        if (response.status.success) {
+            def content = response.content
+            content.each {
+                logger INFO, "${it}"
+            }
+        }
+        else {
+            throw new PluginException("Cannot push image: ${response.content}")
+        }
+    }
+
+
+    def removeImage(String imageId) {
+        def response = dockerClient.removeImage(imageId)
+        if (response.status.success) {
+            logger INFO, "The image ${imageId} has been removed"
+        }
+        else {
+            logger WARNING, "Cannot remove image: ${response.content.message}"
         }
     }
 
@@ -121,8 +150,8 @@ class LiftAndShift extends BaseClient {
         return Artifact.findArtifact(artifactCacheDirectory)
     }
 
-
 }
+
 
 class Artifact {
     String type
@@ -134,18 +163,75 @@ class Artifact {
     static final String ASPNET = 'asp.net'
     static final String CSPROJ = 'csproj'
 
+
+    static def fromFileSystem(File location, boolean copy = false) {
+        if (!location.exists()) {
+            throw new PluginException("Location ${location.absolutePath} does not exist")
+        }
+        if (copy) {
+            String charset = (('A'..'Z') + ('0'..'9')).join()
+            Integer length = 9
+            String random = RandomStringUtils.random(length, charset.toCharArray())
+
+            def target = new File("dockerfile-${location.name.replaceAll("\\W+", '-')}-${random}").canonicalFile
+            if (location.directory) {
+                copyDirectory(location, target)
+            }
+            else {
+                File dest = new File(target, location.name)
+                target.mkdir()
+                Files.copy(Paths.get(location.absolutePath), Paths.get(dest.absolutePath))
+            }
+            return findArtifact(target)
+        }
+
+        if (location.directory) {
+            return findArtifact(location)
+        }
+        else {
+            String type = guessArtifactType(location)
+            return new Artifact(entrypoint: location, type: type, artifact: location)
+        }
+    }
+
+
+    static def copyDirectory(File from, File to) {
+        if (!to.exists()) {
+            to.mkdir()
+        }
+        from.eachFileRecurse { File file ->
+            File destination = new File(to, from.toURI().relativize(file.toURI()).toString())
+            Files.copy(Paths.get(file.absolutePath), Paths.get(destination.absolutePath))
+        }
+    }
+
+    static def fromArtifactory() {
+
+    }
+
+    static def guessArtifactType(File artifact) {
+        if (artifact.name.endsWith(".war")) {
+            return WAR
+        }
+        else if (artifact.name.endsWith(".jar")) {
+            return JAR
+        }
+        else {
+            throw new PluginException("Cannot process artifact: ${artifact.name}")
+        }
+    }
+
     static def findArtifact(File cacheDirectory) {
         String type
         File artifact
         File entrypoint
+        if (!cacheDirectory.directory) {
+            throw new RuntimeException("findArtifact works with directory only")
+        }
         cacheDirectory.eachFile { File f ->
 //                TODO handle multiple files
             if (f.name.endsWith(".war") || f.name.endsWith(".jar")) {
-                if (f.name.endsWith('.war')) {
-                    type = WAR
-                } else {
-                    type = JAR
-                }
+                type = guessArtifactType(f)
                 artifact = f
                 entrypoint = f
             } else if (f.name.compareToIgnoreCase("web.config") == 0) {
@@ -170,7 +256,6 @@ class Artifact {
                         if (entrypoint.exists()) {
                             type = ASPNET
                             artifact = cacheDirectory
-
                         }
                     }
                 }
@@ -187,7 +272,7 @@ class Artifact {
         if (type && artifact) {
             return new Artifact(type: type, entrypoint: entrypoint, artifact: artifact)
         } else {
-            throw new PluginException("Cannot process ${cacheDirectory.name}: no supported artifacts found")
+            throw new PluginException("Cannot process ${cacheDirectory.absolutePath}: no supported artifacts found")
         }
     }
 

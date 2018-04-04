@@ -1,7 +1,7 @@
 import java.io.File
 
 procedure 'Discover',
-	description: 'Discovers services in Docker Compose file and creates corresponding application models for them in ElectricFlow', {
+	description: '[Deprecated] This procedure is deprecated. Use the "Import Microservices" procedure to create microservice models based on the given Docker Compose file contents.', {
 
 	step 'discover',
     	  command: new File(pluginDir, 'dsl/procedures/discover/steps/discover.groovy').text,

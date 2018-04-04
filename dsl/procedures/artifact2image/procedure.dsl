@@ -8,7 +8,7 @@ procedure 'Artifact2Image',
       subprocedure: 'Setup',
       command: null,
       errorHandling: 'failProcedure',
-      exclusiveMode: 'none',
+      exclusiveMode: 'call',
       postProcessor: 'postp',
       releaseMode: 'none',
       timeLimitUnits: 'minutes', {
@@ -64,14 +64,15 @@ procedure 'Artifact2Image',
 //		actualParameter 'version', ''
 //
 
- 
+
 	step 'artifact2image',
-	  command: new File(pluginDir, 'dsl/procedures/artifact2image/steps/artifact2image.groovy').text,
-	  errorHandling: 'failProcedure',
-	  exclusiveMode: 'none',
-	  postProcessor: 'postp',
-	  releaseMode: 'none',
-	  shell: 'ec-groovy',
-	  timeLimitUnits: 'minutes'
-	
+		command: new File(pluginDir, 'dsl/procedures/artifact2image/steps/artifact2image.groovy').text,
+		errorHandling: 'failProcedure',
+		exclusiveMode: 'none',
+		postProcessor: 'postp',
+		releaseMode: 'none',
+		resourceName: '$[grabbedResource]',
+		shell: 'ec-groovy',
+		timeLimitUnits: 'minutes'
+
 }

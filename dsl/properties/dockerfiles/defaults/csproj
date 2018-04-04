@@ -17,4 +17,6 @@ EXPOSE ${PORTS:80}
 ENV ${ENV}
 <% } %>
 
+<% if (COMMAND) { %>
 CMD [${COMMAND}]
+<% } %>

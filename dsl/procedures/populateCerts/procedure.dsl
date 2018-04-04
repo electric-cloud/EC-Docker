@@ -12,6 +12,7 @@ procedure 'Populate Certs',
     	  exclusiveMode: 'none',
     	  postProcessor: 'postp',
     	  releaseMode: 'none',
+    	  resourceName: '$[grabbedResource]',
     	  shell: 'ec-groovy',
     	  timeLimitUnits: 'minutes'
 
@@ -21,6 +22,7 @@ procedure 'Populate Certs',
             exclusiveMode: 'none',
             postProcessor: 'postp',
             releaseMode: 'none',
+            resourceName: '$[grabbedResource]',
             shell: 'ec-perl',
             timeLimitUnits: 'minutes'
 }

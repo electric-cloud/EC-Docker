@@ -75,10 +75,16 @@ More information about how to setup TLS certificates on Docker endpoint can be f
         <li><a href="#CheckCluster">Check Cluster</a></li>
         
 
-        <li><a href="#DeployService">Deploy Service</a></li>
+        <li><a href="#CreateIngress">Create Ingress</a></li>
         
 
-        <li><a href="#UndeployService">Undeploy Service</a></li>
+        <li><a href="#DeleteNetwork">Delete Network</a></li>
+        
+
+        <li><a href="#ImportMicroservices">Import Microservices</a></li>
+        
+
+        <li><a href="#PopulateCerts">Populate Certs</a></li>
         
 
         <li><a href="#RemoveDockerService">Remove Docker Service</a></li>
@@ -93,19 +99,16 @@ More information about how to setup TLS certificates on Docker endpoint can be f
         <li><a href="#runDockerRun">runDockerRun</a></li>
         
 
-        <li><a href="#Discover">Discover</a></li>
+        <li><a href="#UndeployService">Undeploy Service</a></li>
         
 
         <li><a href="#Artifact2Image">Artifact2Image</a></li>
         
 
-        <li><a href="#CreateIngress">Create Ingress</a></li>
+        <li><a href="#DeployService">Deploy Service</a></li>
         
 
-        <li><a href="#DeleteNetwork">Delete Network</a></li>
-        
-
-        <li><a href="#ImportMicroservices">Import Microservices</a></li>
+        <li><a href="#Discover">Discover (DEPRECATED)</a></li>
         
     </ul>
     
@@ -230,41 +233,11 @@ More information about how to setup TLS certificates on Docker endpoint can be f
     </div>
 
     
-    <div id="DeployService">
-        <h2>Deploy Service</h2>
-        <p>Deploys or updates a service on a stand-alone Docker host or a Docker Swarm cluster</p>
+    <div id="CreateIngress">
+        <h2>Create Ingress</h2>
+        <p>Configures default ingress network in Docker Swarm cluster</p>
         
-            <p>
-User can provide a comma-separated list of networks on which to deploy the container or the swarm service in the service mapping page when mapping the service to a cluster in ElectricFlow. If the network does not already exist then the procedure will create one with the provided subnet and gateway. If no subnet and gateway is specified, Docker uses default values. Each of the user-defined networks can have multiple subnets and gateways. In that case, multiple subnets/gateways must be separated by '|'(pipe). If deploying to a stand-alone Docker engine then the user-defined <b>"bridge"</b> network is created.  If deploying to a Docker swarm cluster then the user-defined <b>"overlay"</b> network is created.
-</p>
-<p>
-For example,
-<table class="grid">
-<thead>
-    <tr>
-        <td>Networks:</td>
-        <td>bridge, net1, net2</td>
-    </tr>
-</thead>
-<tbody>
-    <tr>
-        <td>Subnets:</td>
-        <td>,10.200.1.10/24|10.200.2.10/24,198.168.10.10/24</td>
-    </tr>
-    <tr>
-        <td>Gateways:</td>
-        <td>,10.200.1.1|10.200.2.1,198.168.10.1</td>
-    </tr>
-</tbody>
-</table>
-In this example, container gets attached to bridge, net1 and net2 networks. "bridge" network is already created by Docker and no need to specify subnet/gateway for it. "net1" and "net2" are user defined networks. "net1" have two subnet IP ranges i.e. 10.200.1.10/24(Gateway:10.200.1.1) and 10.200.2.10/24(Gateway:10.200.2.1) while "net2" have single subnet IP range i.e. 198.168.10.10/24(Gateway:198.168.10.1).
-</p>
-<p>
-For more information on docker networking, see <a href="https://docs.docker.com/engine/userguide/networking/">here</a>
-</p>
-
-        
-        <h3>Deploy Service Parameters</h3>
+        <h3>Create Ingress Parameters</h3>
         <table class="grid">
             <thead>
             <tr>
@@ -275,48 +248,38 @@ For more information on docker networking, see <a href="https://docs.docker.com/
             <tbody>
             
             <tr>
-                <td class="required">Service Name</td>
-                <td>The name of the service in ElectricFlow that encapsulates the service to be deployed on a stand-alone Docker host or a Docker Swarm cluster. Please note that this name will be modified to comply with the naming conventions of Docker. Specifically characters such as "space , _ " will be converted to "-".</td>
+                <td class="required">Configuration</td>
+                <td>Name of plugin configuration to use.</td>
             </tr>
             
             <tr>
-                <td >Service Revision ID</td>
-                <td>Revision Id of the service in ElectricFlow.</td>
+                <td class="required">Name</td>
+                <td>Name of ingress network to create.</td>
             </tr>
             
             <tr>
-                <td class="required">Project Name</td>
-                <td>The name of the project that the service belongs to. In case of an application-level service it also owns the application.</td>
+                <td >Subnets</td>
+                <td>Comma separated (CSV) list of subnets to create in ingress network. </td>
             </tr>
             
             <tr>
-                <td >Application Name</td>
-                <td>The name of the application that the service belongs to. Not applicable for a top-level service.</td>
+                <td >Gateways</td>
+                <td>Comma separated (CSV) list of gateways for subnets mentioned in "Subnets" field.</td>
             </tr>
             
             <tr>
-                <td >Application Revision ID</td>
-                <td>Revision Id of the application version that the service belongs to.</td>
+                <td >Enable IPv6</td>
+                <td>Enable IPv6 on the network</td>
             </tr>
             
             <tr>
-                <td class="required">Cluster Name</td>
-                <td>The name of the cluster in ElectricFlow that encapsulates the stand-alone Docker host or a Docker Swarm cluster on which the service is to be deployed.</td>
+                <td >MTU</td>
+                <td>MTU to set to ingress network</td>
             </tr>
             
             <tr>
-                <td >Cluster Or Environment Project Name</td>
-                <td>The name of the project that the cluster belongs to if it is a top-level project cluster. Or the name of the project that the environment belongs to if it is an environment-scoped cluster.</td>
-            </tr>
-            
-            <tr>
-                <td >Environment Name</td>
-                <td>The name of the environment that the cluster belongs to. Not applicable for a top-level project cluster.</td>
-            </tr>
-            
-            <tr>
-                <td >Results Property Sheet</td>
-                <td>Name of the property sheet where the output properties for the deployed service will be saved. If not specified, will default to '/myParent/parent'.</td>
+                <td >Labels</td>
+                <td>Comma separated list of key=value pairs to assign to ingress network.</td>
             </tr>
             
             </tbody>
@@ -325,11 +288,11 @@ For more information on docker networking, see <a href="https://docs.docker.com/
     </div>
 
     
-    <div id="UndeployService">
-        <h2>Undeploy Service</h2>
-        <p>Undeploys a previously deployed service on a stand-alone Docker host or a Docker Swarm cluster</p>
+    <div id="DeleteNetwork">
+        <h2>Delete Network</h2>
+        <p>Deletes a network</p>
         
-        <h3>Undeploy Service Parameters</h3>
+        <h3>Delete Network Parameters</h3>
         <table class="grid">
             <thead>
             <tr>
@@ -340,43 +303,93 @@ For more information on docker networking, see <a href="https://docs.docker.com/
             <tbody>
             
             <tr>
-                <td class="required">Service Name</td>
-                <td>The name of the service in ElectricFlow that encapsulates the service that was previously deployed on a stand-alone Docker host or a Docker Swarm cluster. Please note that this name will be modified to comply with the naming conventions of Docker. Specifically characters such as "space , _ " will be converted to "-".</td>
+                <td class="required">Configuration</td>
+                <td>Name of plugin configuration to use.</td>
             </tr>
             
             <tr>
-                <td >Service Revision ID</td>
-                <td>Revision Id of the service in ElectricFlow.</td>
+                <td class="required">Network Name</td>
+                <td>Name of the network to delete.</td>
+            </tr>
+            
+            </tbody>
+        </table>
+        
+    </div>
+
+    
+    <div id="ImportMicroservices">
+        <h2>Import Microservices</h2>
+        <p>Import microcervices using Docker Compose file and creates corresponding application models for them in ElectricFlow</p>
+        
+        <h3>Import Microservices Parameters</h3>
+        <table class="grid">
+            <thead>
+            <tr>
+                <th>Parameter</th>
+                <th>Description</th>
+            </tr>
+            </thead>
+            <tbody>
+            
+            <tr>
+                <td class="required">Docker Compose file</td>
+                <td>Docker Compose file contents</td>
             </tr>
             
             <tr>
                 <td class="required">Project Name</td>
-                <td>The name of the project that the service belongs to. In case of an application-level service it also owns the application.</td>
+                <td>The name of project in which the application or the services will be created.</td>
+            </tr>
+            
+            <tr>
+                <td >Create application-scoped microservices</td>
+                <td>Whether all the services defined in the Docker Compose file should be created within one application in ElectricFlow. If checked, then the application name must be provided.</td>
             </tr>
             
             <tr>
                 <td >Application Name</td>
-                <td>The name of the application that the service belongs to. Not applicable for a top-level service.</td>
-            </tr>
-            
-            <tr>
-                <td >Application Revision ID</td>
-                <td>Revision Id of the application version that the service belongs to.</td>
-            </tr>
-            
-            <tr>
-                <td class="required">Environment Name</td>
-                <td>The name of the environment that the cluster belongs to.</td>
+                <td>The name of the application to create, within which the microservices will be created. Required if 'Create application-scoped microservices' is checked.</td>
             </tr>
             
             <tr>
                 <td >Environment Project Name</td>
-                <td>The name of the project that the environment belongs to. If not specified, the environment is assumed to be in the same project as the service.</td>
+                <td>The name of project that the environment belongs to.</td>
+            </tr>
+            
+            <tr>
+                <td >Environment Name</td>
+                <td>The name of the environment containing the cluster where the newly created microservice(s) will be deployed.</td>
             </tr>
             
             <tr>
                 <td >Cluster Name</td>
-                <td>The name of the cluster in the environment on which the service was previously deployed. If not specified, the application tier mapping will be used to find the cluster name.</td>
+                <td>The name of the EC-Docker backed cluster within the environment where the newly created microservice(s) will be deployed.</td>
+            </tr>
+            
+            </tbody>
+        </table>
+        
+    </div>
+
+    
+    <div id="PopulateCerts">
+        <h2>Populate Certs</h2>
+        <p>Dump TLS certificates (ca-cert, client cert and client key) on agent machine in temp dir</p>
+        
+        <h3>Populate Certs Parameters</h3>
+        <table class="grid">
+            <thead>
+            <tr>
+                <th>Parameter</th>
+                <th>Description</th>
+            </tr>
+            </thead>
+            <tbody>
+            
+            <tr>
+                <td >Plugin Configuration</td>
+                <td>Plugin Configuration Name.</td>
             </tr>
             
             </tbody>
@@ -593,11 +606,11 @@ For more information on docker networking, see <a href="https://docs.docker.com/
     </div>
 
     
-    <div id="Discover">
-        <h2>Discover</h2>
-        <p>Discovers services in Docker Compose file and creates corresponding application models for them in ElectricFlow</p>
+    <div id="UndeployService">
+        <h2>Undeploy Service</h2>
+        <p>Undeploys a previously deployed service on a stand-alone Docker host or a Docker Swarm cluster</p>
         
-        <h3>Discover Parameters</h3>
+        <h3>Undeploy Service Parameters</h3>
         <table class="grid">
             <thead>
             <tr>
@@ -608,23 +621,43 @@ For more information on docker networking, see <a href="https://docs.docker.com/
             <tbody>
             
             <tr>
-                <td class="required">Docker Compose File Content</td>
-                <td>Docker Compose YAML File Content</td>
+                <td class="required">Service Name</td>
+                <td>The name of the service in ElectricFlow that encapsulates the service that was previously deployed on a stand-alone Docker host or a Docker Swarm cluster. Please note that this name will be modified to comply with the naming conventions of Docker. Specifically characters such as "space , _ " will be converted to "-".</td>
             </tr>
             
             <tr>
-                <td class="required">Project</td>
-                <td>Name of the project in which application would be created.</td>
+                <td >Service Revision ID</td>
+                <td>Revision Id of the service in ElectricFlow.</td>
             </tr>
             
             <tr>
-                <td class="required">Application</td>
-                <td>Name of the application to be created as part of discovery.</td>
+                <td class="required">Project Name</td>
+                <td>The name of the project that the service belongs to. In case of an application-level service it also owns the application.</td>
             </tr>
             
             <tr>
-                <td >Recreate application</td>
-                <td>Whether the application should be deleted if it already exists before recreating it based on the Docker Compose file content. If not checked, and the application already exists, the application will not be modified.</td>
+                <td >Application Name</td>
+                <td>The name of the application that the service belongs to. Not applicable for a top-level service.</td>
+            </tr>
+            
+            <tr>
+                <td >Application Revision ID</td>
+                <td>Revision Id of the application version that the service belongs to.</td>
+            </tr>
+            
+            <tr>
+                <td class="required">Environment Name</td>
+                <td>The name of the environment that the cluster belongs to.</td>
+            </tr>
+            
+            <tr>
+                <td >Environment Project Name</td>
+                <td>The name of the project that the environment belongs to. If not specified, the environment is assumed to be in the same project as the service.</td>
+            </tr>
+            
+            <tr>
+                <td >Cluster Name</td>
+                <td>The name of the cluster in the environment on which the service was previously deployed. If not specified, the application tier mapping will be used to find the cluster name.</td>
             </tr>
             
             </tbody>
@@ -735,7 +768,12 @@ CMD [${COMMAND}]
             
             <tr>
                 <td class="required">Artifact Name</td>
-                <td>Artifact name in form group:artifact:version. Artifact will be taken from EF repository.</td>
+                <td>Artifact name in form group:artifact. Artifact will be taken from EF repository.</td>
+            </tr>
+            
+            <tr>
+                <td >Artifact Version</td>
+                <td>Artifact version for retrieval, e.g. 0.0.1. If left empty, latest artifact version will be retrieved.</td>
             </tr>
             
             <tr>
@@ -777,17 +815,52 @@ CMD [${COMMAND}]
         </td>
             </tr>
             
+            <tr>
+                <td >Remove Image After Push?</td>
+                <td>If checked, the built image will be removed from the machine after it is pushed to the registry.</td>
+            </tr>
+            
             </tbody>
         </table>
         
     </div>
 
     
-    <div id="CreateIngress">
-        <h2>Create Ingress</h2>
-        <p>Configures default ingress network in Docker Swarm cluster</p>
+    <div id="DeployService">
+        <h2>Deploy Service</h2>
+        <p>Deploys or updates a service on a stand-alone Docker host or a Docker Swarm cluster</p>
         
-        <h3>Create Ingress Parameters</h3>
+            <p>
+User can provide a comma-separated list of networks on which to deploy the container or the swarm service in the service mapping page when mapping the service to a cluster in ElectricFlow. If the network does not already exist then the procedure will create one with the provided subnet and gateway. If no subnet and gateway is specified, Docker uses default values. Each of the user-defined networks can have multiple subnets and gateways. In that case, multiple subnets/gateways must be separated by '|'(pipe). If deploying to a stand-alone Docker engine then the user-defined <b>"bridge"</b> network is created.  If deploying to a Docker swarm cluster then the user-defined <b>"overlay"</b> network is created.
+</p>
+<p>
+For example,
+<table class="grid">
+<thead>
+    <tr>
+        <td>Networks:</td>
+        <td>bridge, net1, net2</td>
+    </tr>
+</thead>
+<tbody>
+    <tr>
+        <td>Subnets:</td>
+        <td>,10.200.1.10/24|10.200.2.10/24,198.168.10.10/24</td>
+    </tr>
+    <tr>
+        <td>Gateways:</td>
+        <td>,10.200.1.1|10.200.2.1,198.168.10.1</td>
+    </tr>
+</tbody>
+</table>
+In this example, container gets attached to bridge, net1 and net2 networks. "bridge" network is already created by Docker and no need to specify subnet/gateway for it. "net1" and "net2" are user defined networks. "net1" have two subnet IP ranges i.e. 10.200.1.10/24(Gateway:10.200.1.1) and 10.200.2.10/24(Gateway:10.200.2.1) while "net2" have single subnet IP range i.e. 198.168.10.10/24(Gateway:198.168.10.1).
+</p>
+<p>
+For more information on docker networking, see <a href="https://docs.docker.com/engine/userguide/networking/">here</a>
+</p>
+
+        
+        <h3>Deploy Service Parameters</h3>
         <table class="grid">
             <thead>
             <tr>
@@ -798,123 +871,88 @@ CMD [${COMMAND}]
             <tbody>
             
             <tr>
-                <td class="required">Configuration</td>
-                <td>Name of plugin configuration to use.</td>
+                <td class="required">Service Name</td>
+                <td>The name of the service in ElectricFlow that encapsulates the service to be deployed on a stand-alone Docker host or a Docker Swarm cluster. Please note that this name will be modified to comply with the naming conventions of Docker. Specifically characters such as "space , _ " will be converted to "-".</td>
             </tr>
             
             <tr>
-                <td class="required">Name</td>
-                <td>Name of ingress network to create.</td>
-            </tr>
-            
-            <tr>
-                <td >Subnets</td>
-                <td>Comma separated (CSV) list of subnets to create in ingress network. </td>
-            </tr>
-            
-            <tr>
-                <td >Gateways</td>
-                <td>Comma separated (CSV) list of gateways for subnets mentioned in "Subnets" field.</td>
-            </tr>
-            
-            <tr>
-                <td >Enable IPv6</td>
-                <td>Enable IPv6 on the network</td>
-            </tr>
-            
-            <tr>
-                <td >MTU</td>
-                <td>MTU to set to ingress network</td>
-            </tr>
-            
-            <tr>
-                <td >Labels</td>
-                <td>Comma separated list of key=value pairs to assign to ingress network.</td>
-            </tr>
-            
-            </tbody>
-        </table>
-        
-    </div>
-
-    
-    <div id="DeleteNetwork">
-        <h2>Delete Network</h2>
-        <p>Deletes a network</p>
-        
-        <h3>Delete Network Parameters</h3>
-        <table class="grid">
-            <thead>
-            <tr>
-                <th>Parameter</th>
-                <th>Description</th>
-            </tr>
-            </thead>
-            <tbody>
-            
-            <tr>
-                <td class="required">Configuration</td>
-                <td>Name of plugin configuration to use.</td>
-            </tr>
-            
-            <tr>
-                <td class="required">Network Name</td>
-                <td>Name of the network to delete.</td>
-            </tr>
-            
-            </tbody>
-        </table>
-        
-    </div>
-
-    
-    <div id="ImportMicroservices">
-        <h2>Import Microservices</h2>
-        <p>Import microcervices using Docker Compose file and creates corresponding application models for them in ElectricFlow</p>
-        
-        <h3>Import Microservices Parameters</h3>
-        <table class="grid">
-            <thead>
-            <tr>
-                <th>Parameter</th>
-                <th>Description</th>
-            </tr>
-            </thead>
-            <tbody>
-            
-            <tr>
-                <td class="required">Docker Compose file</td>
-                <td>Docker Compose file contents</td>
+                <td >Service Revision ID</td>
+                <td>Revision Id of the service in ElectricFlow.</td>
             </tr>
             
             <tr>
                 <td class="required">Project Name</td>
-                <td>The name of project in which the application or the services will be created.</td>
-            </tr>
-            
-            <tr>
-                <td >Create application-scoped microservices</td>
-                <td>Whether all the services defined in the Docker Compose file should be created within one application in ElectricFlow. If checked, then the application name must be provided.</td>
+                <td>The name of the project that the service belongs to. In case of an application-level service it also owns the application.</td>
             </tr>
             
             <tr>
                 <td >Application Name</td>
-                <td>The name of the application to create, within which the microservices will be created. Required if 'Create application-scoped microservices' is checked.</td>
+                <td>The name of the application that the service belongs to. Not applicable for a top-level service.</td>
             </tr>
             
             <tr>
-                <td class="required">Environment Project Name</td>
-                <td>The name of project that the environment belongs to.</td>
-            </tr>
-            
-            <tr>
-                <td class="required">Environment Name</td>
-                <td>The name of the environment containing the cluster where the newly created microservice(s) will be deployed.</td>
+                <td >Application Revision ID</td>
+                <td>Revision Id of the application version that the service belongs to.</td>
             </tr>
             
             <tr>
                 <td class="required">Cluster Name</td>
-                <td>The name of the EC-Docker backed cluster within the environment where the newly created microservice(s) will be deployed.</td>
+                <td>The name of the cluster in ElectricFlow that encapsulates the stand-alone Docker host or a Docker Swarm cluster on which the service is to be deployed.</td>
+            </tr>
+            
+            <tr>
+                <td >Cluster Or Environment Project Name</td>
+                <td>The name of the project that the cluster belongs to if it is a top-level project cluster. Or the name of the project that the environment belongs to if it is an environment-scoped cluster.</td>
+            </tr>
+            
+            <tr>
+                <td >Environment Name</td>
+                <td>The name of the environment that the cluster belongs to. Not applicable for a top-level project cluster.</td>
+            </tr>
+            
+            <tr>
+                <td >Results Property Sheet</td>
+                <td>Name of the property sheet where the output properties for the deployed service will be saved. If not specified, will default to '/myParent/parent'.</td>
+            </tr>
+            
+            </tbody>
+        </table>
+        
+    </div>
+
+    
+    <div id="Discover">
+        <h2>Discover (DEPRECATED)</h2>
+        <p>Discovers services in Docker Compose file and creates corresponding application models for them in ElectricFlow</p>
+        
+        <h3>Discover Parameters</h3>
+        <table class="grid">
+            <thead>
+            <tr>
+                <th>Parameter</th>
+                <th>Description</th>
+            </tr>
+            </thead>
+            <tbody>
+            
+            <tr>
+                <td class="required">Docker Compose File Content</td>
+                <td>Docker Compose YAML File Content</td>
+            </tr>
+            
+            <tr>
+                <td class="required">Project</td>
+                <td>Name of the project in which application would be created.</td>
+            </tr>
+            
+            <tr>
+                <td class="required">Application</td>
+                <td>Name of the application to be created as part of discovery.</td>
+            </tr>
+            
+            <tr>
+                <td >Recreate application</td>
+                <td>Whether the application should be deleted if it already exists before recreating it based on the Docker Compose file content. If not checked, and the application already exists, the application will not be modified.</td>
             </tr>
             
             </tbody>
@@ -934,15 +972,19 @@ CMD [${COMMAND}]
     <ul>
         
         <li>Added <i>Import Microservices</i> procedure.</li>
+
+        <li>Discover procedure is <i>Deprecated</i>. Use the "Import Microservices" procedure to create microservice models based on the given Docker Compose file contents</li>
         
-        <li>Added __Artifact2Image__procedure.</li>
+        <li>Added <i>Artifact2Image<i> procedure.</li>
+        
+        <li>Internal improvements for 8.3 release.</li>
         
     </ul>
     
     <h3>@PLUGIN_KEY@ 1.2.2</h3>
     <ul>
         
-        <li>Registered the <i>Undeploy Service</i> procedure as an <i>undeployService</i> operation to enable undeploying micro-services modeled in ElectricFlow from Docker using the service process.</li>
+        <li>Registered the <i>Undeploy Service</i> procedure as an <i>Undeploy Service</i> operation to enable undeploying micro-services modeled in ElectricFlow from Docker using the service process.</li>
         
         <li>Added <i>Create Ingress</i> and <i>Delete Network</i> procedures.</li>
         
@@ -955,10 +997,10 @@ CMD [${COMMAND}]
     <h3>@PLUGIN_KEY@ 1.2.1</h3>
     <ul>
         
-        <li>Added support for Docker network creation
+        <li>Added support for Docker network creation.
 <ul>
-    <li>For Stand-alone Docker instances, <i>Deploy Service</i> procedure creates a user defined bridge network if network name given in service mapping page. Procedure uses this network to deploy containers.</li>
-    <li>For Docker Swarm instances, <i>Deploy Service</i> procedure creates a user defined overlay network if network name given in service mapping page. Procedure uses this network to deploy Docker Swarm services.</li>
+  <li>For Stand-alone Docker instances, <i>Deploy Service</i> procedure creates a user defined bridge network if network name given in service mapping page. Procedure uses this network to deploy containers.</li>
+  <li>For Docker Swarm instances, <i>Deploy Service</i> procedure creates a user defined overlay network if network name given in service mapping page. Procedure uses this network to deploy Docker Swarm services.</li>
 </ul>
 </li>
         
@@ -970,6 +1012,9 @@ CMD [${COMMAND}]
         <li>Added support for deploying micro-services modeled in ElectricFlow to Docker. Deploying micro-services to the following Docker environments are supported:
 <ul>
   <li>Stand-alone Docker instances</li>
+  <li>Docker Swarm</li>
+  <li>Docker Enterprise Edition</li>
+  <li>Windows Docker containers on Windows 2016</li>
   <li>Docker Swarm</li>
   <li>Docker Enterprise Edition</li>
   <li>Windows Docker containers on Windows 2016</li>

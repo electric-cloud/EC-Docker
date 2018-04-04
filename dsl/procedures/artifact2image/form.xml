@@ -27,7 +27,7 @@
         <type>entry</type>
         <label>Artifact Name:</label>
         <property>ecp_docker_artifactName</property>
-        <required>1</required>
+        <required>0</required>
         <documentation>Artifact name in form group:artifact. Artifact will be taken from EF repository.</documentation>
     </formElement>
     <formElement>
@@ -36,6 +36,13 @@
         <required>0</required>
         <property>ecp_docker_versionRange</property>
         <documentation>Artifact version for retrieval, e.g. 0.0.1. If left empty, latest artifact version will be retrieved.</documentation>
+    </formElement>
+    <formElement>
+        <type>textarea</type>
+        <label>Artifact Filesystem Location:</label>
+        <required>0</required>
+        <property>ecp_docker_artifactLocation</property>
+        <documentation>Path to the folder where the artifact was retrieved or to the artifact itself, e.g. /myArtifactStorage/artifact.war or /my-storage/artifact1/.</documentation>
     </formElement>
     <formElement>
         <type>entry</type>
@@ -151,5 +158,14 @@
         <required>0</required>
         <documentation>Multi-line name=value pairs. If specified, merge with any existing environment variables defined in the template DockerFile for the artifact.
         </documentation>
+    </formElement>
+    <formElement>
+        <type>checkbox</type>
+        <label>Remove Image After Push?:</label>
+        <property>ecp_docker_removeAfterPush</property>
+        <required>0</required>
+        <checkedValue>true</checkedValue>
+        <uncheckedValue>false</uncheckedValue>
+        <documentation>If checked, the built image will be removed from the machine after it is pushed to the registry.</documentation>
     </formElement>
 </editor>

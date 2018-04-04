@@ -8,7 +8,7 @@ procedure 'Check Cluster',
       subprocedure: 'Setup',
       command: null,
       errorHandling: 'failProcedure',
-      exclusiveMode: 'none',
+      exclusiveMode: 'call',
       postProcessor: 'postp',
       releaseMode: 'none',
       timeLimitUnits: 'minutes', {
@@ -23,6 +23,7 @@ procedure 'Check Cluster',
 	  postProcessor: 'postp',
 	  releaseMode: 'none',
 	  shell: 'ec-groovy',
+	  resourceName: '$[grabbedResource]',
 	  timeLimitUnits: 'minutes'
 	  
 }

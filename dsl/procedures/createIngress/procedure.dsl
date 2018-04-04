@@ -8,7 +8,7 @@ procedure 'Create Ingress',
       subprocedure: 'Setup',
       command: null,
       errorHandling: 'failProcedure',
-      exclusiveMode: 'none',
+      exclusiveMode: 'call',
       postProcessor: 'postp',
       releaseMode: 'none',
       timeLimitUnits: 'minutes', {
@@ -22,5 +22,6 @@ procedure 'Create Ingress',
       exclusiveMode: 'none',
       releaseMode: 'none',
       shell: 'ec-groovy',
+      resourceName: '$[grabbedResource]',
       timeLimitUnits: 'minutes'
    }
