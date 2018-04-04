@@ -259,6 +259,7 @@ runProcedure(
         process.waitForOrKill(10 * 1000)
         logger.debug("STDOUT: $stdout")
         logger.debug("STDERR: $stderr")
+        logger.debug("Exit code: ${process.exitValue()}")
         def text = "$stdout\n$stderr"
         assert process.exitValue() == 0
         text
