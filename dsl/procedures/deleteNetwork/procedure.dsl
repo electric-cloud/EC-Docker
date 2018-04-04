@@ -21,6 +21,7 @@ procedure 'Delete Network',
       errorHandling: 'abortProcedure',
       exclusiveMode: 'none',
       releaseMode: 'none',
+      resourceName: '$[grabbedResource]',
       shell: 'ec-groovy',
       timeLimitUnits: 'minutes'
    }

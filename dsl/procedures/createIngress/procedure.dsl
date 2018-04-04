@@ -22,5 +22,6 @@ procedure 'Create Ingress',
       exclusiveMode: 'none',
       releaseMode: 'none',
       shell: 'ec-groovy',
+      resourceName: '$[grabbedResource]',
       timeLimitUnits: 'minutes'
    }
