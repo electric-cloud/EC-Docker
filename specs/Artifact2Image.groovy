@@ -249,16 +249,19 @@ runProcedure(
         dockerfile
     }
 
+
     def runCommand(command) {
-        logger.info("Command: $command")
+        logger.debug("Command: $command")
+        def stdout = new StringBuilder()
+        def stderr = new StringBuilder()
         def process = command.execute()
-        process.waitFor()
-        String text = process.text
-        logger.info(text)
-        if (text) {
-            return text
-        }
+        process.consumeProcessOutput(stdout, stderr)
+        process.waitForOrKill(10 * 1000)
+        logger.debug("STDOUT: $stdout")
+        logger.debug("STDERR: $stderr")
+        def text = "$stdout\n$stderr"
         assert process.exitValue() == 0
+        text
     }
 
     def publishArtifact(String artifactName, String version, String resName) {
@@ -274,10 +277,12 @@ runProcedure(
         assert ectool.exists()
         logger.debug(ectool.absolutePath.toString())
 
-        runCommand("${ectool.absolutePath} --server $commanderServer login $username $password")
-        runCommand("${ectool.absolutePath} --server $commanderServer deleteArtifactVersion ${artifactName}:${version}")
+        String command = "${ectool.absolutePath} --server $commanderServer "
+        runCommand("${command} login ${username} ${password}")
 
-        String publishCommand = "${ectool.absolutePath} --server ${commanderServer} publishArtifactVersion --version $version --artifactName ${artifactName} "
+        runCommand("${command} deleteArtifactVersion ${artifactName}:${version}")
+
+        String publishCommand = "${command} publishArtifactVersion --version $version --artifactName ${artifactName} "
         if (resource.directory) {
             publishCommand += "--fromDirectory ${resource}"
         }
