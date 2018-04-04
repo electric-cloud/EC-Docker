@@ -7,7 +7,7 @@ use ElectricCommander::ArtifactManagement::ArtifactVersion;
 use Cwd qw(getcwd);
 use File::Spec;
 
-
+$|=1;
 
 my $ec = ElectricCommander->new();
 
@@ -96,18 +96,38 @@ sub retrieveArtifactFromArtifactory {
         };
     }
 
-    print Dumper $actualParameters;
+    my $random = int rand 99999999;
+    my $destinationProperty = "/myJob/retrievedArtifact${random}";
 
-
+    push @$actualParameters, {
+        actualParameterName => 'resultPropertySheet',
+        value               => $destinationProperty,
+    };
     my $xpath = $ec->createJobStep({
         subprocedure    => 'Retrieve Artifact from Artifactory',
         subproject      => '/plugins/EC-Artifactory/project',
         actualParameter => $actualParameters,
     });
 
-    print $xpath->{_xml};
+    my $jobStepId = $xpath->findvalue('//jobStepId')->string_value;
+    my $status = '';
+    my $initialDelay = 5;
+    my $delay = $initialDelay;
+    while ($status ne 'completed') {
+        $status = $ec->getJobStepStatus({jobStepId => $jobStepId})->findvalue('//status')->string_value;
+        sleep($delay);
+        $delay *= 1.2;
+    }
 
+    my $fullExtractionPath;
+    eval {
+        $fullExtractionPath = $ec->getProperty("$destinationProperty/$artifactName/fullExtractionPath")->findvalue('//value')->string_value;
+    };
+    if ($fullExtractionPath) {
+        $destination = $fullExtractionPath;
+    }
     $ec->setProperty("/myJob/$artifactName/location", $destination);
+    $ec->deleteProperty($destinationProperty);
 }
 
 
