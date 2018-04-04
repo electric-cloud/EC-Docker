@@ -256,7 +256,7 @@ runProcedure(
         def stderr = new StringBuilder()
         def process = command.execute()
         process.consumeProcessOutput(stdout, stderr)
-        process.waitForOrKill(10 * 1000)
+        process.waitForOrKill(20 * 1000)
         logger.debug("STDOUT: $stdout")
         logger.debug("STDERR: $stderr")
         logger.debug("Exit code: ${process.exitValue()}")
