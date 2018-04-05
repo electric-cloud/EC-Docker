@@ -111,12 +111,11 @@ public class ImportMicroservices extends EFClient {
         ]
 
         // Service Fields
-        efService.service.defaultCapacity = serviceConfig.deploy?.replicas
-        if (serviceConfig.deploy?.replicas && serviceConfig.deploy?.updateConfig?.parallelism) {
-            efService.service.minCapacity = serviceConfig.deploy?.updateConfig?.parallelism - serviceConfig.deploy?.replicas
-        } else {
-            efService.service.minCapacity = serviceConfig.deploy?.updateConfig?.parallelism
-        }
+        def defaultCapacity = serviceConfig.deploy?.replicas ?: 1
+        def minCapacity = serviceConfig.deploy?.updateConfig?.parallelism ?: 1
+
+        efService.service.defaultCapacity = defaultCapacity
+        efService.service.minCapacity = defaultCapacity - minCapacity
 
         // image
         def image = ''

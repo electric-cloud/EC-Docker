@@ -575,8 +575,7 @@ public class DockerClient extends BaseClient {
  
         
         int replicas = args.defaultCapacity?args.defaultCapacity.toInteger():1
-        
-        int updateParallelism = args.minCapacity?args.minCapacity.toInteger():1
+        int updateParallelism = args.minCapacity? replicas - args.minCapacity.toInteger() : replicas - 1
         
         def networkList = getNetworkList(args)
 
@@ -678,6 +677,12 @@ public class DockerClient extends BaseClient {
     def pushImage(String name, String auth, String registry) {
         def response = dockerClient.push(name, auth, registry)
         logger INFO, "Pushed image $name. Response $response\n"
+        return response
+    }
+
+    def removeImage(String imageId) {
+        def response = dockerClient.rmi(imageId)
+        logger INFO, "Removed image ${imageId}. Response ${response}."
         return response
     }
 

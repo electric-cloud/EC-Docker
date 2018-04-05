@@ -1,6 +1,7 @@
 import spock.lang.*
 import com.electriccloud.spec.*
 
+@Ignore
 class Artifact2Image extends DockerHelper {
     static def projectName = 'EC-Docker Specs Artifact2Image'
     static def configName = 'EC-Docker Specs'
@@ -255,8 +256,10 @@ runProcedure(
         process.waitFor()
         String text = process.text
         logger.info(text)
+        if (text) {
+            return text
+        }
         assert process.exitValue() == 0
-        text
     }
 
     def publishArtifact(String artifactName, String version, String resName) {

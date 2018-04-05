@@ -1,11 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ivy-module version="2.0" xmlns:m="http://ant.apache.org/ivy/maven">
-	<info organisation="org.scijava"
-		module="native-lib-loader"
-		revision="2.0.2"
-		status="release"
-		publication="20140821073800"
-	>
+	<info organisation="org.scijava" module="native-lib-loader" revision="2.0.2" status="release" publication="20140821173800">
 		<description homepage="http://github.com/scijava/native-lib-loader">
 		A library for loading native libraries.
 		</description>
