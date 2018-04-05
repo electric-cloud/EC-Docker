@@ -201,7 +201,7 @@ public class ImportMicroservices extends EFClient {
                 memorySize: convertToMBs(serviceConfig.deploy?.resources?.reservations?.memory),
                 cpuLimit: serviceConfig.deploy?.resources?.limits?.nanoCpus,
                 cpuCount: serviceConfig.deploy?.resources?.reservations?.nanoCpus,
-                volumeMount: containerVolumeValue,
+                volumeMount:  new JsonBuilder(containerVolumeValue).toString(),
             ports: containerPorts
         ]
 
@@ -472,18 +472,27 @@ public class ImportMicroservices extends EFClient {
 
     def createEFService(projectName, service, applicationName) {
         def payload = service.service
+        def container = service.container
         def serviceName = payload.serviceName
         payload.description = "Created by EF Import Microservices"
-        ElectricFlow ef  = new ElectricFlow();
+        ElectricFlow ef  = new ElectricFlow()
         if(applicationName.equals('')) applicationName = null
-        // TO DO
-        ef.createService(projectName: projectName , serviceName: payload?.serviceName, addDeployProcess: payload?.addDeployProcess, applicationName:  applicationName,
-                defaultCapacity: payload?.defaultCapacity, description: payload?.description, maxCapacity: payload?.maxCapacity, minCapacity: payload?.minCapacity,
-                volume: payload?.volume)
-        //_createService (args.projectName, args.serviceName, args.addDeployProcess, args.applicationName, args.defaultCapacity, args.description,
-        // args.maxCapacity, args.minCapacity, args.volume, onSuccess, onFailure)
-        //def result = createService(projectName, payload)
-        //result
+        def volumeParam = [
+                "name": payload?.volume,
+                "mountPath": container?.volumeMount
+        ]
+        Map argsForService = [
+                projectName: projectName,
+                serviceName: payload?.serviceName,
+                addDeployProcess: payload?.addDeployProcess,
+                applicationName:  applicationName,
+                defaultCapacity: payload?.defaultCapacity.toString(),
+                description: payload?.description,
+                maxCapacity: payload?.maxCapacity,
+                minCapacity: payload?.minCapacity,
+                volume: new JsonBuilder(volumeParam).toString()
+        ]
+        ef.createService(argsForService)
         if (!applicationName) {
             // Add deploy process for top-level service
             createDeployProcess(projectName, serviceName)
