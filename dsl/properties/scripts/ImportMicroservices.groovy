@@ -488,8 +488,8 @@ public class ImportMicroservices extends EFClient {
                 applicationName:  applicationName,
                 defaultCapacity: payload?.defaultCapacity.toString(),
                 description: payload?.description,
-                maxCapacity: payload?.maxCapacity,
-                minCapacity: payload?.minCapacity,
+                maxCapacity: payload?.maxCapacity.toString(),
+                minCapacity: payload?.minCapacity.toString(),
                 volume: new JsonBuilder(volumeParam).toString()
         ]
         ef.createService(argsForService)
