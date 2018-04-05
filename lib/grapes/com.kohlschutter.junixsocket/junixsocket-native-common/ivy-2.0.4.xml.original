@@ -1,112 +1,47 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-  <parent>
-    <artifactId>junixsocket-parent</artifactId>
-    <groupId>com.kohlschutter.junixsocket</groupId>
-    <version>2.0.4</version>
-  </parent>
-  <modelVersion>4.0.0</modelVersion>
-  <artifactId>junixsocket-native-common</artifactId>
-  <name>junixsocket-native-common</name>
-  <build>
-    <plugins>
-      <plugin>
-        <artifactId>maven-shade-plugin</artifactId>
-        <version>2.3</version>
-        <executions>
-          <execution>
-            <phase>package</phase>
-            <goals>
-              <goal>shade</goal>
-            </goals>
-            <configuration>
-              <artifactSet>
-                <includes>
-                  <include>com.kohlschutter.junixsocket:junixsocket-native</include>
-                </includes>
-              </artifactSet>
-              <promoteTransitiveDependencies>true</promoteTransitiveDependencies>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-      <plugin>
-        <groupId>com.github.maven-nar</groupId>
-        <artifactId>nar-maven-plugin</artifactId>
-        <version>3.2.0</version>
-        <extensions>true</extensions>
-      </plugin>
-    </plugins>
-  </build>
-  <profiles>
-    <profile>
-      <id>x86_64-MacOSX-gpp-jni</id>
-      <dependencies>
-        <dependency>
-          <groupId>com.kohlschutter.junixsocket</groupId>
-          <artifactId>junixsocket-native</artifactId>
-          <version>${project.version}</version>
-          <type>nar</type>
-          <classifier>x86_64-MacOSX-gpp-jni</classifier>
-        </dependency>
-      </dependencies>
-    </profile>
-    <profile>
-      <id>amd64-Linux-gpp-jni</id>
-      <dependencies>
-        <dependency>
-          <groupId>com.kohlschutter.junixsocket</groupId>
-          <artifactId>junixsocket-native</artifactId>
-          <version>${project.version}</version>
-          <type>nar</type>
-          <classifier>amd64-Linux-gpp-jni</classifier>
-        </dependency>
-      </dependencies>
-    </profile>
-    <profile>
-      <id>release</id>
-      <dependencies>
-        <dependency>
-          <groupId>com.kohlschutter.junixsocket</groupId>
-          <artifactId>junixsocket-native</artifactId>
-          <version>2.0.4</version>
-          <type>nar</type>
-          <classifier>x86_64-MacOSX-gpp-jni</classifier>
-          <scope>compile</scope>
-        </dependency>
-        <dependency>
-          <groupId>com.kohlschutter.junixsocket</groupId>
-          <artifactId>junixsocket-native</artifactId>
-          <version>2.0.4</version>
-          <type>nar</type>
-          <classifier>amd64-Linux-gpp-jni</classifier>
-          <scope>compile</scope>
-        </dependency>
-      </dependencies>
-    </profile>
-  </profiles>
-  <dependencies>
-    <dependency>
-      <groupId>com.kohlschutter.junixsocket</groupId>
-      <artifactId>junixsocket-common</artifactId>
-      <version>2.0.4</version>
-      <scope>compile</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.scijava</groupId>
-      <artifactId>native-lib-loader</artifactId>
-      <version>2.0.2</version>
-      <scope>compile</scope>
-    </dependency>
-    <dependency>
-      <groupId>log4j</groupId>
-      <artifactId>log4j</artifactId>
-      <version>1.2.17</version>
-      <scope>compile</scope>
-    </dependency>
-  </dependencies>
-  <properties>
-    <kohlschutter.project.base.directory>${project.parent.basedir}</kohlschutter.project.base.directory>
-  </properties>
-</project>
-
+<ivy-module version="2.0" xmlns:m="http://ant.apache.org/ivy/maven">
+	<info organisation="com.kohlschutter.junixsocket"
+		module="junixsocket-native-common"
+		revision="2.0.4"
+		status="release"
+		publication="20141201084500"
+	>
+		<description homepage="" />
+		<m:properties__kohlschutter.project.base.directory>${project.parent.basedir}</m:properties__kohlschutter.project.base.directory>
+		<m:properties__eclipse.checkstyle.config>${coding.style.eclipse.dir}/checkstyle-configuration.xml</m:properties__eclipse.checkstyle.config>
+		<m:properties__maven.compiler.target>1.7</m:properties__maven.compiler.target>
+		<m:properties__coding.style.eclipse.dir>${kohlschutter.project.base.directory}/eclipse</m:properties__coding.style.eclipse.dir>
+		<m:properties__file.encoding>UTF-8</m:properties__file.encoding>
+		<m:properties__eclipse.formatter.config>${coding.style.eclipse.dir}/eclipse-formatter-config.xml</m:properties__eclipse.formatter.config>
+		<m:properties__maven.compiler.source>1.7</m:properties__maven.compiler.source>
+		<m:properties__maven.compile.encoding>UTF-8</m:properties__maven.compile.encoding>
+		<m:properties__project.build.sourceEncoding>UTF-8</m:properties__project.build.sourceEncoding>
+		<m:properties__eclipse.jdt.core.prefs>${coding.style.eclipse.dir}/java7-strict-org.eclipse.jdt.core.prefs</m:properties__eclipse.jdt.core.prefs>
+		<m:properties__project.build.resourceEncoding>UTF-8</m:properties__project.build.resourceEncoding>
+		<m:maven.plugins>null__maven-compiler-plugin__null|null__maven-source-plugin__null|org.apache.maven.plugins__maven-javadoc-plugin__null|com.googlecode.maven-java-formatter-plugin__maven-java-formatter-plugin__null|com.mycila__license-maven-plugin__null|org.codehaus.mojo__versions-maven-plugin__null|null__maven-scm-plugin__null|org.sonatype.plugins__nexus-staging-maven-plugin__null|null__maven-compiler-plugin__null|null__maven-source-plugin__null|org.apache.maven.plugins__maven-javadoc-plugin__null|com.googlecode.maven-java-formatter-plugin__maven-java-formatter-plugin__null|com.mycila__license-maven-plugin__null|org.codehaus.mojo__versions-maven-plugin__null|null__maven-scm-plugin__null|org.sonatype.plugins__nexus-staging-maven-plugin__null|null__maven-compiler-plugin__null|null__maven-source-plugin__null|org.apache.maven.plugins__maven-javadoc-plugin__null|com.googlecode.maven-java-formatter-plugin__maven-java-formatter-plugin__null|com.mycila__license-maven-plugin__null|org.codehaus.mojo__versions-maven-plugin__null|null__maven-scm-plugin__null|org.sonatype.plugins__nexus-staging-maven-plugin__null|null__maven-compiler-plugin__null|null__maven-source-plugin__null|org.apache.maven.plugins__maven-javadoc-plugin__null|com.googlecode.maven-java-formatter-plugin__maven-java-formatter-plugin__null|com.mycila__license-maven-plugin__null|org.codehaus.mojo__versions-maven-plugin__null|null__maven-scm-plugin__null|org.sonatype.plugins__nexus-staging-maven-plugin__null|null__maven-shade-plugin__2.3|com.github.maven-nar__nar-maven-plugin__3.2.0</m:maven.plugins>
+	</info>
+	<configurations>
+		<conf name="default" visibility="public" description="runtime dependencies and master artifact can be used with this conf" extends="runtime,master"/>
+		<conf name="master" visibility="public" description="contains only the artifact published by this module itself, with no transitive dependencies"/>
+		<conf name="compile" visibility="public" description="this is the default scope, used if none is specified. Compile dependencies are available in all classpaths."/>
+		<conf name="provided" visibility="public" description="this is much like compile, but indicates you expect the JDK or a container to provide it. It is only available on the compilation classpath, and is not transitive."/>
+		<conf name="runtime" visibility="public" description="this scope indicates that the dependency is not required for compilation, but is for execution. It is in the runtime and test classpaths, but not the compile classpath." extends="compile"/>
+		<conf name="test" visibility="private" description="this scope indicates that the dependency is not required for normal use of the application, and is only available for the test compilation and execution phases." extends="runtime"/>
+		<conf name="system" visibility="public" description="this scope is similar to provided except that you have to provide the JAR which contains it explicitly. The artifact is always available and is not looked up in a repository."/>
+		<conf name="sources" visibility="public" description="this configuration contains the source artifact of this module, if any."/>
+		<conf name="javadoc" visibility="public" description="this configuration contains the javadoc artifact of this module, if any."/>
+		<conf name="optional" visibility="public" description="contains all optional dependencies"/>
+	</configurations>
+	<publications>
+		<artifact name="junixsocket-native-common" type="jar" ext="jar" conf="master"/>
+		<artifact name="junixsocket-native-common" type="source" ext="jar" conf="sources" m:classifier="sources"/>
+		<artifact name="junixsocket-native-common" type="javadoc" ext="jar" conf="javadoc" m:classifier="javadoc"/>
+	</publications>
+	<dependencies>
+		<dependency org="com.kohlschutter.junixsocket" name="junixsocket-common" rev="2.0.4" force="true" conf="compile->compile(*),master(*);runtime->runtime(*)"/>
+		<dependency org="org.scijava" name="native-lib-loader" rev="2.0.2" force="true" conf="compile->compile(*),master(*);runtime->runtime(*)"/>
+		<dependency org="log4j" name="log4j" rev="1.2.17" force="true" conf="compile->compile(*),master(*);runtime->runtime(*)"/>
+		<dependency org="junit" name="junit" rev="4.11" force="true" conf="test->runtime(*),master(*)"/>
+		<dependency org="log4j" name="log4j" rev="1.2.17" force="true" conf="compile->compile(*),master(*);runtime->runtime(*)"/>
+	</dependencies>
+</ivy-module>

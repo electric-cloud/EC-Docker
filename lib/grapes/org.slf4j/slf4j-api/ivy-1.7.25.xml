@@ -1,11 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ivy-module version="2.0" xmlns:m="http://ant.apache.org/ivy/maven">
-	<info organisation="org.slf4j"
-		module="slf4j-api"
-		revision="1.7.25"
-		status="release"
-		publication="20170316093632"
-	>
+	<info organisation="org.slf4j" module="slf4j-api" revision="1.7.25" status="release" publication="20170316183632">
 		<description homepage="http://www.slf4j.org">
 		The slf4j API
 		</description>

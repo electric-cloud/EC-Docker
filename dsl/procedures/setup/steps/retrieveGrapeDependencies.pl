@@ -43,7 +43,7 @@ sub main() {
     my $ec = ElectricCommander->new();
     $ec->abortOnError(1);
 
-    retrieveGrapeDependency($ec, 'com.electriccloud:EC-Docker-Grapes:1.0.2');
+    retrieveGrapeDependency($ec, 'com.electriccloud:EC-Docker-Grapes:1.0.3');
     if ($::gAdditionalArtifactVersion ne '') {
         retrieveGrapeDependency($ec, $::gAdditionalArtifactVersion);
     }
@@ -80,6 +80,10 @@ sub retrieveGrapeDependency($){
 
     rcopy( $dir, $grapesDir) or die "Copy failed: $!";
     print "Retrieved and copied grape dependencies from $dir to $grapesDir\n";
+
+    my $resource = $ec->getProperty('/myJobStep/assignedResourceName')->findvalue('//value')->string_value;
+    $ec->setProperty({propertyName => '/myJob/grabbedResource', value => $resource});
+    print "Grabbed Resource: $resource\n";
 
 }
 

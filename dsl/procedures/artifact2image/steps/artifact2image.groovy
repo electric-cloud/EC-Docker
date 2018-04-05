@@ -15,22 +15,15 @@ String baseImage = '$[ecp_docker_baseImage]'
 String ports = '''$[ecp_docker_ports]'''.trim()
 String command = '''$[ecp_docker_command]'''.trim()
 String env = '''$[ecp_docker_env]'''.trim()
+String artifactFileLocation = '''$[ecp_docker_artifactLocation]'''.trim()
+boolean removeAfterPush = '$[ecp_docker_removeAfterPush]'.trim() == "true"
 
 ElectricFlow ef = new ElectricFlow()
 EFClient efClient = new EFClient()
 
-String artifactLocation = ef.getProperty(
-    propertyName: "/myJob/${artifactName}/location"
-)?.property?.value
 
-if (!artifactLocation) {
-    efClient.handleProcedureError("Artifact location property was not found")
-}
-
-
-File artifactFolder = new File(artifactLocation)
-if (!artifactFolder.exists()) {
-    efClient.handleProcedureError("Artifact location does not exist: ${artifactLocation}")
+if (artifactFileLocation && artifactName) {
+    efClient.handleProcedureError("Either artifact file location or artifact name should be provided, but not both")
 }
 
 String userName
@@ -53,9 +46,29 @@ String projectName = '$[/myProject/projectName]'
 def pluginConfig = efClient.getConfigValues('ec_plugin_cfgs', configName, projectName)
 DockerClient dockerClient = new DockerClient(pluginConfig)
 
+Artifact artifactLocator
+
+try {
+
+    if (artifactName) {
+        String artifactLocation = ef.getProperty(
+            propertyName: "/myJob/${artifactName}/location"
+        )?.property?.value
+        // From ef repository
+        artifactLocator = Artifact.fromFileSystem(new File(artifactLocation), false)
+    } else if (artifactFileLocation) {
+        artifactLocator = Artifact.fromFileSystem(new File(artifactFileLocation), true)
+    }
+    else {
+        throw new PluginException("Either artifact location or artifact name should be specified")
+    }
+} catch (PluginException e) {
+    efClient.handleProcedureError(e.getMessage())
+}
+
 def liftAndShift = new LiftAndShift(
     dockerClient: dockerClient,
-    artifactCacheDirectory: artifactFolder
+    artifact: artifactLocator,
 )
 
 String resultPropertySheet = "/myParent/parent"
@@ -67,17 +80,19 @@ try {
         BASE_IMAGE: baseImage,
         PORTS: ports
     ]
-    def artifact = liftAndShift.getArtifact()
-    String templateName = artifact.getTemplateName()
+    String templateName = artifactLocator.getTemplateName()
     String fullTemplatePath = "/projects/$[/myProject/projectName]/dockerfiles/defaults/${templateName}"
     String template = ef.getProperty(propertyName: fullTemplatePath)?.property?.value
     assert template : "Template ${templateName} is not found ($fullTemplatePath)"
 
-    File dockerfileWorkspace = liftAndShift.generateDockerfile(artifact, details, template)
+    File dockerfileWorkspace = liftAndShift.generateDockerfile(details, template)
     String imageId = liftAndShift.buildImage(imageName, dockerfileWorkspace)
     liftAndShift.pushImage(imageName, registryUrl, userName, password)
     ef.setProperty(propertyName: '/myJobStep/summary', value: "Image ID: ${imageId}")
     ef.setProperty(propertyName: "${resultPropertySheet}/${imageName}/imageId", value: imageId)
+    if (removeAfterPush) {
+        liftAndShift.removeImage(imageId)
+    }
 
 } catch (PluginException e) {
     efClient.handleProcedureError(e.getMessage())
@@ -117,3 +132,4 @@ def parseEnvVariables(String env) {
     }
     envVars
 }
+
