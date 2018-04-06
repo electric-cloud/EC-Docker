@@ -46,6 +46,67 @@
     </formElement>
     <formElement>
         <type>entry</type>
+        <label>EC-Artifactory Configuration Name:</label>
+        <property>ecp_docker_artifactoryConfigName</property>
+        <documentation>Previously defined configuiration name for EC-Artifactory plugin. Please note, that EC-Artifactory plugin must be installed and promoted.</documentation>
+        <required>0</required>
+    </formElement>
+    <formElement>
+        <type>select</type>
+        <label>Repository Type (Artifactory):</label>
+        <property>ecp_docker_artifactoryRepoType</property>
+        <documentation>Artifactory repository type. Required if Artifactory is used.</documentation>
+        <required>0</required>
+        <option>
+            <value>Maven</value>
+            <name>Maven</name>
+        </option>
+        <option>
+            <name>NuGet</name>
+            <value>NuGet</value>
+        </option>
+        <option>
+            <value>Generic</value>
+            <name>Generic</name>
+        </option>
+    </formElement>
+    <formElement>
+        <type>entry</type>
+        <label>Repository Key (Artifactory):</label>
+        <property>ecp_docker_artifactoryRepoKey</property>
+        <documentation>Repository key for the repository in Artifactory, e.g. myrepo, libs-release-local. Required if Artifactory is used.</documentation>
+        <required>0</required>
+    </formElement>
+    <formElement>
+        <type>entry</type>
+        <label>Organization Path (Artifactory):</label>
+        <property>ecp_docker_artifactoryOrgPath</property>
+        <documentation>Organization path for the artifact in Artifactory, e.g. com/mycompany. Required if Artifactory is used.</documentation>
+        <required>0</required>
+    </formElement>
+    <formElement>
+        <type>entry</type>
+        <label>Artifact Name (Artifactory):</label>
+        <property>ecp_docker_artifactoryArtifactName</property>
+        <documentation>Name of the artifact (module name) in the artifactory. E.g. my-artifact. Required if Artifactory is used.</documentation>
+        <required>0</required>
+    </formElement>
+    <formElement>
+        <type>entry</type>
+        <label>Artifact Version (Artifactory):</label>
+        <property>ecp_docker_artifactoryVersion</property>
+        <documentation>Artifact's version in Artifactory, e.g. 1.0.0. If left blank, the latest version will be retrieved (Artifactory Pro is required for non-Maven repositories to retrieve the latest version). Required if Artifactory is used.</documentation>
+        <required>0</required>
+    </formElement>
+    <formElement>
+        <type>entry</type>
+        <label>Extension (Artifactory):</label>
+        <property>ecp_docker_artifactoryExtension</property>
+        <documentation>Artifact extension, e.g. jar or war. Required if Artifactory is used.</documentation>
+        <required>0</required>
+    </formElement>
+    <formElement>
+        <type>entry</type>
         <required>1</required>
         <property>ecp_docker_imageName</property>
         <label>Image Name:</label>

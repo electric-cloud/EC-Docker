@@ -18,10 +18,9 @@ procedure 'Artifact2Image',
 	step 'download artifact',
 		command: new File(pluginDir, 'dsl/procedures/artifact2image/steps/downloadArtifact.pl').text,
 		shell: 'ec-perl',
-		errorHandling: 'abortProcedureNow',
-		condition: '$[ecp_docker_artifactName]'
+		errorHandling: 'abortProcedureNow'
 
- 
+
 	step 'artifact2image',
 		command: new File(pluginDir, 'dsl/procedures/artifact2image/steps/artifact2image.groovy').text,
 		errorHandling: 'failProcedure',
@@ -31,5 +30,5 @@ procedure 'Artifact2Image',
 		resourceName: '$[grabbedResource]',
 		shell: 'ec-groovy',
 		timeLimitUnits: 'minutes'
-	
+
 }
