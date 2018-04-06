@@ -32,6 +32,6 @@
   - Added support for attaching additional networks during container update. 
 1.3.0:
   - Added <i>Import Microservices</i> procedure.
-  - Added <i>Artifact2Image<i> procedure.
+  - Added <i>Artifact2Image</i> procedure.
   - Discover procedure is <i>Deprecated</i>. Use the "Import Microservices" procedure to create microservice models based on the given Docker Compose file contents
   - Internal improvements for 8.3 release.

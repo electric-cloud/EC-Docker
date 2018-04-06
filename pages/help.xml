@@ -113,6 +113,8 @@ More information about how to setup TLS certificates on Docker endpoint can be f
     </ul>
     
     
+    <li><a href="#knownIssues">Known Issues</a></li>
+    
     <li><a href="#releaseNotes">Release Notes</a></li>
 </ul>
     
@@ -767,13 +769,53 @@ CMD [${COMMAND}]
             </tr>
             
             <tr>
-                <td class="required">Artifact Name</td>
+                <td >Artifact Name</td>
                 <td>Artifact name in form group:artifact. Artifact will be taken from EF repository.</td>
             </tr>
             
             <tr>
                 <td >Artifact Version</td>
                 <td>Artifact version for retrieval, e.g. 0.0.1. If left empty, latest artifact version will be retrieved.</td>
+            </tr>
+            
+            <tr>
+                <td >Artifact Filesystem Location</td>
+                <td>Path to the folder where the artifact was retrieved or to the artifact itself, e.g. /myArtifactStorage/artifact.war or /my-storage/artifact1/.</td>
+            </tr>
+            
+            <tr>
+                <td >EC-Artifactory Configuration Name</td>
+                <td>Previously defined configuiration name for EC-Artifactory plugin. Please note, that EC-Artifactory plugin must be installed and promoted.</td>
+            </tr>
+            
+            <tr>
+                <td >Repository Type (Artifactory)</td>
+                <td>Artifactory repository type. Required if Artifactory is used.</td>
+            </tr>
+            
+            <tr>
+                <td >Repository Key (Artifactory)</td>
+                <td>Repository key for the repository in Artifactory, e.g. myrepo, libs-release-local. Required if Artifactory is used.</td>
+            </tr>
+            
+            <tr>
+                <td >Organization Path (Artifactory)</td>
+                <td>Organization path for the artifact in Artifactory, e.g. com/mycompany. Required if Artifactory is used.</td>
+            </tr>
+            
+            <tr>
+                <td >Artifact Name (Artifactory)</td>
+                <td>Name of the artifact (module name) in the artifactory. E.g. my-artifact. Required if Artifactory is used.</td>
+            </tr>
+            
+            <tr>
+                <td >Artifact Version (Artifactory)</td>
+                <td>Artifact's version in Artifactory, e.g. 1.0.0. If left blank, the latest version will be retrieved (Artifactory Pro is required for non-Maven repositories to retrieve the latest version). Required if Artifactory is used.</td>
+            </tr>
+            
+            <tr>
+                <td >Extension (Artifactory)</td>
+                <td>Artifact extension, e.g. jar or war. Required if Artifactory is used.</td>
             </tr>
             
             <tr>
@@ -923,7 +965,7 @@ For more information on docker networking, see <a href="https://docs.docker.com/
     
     <div id="Discover">
         <h2>Discover (DEPRECATED)</h2>
-        <p>Discovers services in Docker Compose file and creates corresponding application models for them in ElectricFlow</p>
+        <p>[Deprecated] This procedure is deprecated. Use the "Import Microservices" procedure to create microservice models based on the given Docker Compose file contents.</p>
         
         <h3>Discover Parameters</h3>
         <table class="grid">
@@ -965,6 +1007,12 @@ For more information on docker networking, see <a href="https://docs.docker.com/
     
 
     
+    <h1 id="knownIssues">Known Issues</h1>
+    <div>
+        <p>Backslashes (\) are not supported in .dockerignore for Artifact2Image procedure. Use forward slashes.</p>
+
+    </div>
+    
 
     <h1 id="releaseNotes">Release Notes</h1>
     
@@ -972,10 +1020,10 @@ For more information on docker networking, see <a href="https://docs.docker.com/
     <ul>
         
         <li>Added <i>Import Microservices</i> procedure.</li>
-
-        <li>Discover procedure is <i>Deprecated</i>. Use the "Import Microservices" procedure to create microservice models based on the given Docker Compose file contents</li>
         
-        <li>Added <i>Artifact2Image<i> procedure.</li>
+        <li>Added <i>Artifact2Image</i> procedure.</li>
+        
+        <li>Discover procedure is <i>Deprecated</i>. Use the "Import Microservices" procedure to create microservice models based on the given Docker Compose file contents</li>
         
         <li>Internal improvements for 8.3 release.</li>
         
