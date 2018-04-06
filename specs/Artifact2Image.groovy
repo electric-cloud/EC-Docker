@@ -1,7 +1,6 @@
 import spock.lang.*
 import com.electriccloud.spec.*
 
-@Ignore
 class Artifact2Image extends DockerHelper {
     static def projectName = 'EC-Docker Specs Artifact2Image'
     static def configName = 'EC-Docker Specs'
