@@ -46,7 +46,7 @@ if (environmentProjectName && environmentName && clusterName) {
 String dir = System.getenv('COMMANDER_WORKSPACE')
 File composeFile = new File(dir, 'docker-compose.yml')
 String composeContent = dockerComposeContent
-composeFile << composeContent.replace('#','').replace("\t", "")
+composeFile << composeContent
 
 
 def composeConfig
