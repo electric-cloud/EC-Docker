@@ -52,8 +52,8 @@ composeFile << composeContent
 def composeConfig
 try {
     composeConfig = DockerClient.readCompose(composeFile)
-    if(composeConfig?.version == '3' || composeConfig?.version == '2') {
-        println("ERROR: unsupported version of compose file: version " + composeFile.version + ". Please use version 3.5 for import procedure.")
+    if(Double.parseDouble(composeConfig?.version) < 3 && Double.parseDouble(composeConfig?.version) >= 1) {
+        println("ERROR: unsupported version of compose file: version " + composeFile.version + ". Please use version 3 and above for import procedure.")
         System.exit(-1)
     }
 } catch (Exception ex) {

@@ -116,6 +116,10 @@ public class ImportMicroservices extends EFClient {
 
         efService.service.defaultCapacity = defaultCapacity
         efService.service.minCapacity = defaultCapacity - minCapacity
+        // 'minCapacity' must be between 1 and 2147483647
+        if(efService.service.minCapacity < 1) {
+            efService.service.minCapacity = 1
+        }
 
         // image
         def image = ''
@@ -200,7 +204,7 @@ public class ImportMicroservices extends EFClient {
                 memorySize: convertToMBs(serviceConfig.deploy?.resources?.reservations?.memory),
                 cpuLimit: serviceConfig.deploy?.resources?.limits?.nanoCpus,
                 cpuCount: serviceConfig.deploy?.resources?.reservations?.nanoCpus,
-                volumeMount:  new JsonBuilder(containerVolumeValue).toString(),
+                volumeMount:  containerVolumeValue,
             ports: containerPorts
         ]
 
