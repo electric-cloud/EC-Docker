@@ -45,14 +45,20 @@ if (environmentProjectName && environmentName && clusterName) {
 // write out the docker compose to the workspace directory
 String dir = System.getenv('COMMANDER_WORKSPACE')
 File composeFile = new File(dir, 'docker-compose.yml')
-composeFile << dockerComposeContent
+String composeContent = dockerComposeContent
+composeFile << composeContent
+
 
 def composeConfig
 try {
     composeConfig = DockerClient.readCompose(composeFile)
+    if(Double.parseDouble(composeConfig?.version) < 3 && Double.parseDouble(composeConfig?.version) >= 1) {
+        println("ERROR: unsupported version of compose file: version " + composeFile.version + ". Please use version 3 and above for import procedure.")
+        System.exit(-1)
+    }
 } catch (Exception ex) {
     println("ERROR: Failed to read the Docker Compose file contents")
-    ex.printStackTrace();
+    ex.printStackTrace()
     System.exit(-1)
 }
 
@@ -60,7 +66,7 @@ try {
 Yaml parser = new Yaml()
 def DELIMITER = "#"
 def parsedYamlConfigList = []
-def configList = dockerComposeContent.split(DELIMITER)
+def configList = dockerComposeContent.replace("\t", "").split(DELIMITER)
 configList.each { config ->
     def parsedConfig = parser.load(config)
     parsedYamlConfigList.push(parsedConfig)

@@ -31,20 +31,32 @@ public class ImportMicroservices extends EFClient {
 
     def buildServicesDefinitions(def projectName, def applicationName) {
         def efServices = []
+        def serviceNetwork = []
 
         //Networks
         yamlConfig.each { networksConfig ->
             networksConfig.networks.each { name, networkConfig ->
                 def efNetwork = buildServiceMapping(name, networkConfig)
-                efServices.push(efNetwork)
+                logger INFO, "Reading networks config: " + prettyPrint(efNetwork)
+                serviceNetwork.push(efNetwork)
             }
+        }
+
+        def networks = []
+        if (serviceNetwork) {
+            networks = [
+                    networkName: serviceNetwork?.network.networkName ? serviceNetwork?.network.networkName.get(0) : null,
+                    driver     : serviceNetwork?.serviceMapping.driver ? serviceNetwork?.serviceMapping.driver.get(0) : null,
+                    subnet     : serviceNetwork?.serviceMapping.subnet ? serviceNetwork?.serviceMapping.subnet.get(0) : null,
+                    gateway    : serviceNetwork?.serviceMapping.gateway ? serviceNetwork?.serviceMapping.gateway.get(0) : null
+            ]
         }
 
         // Services
         composeConfig.services.each { name, serviceConfig ->
             checkForUnsupportedParameters(name, serviceConfig)
-            logger DEBUG, "VOLUME CLASS: ${serviceConfig.volumes?.source.getClass()}"
             def efService = buildServiceDefinition(name, serviceConfig)
+            efService.network = networks
             efServices.push(efService)
         }
 
@@ -116,6 +128,10 @@ public class ImportMicroservices extends EFClient {
 
         efService.service.defaultCapacity = defaultCapacity
         efService.service.minCapacity = defaultCapacity - minCapacity
+        // 'minCapacity' must be between 1 and 2147483647
+        if(efService.service.minCapacity < 1) {
+            efService.service.minCapacity = 1
+        }
 
         // image
         def image = ''
@@ -200,7 +216,7 @@ public class ImportMicroservices extends EFClient {
                 memorySize: convertToMBs(serviceConfig.deploy?.resources?.reservations?.memory),
                 cpuLimit: serviceConfig.deploy?.resources?.limits?.nanoCpus,
                 cpuCount: serviceConfig.deploy?.resources?.reservations?.nanoCpus,
-                volumeMount: containerVolumeValue,
+                volumeMount:  containerVolumeValue,
             ports: containerPorts
         ]
 
@@ -269,7 +285,9 @@ public class ImportMicroservices extends EFClient {
         }
         def efServices = applicationName ? [] : getServices(projectName)
         services.each { service ->
-            createService(projectName, envProjectName, envName, clusterName, efServices, service, applicationName)
+            if (service?.network == null) {
+                createService(projectName, envProjectName, envName, clusterName, efServices, service, applicationName)
+            }
         }
 
         def lines = ["Imported services: ${importedSummary.size()}"]
@@ -469,17 +487,27 @@ public class ImportMicroservices extends EFClient {
 
     def createEFService(projectName, service, applicationName) {
         def payload = service.service
+        def container = service.container
         def serviceName = payload.serviceName
         payload.description = "Created by EF Import Microservices"
-        ElectricFlow ef  = new ElectricFlow();
+        ElectricFlow ef  = new ElectricFlow()
         if(applicationName.equals('')) applicationName = null
-        ef.createService(projectName: projectName , serviceName: payload?.serviceName, addDeployProcess: payload?.addDeployProcess, applicationName:  applicationName,
-                defaultCapacity: payload?.defaultCapacity, description: payload?.description, maxCapacity: payload?.maxCapacity, minCapacity: payload?.minCapacity,
-                volume: payload?.volume)
-        //_createService (args.projectName, args.serviceName, args.addDeployProcess, args.applicationName, args.defaultCapacity, args.description,
-        // args.maxCapacity, args.minCapacity, args.volume, onSuccess, onFailure)
-        //def result = createService(projectName, payload)
-        //result
+        def volumeParam = [
+                "name": payload?.volume,
+                "mountPath": container?.volumeMount
+        ]
+        Map argsForService = [
+                projectName: projectName,
+                serviceName: payload?.serviceName,
+                addDeployProcess: payload?.addDeployProcess,
+                applicationName:  applicationName,
+                defaultCapacity: payload?.defaultCapacity.toString(),
+                description: payload?.description,
+                maxCapacity: payload?.maxCapacity.toString(),
+                minCapacity: payload?.minCapacity.toString(),
+                volume: new JsonBuilder(volumeParam).toString()
+        ]
+        ef.createService(argsForService)
         if (!applicationName) {
             // Add deploy process for top-level service
             createDeployProcess(projectName, serviceName)
