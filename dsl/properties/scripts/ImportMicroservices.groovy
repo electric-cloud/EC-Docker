@@ -31,20 +31,32 @@ public class ImportMicroservices extends EFClient {
 
     def buildServicesDefinitions(def projectName, def applicationName) {
         def efServices = []
+        def serviceNetwork = []
 
         //Networks
         yamlConfig.each { networksConfig ->
             networksConfig.networks.each { name, networkConfig ->
                 def efNetwork = buildServiceMapping(name, networkConfig)
-                efServices.push(efNetwork)
+                logger INFO, "Reading networks config: " + prettyPrint(efNetwork)
+                serviceNetwork.push(efNetwork)
             }
+        }
+
+        def networks = []
+        if (serviceNetwork) {
+            networks = [
+                    networkName: serviceNetwork?.network.networkName ? serviceNetwork?.network.networkName.get(0) : null,
+                    driver     : serviceNetwork?.serviceMapping.driver ? serviceNetwork?.serviceMapping.driver.get(0) : null,
+                    subnet     : serviceNetwork?.serviceMapping.subnet ? serviceNetwork?.serviceMapping.subnet.get(0) : null,
+                    gateway    : serviceNetwork?.serviceMapping.gateway ? serviceNetwork?.serviceMapping.gateway.get(0) : null
+            ]
         }
 
         // Services
         composeConfig.services.each { name, serviceConfig ->
             checkForUnsupportedParameters(name, serviceConfig)
-            logger DEBUG, "VOLUME CLASS: ${serviceConfig.volumes?.source.getClass()}"
             def efService = buildServiceDefinition(name, serviceConfig)
+            efService.network = networks
             efServices.push(efService)
         }
 

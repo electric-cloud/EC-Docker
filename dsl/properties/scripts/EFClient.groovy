@@ -348,6 +348,9 @@ public class EFClient extends BaseClient {
     }
 
     def createContainer(String projectName, String serviceName, payload, applicationName = null) {
+        if (payload.volumeMount) {
+            payload.volumeMount = new JsonBuilder(payload.volumeMount).toString()
+        }
         payload.serviceName = serviceName
         if (applicationName) {
             payload.applicationName = applicationName
