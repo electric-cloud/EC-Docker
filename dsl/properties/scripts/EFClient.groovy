@@ -349,7 +349,10 @@ public class EFClient extends BaseClient {
 
     def createContainer(String projectName, String serviceName, payload, applicationName = null) {
         if (payload.volumeMount) {
-            payload.volumeMount = new JsonBuilder(payload.volumeMount).toString()
+            def volumeMount = [
+                    "mountPath": payload?.volumeMount
+            ]
+            payload.volumeMount = new JsonBuilder(volumeMount).toString()
         }
         payload.serviceName = serviceName
         if (applicationName) {
@@ -416,13 +419,13 @@ public class EFClient extends BaseClient {
 	
 	def updateJobSummary(String message) {
         def jobStepId = System.getenv('COMMANDER_JOBSTEPID')
-        def summary = getEFProperty('/myJob/summary', true)?.value
+        def summary = getEFProperty('myJob/summary', true)?.value
         def lines = []
         if (summary) {
             lines = summary.split(/\n/)
         }
         lines.add(message)
-        setEFProperty('/myJob/summary', lines.join("\n"))
+        setEFProperty('myJob/summary', lines.join("\n"))
     }
 
     def createTierMap(projName, applicationName, payload){

@@ -197,6 +197,7 @@ public class ImportMicroservices extends EFClient {
         if(servicesVolumes != null) {
             serviceVolumeValue = servicesVolumes.first()
         }
+
         efService.service.volume = serviceVolumeValue
 
         String containerVolumeValue = null
@@ -285,9 +286,7 @@ public class ImportMicroservices extends EFClient {
         }
         def efServices = applicationName ? [] : getServices(projectName)
         services.each { service ->
-            if (service?.network == null) {
                 createService(projectName, envProjectName, envName, clusterName, efServices, service, applicationName)
-            }
         }
 
         def lines = ["Imported services: ${importedSummary.size()}"]
