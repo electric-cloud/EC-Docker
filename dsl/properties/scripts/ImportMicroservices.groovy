@@ -124,56 +124,19 @@ public class ImportMicroservices extends EFClient {
 
         // Service Fields
         def defaultCapacity = serviceConfig.deploy?.replicas ?: 1
-        def minCapacity = serviceConfig.deploy?.updateConfig?.parallelism ?: 1
+        def minCapacity = defaultCapacity - (serviceConfig.deploy?.updateConfig?.parallelism ?: 1)
 
         efService.service.defaultCapacity = defaultCapacity
-        efService.service.minCapacity = defaultCapacity - minCapacity
+        efService.service.minCapacity = minCapacity
         // 'minCapacity' must be between 1 and 2147483647
         if(efService.service.minCapacity < 1) {
             efService.service.minCapacity = 1
         }
 
         // image
-        def image = ''
-        def version = ''
-        def url = ''
-        def repositoryName = ''
-        String imageInfo = serviceConfig?.image
-        if (imageInfo != null) {
-            if (imageInfo.contains('/')) {
-                String[] parts = imageInfo.split('/')
-                if (parts.length > 2) {
-                    url = parts[0]
-                    repositoryName = parts[1]
-                    if(parts[2].contains(':')) {
-                        String[] imageParts = parts[2].split(':')
-                        image = imageParts[0]
-                        version = imageParts[1]
-                    } else {
-                        image = parts[2]
-                    }
-
-                }
-                else if (parts.length > 1) {
-                    repositoryName = parts[0]
-                    if (parts[1].contains(':')) {
-                        String[] imageParts = parts[1].split(':')
-                        image = imageParts[0]
-                        version = imageParts[1]
-                    } else {
-                        image = parts[1]
-                    }
-
-                }
-            } else {
-                String[] parts = imageInfo.split(':')
-                image = parts[0]
-                if (parts.length > 1) {
-                    version = parts[1]
-                }
-            }
-        }
-        def imageName = repositoryName ? "${repositoryName}/${image}" : image
+        def imageName = getImageName(serviceConfig.image)
+        def version = getImageVersion(serviceConfig.image)
+        def url = getRegistryUri(serviceConfig.image)
 
         // ENV variables
         def envVars = serviceConfig.environment.entries?.collect{
@@ -217,7 +180,7 @@ public class ImportMicroservices extends EFClient {
                 memorySize: convertToMBs(serviceConfig.deploy?.resources?.reservations?.memory),
                 cpuLimit: serviceConfig.deploy?.resources?.limits?.nanoCpus,
                 cpuCount: serviceConfig.deploy?.resources?.reservations?.nanoCpus,
-                volumeMount:  containerVolumeValue,
+                volumeMount: containerVolumeValue,
             ports: containerPorts
         ]
 
@@ -233,6 +196,58 @@ public class ImportMicroservices extends EFClient {
         logger INFO, "Service definition read from the Docker Compose file:"
         logger INFO, prettyPrint(efService)
         efService
+    }
+
+    private def parseImage(image) {
+        // Image can consist of
+        // repository url
+        // repo name
+        // image name
+        def parts = image.split('/')
+        // The name always exists
+        def imageName = parts.last()
+        def registry
+        def repoName
+        if (parts.size() >= 2) {
+            repoName = parts[parts.size() - 2]
+            // It may be an image without repo, like nginx
+            if (repoName =~ /\./) {
+                registry = repoName
+                repoName = null
+            }
+        }
+        if (!registry && parts.size() > 2) {
+            registry = parts.take(parts.size() - 2).join('/')
+        }
+        if (repoName) {
+            imageName = repoName + '/' + imageName
+        }
+        def versioned = imageName.split(':')
+        def version
+        if (versioned.size() > 1) {
+            version = versioned.last()
+        }
+        else {
+            version = 'latest'
+        }
+        imageName = versioned.first()
+        return [imageName: imageName, version: version, repoName: repoName, registry: registry]
+    }
+
+    def getImageName(image) {
+        parseImage(image).imageName
+    }
+
+    def getImageRepo(image) {
+        parseImage(image).repoName
+    }
+
+    def getImageVersion(image) {
+        parseImage(image).version
+    }
+
+    def getRegistryUri(image) {
+        parseImage(image).registry
     }
 
     def buildServiceMapping(def name, def networkConfig) {
@@ -276,22 +291,30 @@ public class ImportMicroservices extends EFClient {
                 handleError("Application '${applicationName}' already exists in the project '${projectName}'")
             }
             else {
-                createApplication(projectName, applicationName)
+                def app = createApplication(projectName, applicationName)
                 createAppDeployProcess(projectName, applicationName)
                 if (envProjectName && envName) {
                     createTierMap(projectName, envProjectName, envName, applicationName)
                 }
                 logger INFO, "Application ${applicationName} has been created"
+                // create link for the application
+                def applicationId = app.applicationId
+                setEFProperty("/myJob/report-urls/Application: $applicationName", "/flow/#applications/$applicationId")
             }
         }
         def efServices = applicationName ? [] : getServices(projectName)
         services.each { service ->
-                createService(projectName, envProjectName, envName, clusterName, efServices, service, applicationName)
+            def svc = createService(projectName, envProjectName, envName, clusterName, efServices, service, applicationName)
+            // create links for the service if creating top-level services
+            if (svc && !applicationName) {
+                def serviceId = svc.serviceId
+                setEFProperty("/myJob/report-urls/Microservice: ${svc.serviceName}", "/flow/#services/$serviceId")
+            }
         }
 
         def lines = ["Imported services: ${importedSummary.size()}"]
         importedSummary.each { serviceName, containers ->
-            def containerNames = containers.collect { k -> k }
+            def containerNames = containers.collect { k -> k.key }
             if (applicationName) {
                 lines.add("${applicationName}: ${serviceName}: ${containerNames.join(', ')}")
             } else {
@@ -299,7 +322,7 @@ public class ImportMicroservices extends EFClient {
             }
         }
 
-        updateJobSummary(lines.join("\n"))
+        updateJobSummary(lines.join("\n"), /*jobStepSummary*/ true)
     }
 
      def createService(def projectName, def envProjectName, def envName, def clusterName, def efServices, def service, def applicationName) {
@@ -312,14 +335,16 @@ public class ImportMicroservices extends EFClient {
         logger INFO, "Service payload:"
         logger INFO, prettyPrint(service)
 
+        def result
         if (existingService) {
             logger WARNING, "Service ${existingService.serviceName} already exists, skipping"
             // return since we do not want to update an existing service.
-            return
+            return null
         }
         else {
+            assert service?.service?.serviceName
             serviceName = service.service.serviceName
-            createEFService(projectName, service, applicationName)
+            result = createEFService(projectName, service, applicationName)
             logger INFO, "Service ${serviceName} has been created"
             importedSummary[serviceName] = [:]
         }
@@ -335,6 +360,7 @@ public class ImportMicroservices extends EFClient {
             }
             createServiceClusterMapping(projectName, envProjectName, envName, clusterName, serviceName, service, applicationName)
         }
+        result
     }
 
     def createEFPorts(projectName, serviceName, container, service, applicationName) {
@@ -491,20 +517,22 @@ public class ImportMicroservices extends EFClient {
         payload.description = "Created by EF Import Microservices"
         ElectricFlow ef  = new ElectricFlow()
         if(applicationName.equals('')) applicationName = null
-        def volumeParam = [
-                "name": payload?.volume,
-                "mountPath": container?.volumeMount
-        ]
+        def volumeParam
+        if (payload?.volume) {
+            volumeParam = [
+                    "name": payload.volume,
+                    "mountPath": container?.volumeMount
+            ]
+        }
         Map argsForService = [
                 projectName: projectName,
-                serviceName: payload?.serviceName,
-                addDeployProcess: payload?.addDeployProcess,
+                serviceName: payload.serviceName,
+                addDeployProcess: true,
                 applicationName:  applicationName,
-                defaultCapacity: payload?.defaultCapacity.toString(),
-                description: payload?.description,
-                maxCapacity: payload?.maxCapacity.toString(),
-                minCapacity: payload?.minCapacity.toString(),
-                volume: new JsonBuilder(volumeParam).toString()
+                defaultCapacity: payload.defaultCapacity?.toString(),
+                description: payload.description,
+                minCapacity: payload.minCapacity?.toString(),
+                volume: volumeParam ? new JsonBuilder(volumeParam).toString() : null
         ]
         ef.createService(argsForService)
         if (!applicationName) {
@@ -513,6 +541,7 @@ public class ImportMicroservices extends EFClient {
         } else {
             createAppDeployProcessStep(projectName, applicationName, serviceName)
         }
+        svc
     }
 
     def equalNames(String oneName, String anotherName) {

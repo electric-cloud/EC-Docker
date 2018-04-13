@@ -61,7 +61,7 @@ public class EFClient extends BaseClient {
                 applicationName: appName
         ]
         def result = doRestPost("/rest/${REST_VERSION}/projects/${projName}/applications", payload, false)
-        result?.data
+        result?.data?.application
     }
 
     def getClusters(projName, envName) {
@@ -416,16 +416,22 @@ public class EFClient extends BaseClient {
         def result = doHttpGet("/rest/${REST_VERSION}/projects/${projectName}/containers", false, query)
         result?.data?.container
     }
-	
-	def updateJobSummary(String message) {
-        def jobStepId = System.getenv('COMMANDER_JOBSTEPID')
-        def summary = getEFProperty('myJob/summary', true)?.value
+
+    def updateJobSummary(String message, boolean jobStepSummary = false) {
+        updateSummary('/myJob/summary', message)
+        if (jobStepSummary) {
+            updateSummary('/myJobStep/summary', message)
+        }
+    }
+
+    def updateSummary(String property, String message) {
+        def summary = getEFProperty(property, true)?.value
         def lines = []
         if (summary) {
             lines = summary.split(/\n/)
         }
         lines.add(message)
-        setEFProperty('myJob/summary', lines.join("\n"))
+        setEFProperty(property, lines.join("\n"))
     }
 
     def createTierMap(projName, applicationName, payload){
