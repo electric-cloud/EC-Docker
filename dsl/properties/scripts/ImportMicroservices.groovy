@@ -534,11 +534,8 @@ public class ImportMicroservices extends EFClient {
                 minCapacity: payload.minCapacity?.toString(),
                 volume: volumeParam ? new JsonBuilder(volumeParam).toString() : null
         ]
-        ef.createService(argsForService)
-        if (!applicationName) {
-            // Add deploy process for top-level service
-            createDeployProcess(projectName, serviceName)
-        } else {
+        def svc = ef.createService(argsForService)?.service
+        if (applicationName) {
             createAppDeployProcessStep(projectName, applicationName, serviceName)
         }
         svc
