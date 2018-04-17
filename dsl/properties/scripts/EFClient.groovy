@@ -317,7 +317,7 @@ public class EFClient extends BaseClient {
         payload = JsonOutput.toJson(payload)
         doHttpPut("/rest/v1.0/properties/${propertyName}", /* request body */ payload)
     }
-	
+
     def getAppEnvMaps(projectName, applicationName, tierMapName) {
         def result = doHttpGet("/rest/${REST_VERSION}/projects/${projectName}/applications/${applicationName}/tierMaps/${tierMapName}/serviceClusterMappings")
         result?.data?.serviceClusterMapping
@@ -348,20 +348,17 @@ public class EFClient extends BaseClient {
     }
 
     def createContainer(String projectName, String serviceName, payload, applicationName = null) {
-        if (payload.volumeMount) {
-            def volumeMount = [
-                    "mountPath": payload?.volumeMount
-            ]
-            payload.volumeMount = new JsonBuilder(volumeMount).toString()
+        if (payload.volumes) {
+            payload.volumeMount = new JsonBuilder(payload.volumes).toString()
         }
-        payload.serviceName = serviceName
+        payload.serviceName = buildApplicationDsl
         if (applicationName) {
             payload.applicationName = applicationName
         }
         def result = doRestPost("/rest/${REST_VERSION}/projects/${projectName}/containers", payload, true)
         result?.data
     }
-	
+
 	def createEnvironmentMap(projName, serviceName, payload) {
         def result = doRestPost("/rest/${REST_VERSION}/projects/${projName}/services/${serviceName}/environmentMaps", payload)
         result?.data
@@ -387,7 +384,7 @@ public class EFClient extends BaseClient {
         def result = doRestPost("/rest/${REST_VERSION}/projects/${projName}/services/${serviceName}/processes/${processName}/processSteps", payload, false)
         result?.data
     }
-	
+
 	def createServiceMapDetails(projName, serviceName, envMapName, serviceClusterMapName, payload, applicationName = null) {
         if (applicationName) {
             payload.applicationName = applicationName
@@ -405,7 +402,7 @@ public class EFClient extends BaseClient {
         def result = doRestPost("/rest/${REST_VERSION}/projects/${projName}/services/${serviceName}/environmentMaps/${envMapName}/serviceClusterMappings", payload)
         result?.data
     }
-	
+
 	def getContainers(projectName, serviceName, applicationName = null) {
         def query = [
             serviceName: serviceName
