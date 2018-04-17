@@ -352,6 +352,8 @@ public class ImportMicroservices extends EFClient {
 
         // Container - Docker service has only one container
          createEFContainer(projectName, serviceName, service.container, applicationName)
+         //container name is the same as the service name in Docker service
+         importedSummary[serviceName][serviceName] = [:]
          createEFPorts(projectName, serviceName, service.container, service.service, applicationName)
 
         if (envProjectName && envName && clusterName) {
