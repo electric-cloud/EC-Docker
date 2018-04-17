@@ -427,6 +427,8 @@ public class ImportMicroservices extends EFClient {
 
         // Container - Docker service has only one container
          createEFContainer(projectName, serviceName, service.container, applicationName)
+         //container name is the same as the service name in Docker service
+         importedSummary[serviceName][serviceName] = [:]
          createEFPorts(projectName, serviceName, service.container, service.service, applicationName)
 
         if (envProjectName && envName && clusterName) {
@@ -602,11 +604,8 @@ public class ImportMicroservices extends EFClient {
                 minCapacity: payload.minCapacity?.toString(),
                 volume: payload.volumes ? new JsonBuilder(payload.volumes).toString() : null
         ]
-        ef.createService(argsForService)
-        if (!applicationName) {
-            // Add deploy process for top-level service
-            createDeployProcess(projectName, serviceName)
-        } else {
+        def svc = ef.createService(argsForService)?.service
+        if (applicationName) {
             createAppDeployProcessStep(projectName, applicationName, serviceName)
         }
         svc
