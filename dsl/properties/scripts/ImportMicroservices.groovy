@@ -1,7 +1,7 @@
 /**	Docker Compose File structure:
  *
  *	version:
- *	'2'
+ *	'3'
  *	services:
  *   web:
  *	    image: nginx:13.1
@@ -64,14 +64,6 @@ public class ImportMicroservices extends EFClient {
         if(globalServicesVolumesParams) {
             volumes = globalServicesVolumesParams
         }
-        /*def volumes =
-        if (globalServicesVolumesParams) {
-            volumes = [
-                    volumeName: globalServiceNetworksParams?.network.networkName ? globalServiceNetworksParams?.network.networkName.get(0) : null,
-                    driver     : globalServiceNetworksParams?.serviceMapping.driver ? globalServiceNetworksParams?.serviceMapping.driver.get(0) : null,
-                    device     : globalServiceNetworksParams?.serviceMapping.subnet ? globalServiceNetworksParams?.serviceMapping.subnet.get(0) : null
-            ]
-        }*/
 
         // Services
         composeConfig.services.each { name, serviceConfig ->
@@ -190,21 +182,6 @@ public class ImportMicroservices extends EFClient {
 
         efService.service.ports = servicePorts
 
-        /*// Volumes
-        String serviceVolumeValue = null
-        def servicesVolumes = serviceConfig.volumes?.source
-        if(servicesVolumes != null) {
-            serviceVolumeValue = servicesVolumes.first()
-        }
-
-        efService.service.volume = serviceVolumeValue
-
-        String containerVolumeValue = null
-        def containerVolumes = serviceConfig.volumes?.target
-        if(containerVolumes != null) {
-            containerVolumeValue = containerVolumes.first()
-        }*/
-
         // Volumes
         def containerVolumes = []
         def serviceVolumes = []
@@ -217,7 +194,6 @@ public class ImportMicroservices extends EFClient {
             def containerVolumeMountPath
             def serviceVolumeName
             def serviceVolumeHostPath
-            logger DEBUG, "SERVICE ${name} !!VOLUME type: ${volume?.type}, source: ${volume?.source}, target: ${volume.target} \n"
             if(volume.type && volume.type.equals("volume")) {
                 serviceVolumeName = volume?.source
                 containerVolumeName = volume?.source
