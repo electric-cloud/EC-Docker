@@ -45,12 +45,15 @@ public class ImportMicroservices extends EFClient {
 
         def networks = []
         if (globalServiceNetworksParams) {
-            networks = [
-                    networkName: globalServiceNetworksParams?.network.networkName ? globalServiceNetworksParams?.network.networkName.get(0) : null,
-                    driver     : globalServiceNetworksParams?.serviceMapping.driver ? globalServiceNetworksParams?.serviceMapping.driver.get(0) : null,
-                    subnet     : globalServiceNetworksParams?.serviceMapping.subnet ? globalServiceNetworksParams?.serviceMapping.subnet.get(0) : null,
-                    gateway    : globalServiceNetworksParams?.serviceMapping.gateway ? globalServiceNetworksParams?.serviceMapping.gateway.get(0) : null
-            ]
+            globalServiceNetworksParams.each { parsedNetworkConfig ->
+                def network = [
+                        networkName: parsedNetworkConfig.network?.networkName,
+                        driver     : parsedNetworkConfig.serviceMapping?.driver,
+                        subnet     : parsedNetworkConfig.serviceMapping?.subnet,
+                        gateway    : parsedNetworkConfig.serviceMapping?.gateway
+                ]
+                networks.push(network)
+            }
         }
 
         // Global volumes
@@ -64,21 +67,16 @@ public class ImportMicroservices extends EFClient {
         if(globalServicesVolumesParams) {
             volumes = globalServicesVolumesParams
         }
-        /*def volumes =
-        if (globalServicesVolumesParams) {
-            volumes = [
-                    volumeName: globalServiceNetworksParams?.network.networkName ? globalServiceNetworksParams?.network.networkName.get(0) : null,
-                    driver     : globalServiceNetworksParams?.serviceMapping.driver ? globalServiceNetworksParams?.serviceMapping.driver.get(0) : null,
-                    device     : globalServiceNetworksParams?.serviceMapping.subnet ? globalServiceNetworksParams?.serviceMapping.subnet.get(0) : null
-            ]
-        }*/
 
         // Services
         composeConfig.services.each { name, serviceConfig ->
             checkForUnsupportedParameters(name, serviceConfig)
-            def efService = buildServiceDefinition(name, serviceConfig)
-            efService.network = networks
-            efService.globalVolume =
+            def efService = null
+            if (networks) {
+                efService = buildServiceDefinition(name, serviceConfig, networks)
+            } else {
+                efService = buildServiceDefinition(name, serviceConfig)
+            }
             efServices.push(efService)
         }
 
@@ -145,7 +143,7 @@ public class ImportMicroservices extends EFClient {
         ]
     }
 
-    def buildServiceDefinition(def name, def serviceConfig) {
+    def buildServiceDefinition(def name, def serviceConfig, def globalNetworks = null) {
         def efServiceName = name
         def efService = [
             service: [
@@ -174,6 +172,28 @@ public class ImportMicroservices extends EFClient {
             version = getImageVersion(serviceConfig.image)
             url = getRegistryUri(serviceConfig.image)
         }
+
+        //network
+        def networks = []
+
+        def networkList = []
+        if(serviceConfig.networks) {
+            serviceConfig.networks.each { key, value ->
+                networkList.push(key)
+            }
+        }
+        efService.service.networkList = networkList
+
+        if(globalNetworks && networkList) {
+            globalNetworks.each { globalNetworkConfig ->
+                for(int i = 0; i < networkList.size(); i++)
+                    if(globalNetworkConfig.networkName == networkList.get(i)) {
+                        networks.push(globalNetworkConfig)
+                    }
+            }
+        }
+
+        efService.service.networks = networks
 
         // ENV variables
         def envVars = serviceConfig.environment.entries?.collect{
