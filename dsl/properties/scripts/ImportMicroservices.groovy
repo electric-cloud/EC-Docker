@@ -488,9 +488,7 @@ public class ImportMicroservices extends EFClient {
                     logger INFO, "Created process step ${processStepName} for service ${serviceName}"
 
                 } catch (Throwable e) {
-                    if (!(e.message =~ /DuplicateProcessStepName/)) {
-                        throw e
-                    }
+
                 }
                 if (index != 0) {
                     def dependency = createProcessStepName(ordered.get(index - 1))
@@ -505,9 +503,7 @@ public class ImportMicroservices extends EFClient {
                         )
                         logger INFO, "Created dependency: $dependency -> $processStepName"
                     } catch (Throwable e) {
-                        if (!(e.message =~ /DuplicateProcessDependency/)) {
-                            throw e
-                        }
+
                     }
                 }
             }
@@ -524,24 +520,27 @@ public class ImportMicroservices extends EFClient {
 
     }
 
-    def buildDependencies(serviceName, services) {
+    def buildDependencies(serviceName, services, acc = []) {
         assert serviceName
+        if (serviceName in acc) {
+            throw new RuntimeException("Circular dependency found: ${serviceName}")
+        }
+        acc << serviceName
         def service = services.find { it.service.serviceName == serviceName }
         if (!service || !service.service.processDependency) {
-            return [serviceName]
+            return acc
         }
-        def dependency = [serviceName]
         service.service.processDependency.each { dep ->
             def name = dep.processDependencyName
-            def parent = buildDependencies(name, services)
+            def parent = buildDependencies(name, services, acc)
             if (parent) {
-                dependency.addAll(parent)
+                acc.addAll(parent)
             }
             else {
-                dependency << name
+                acc << name
             }
         }
-        dependency
+        acc
     }
 
     def createEFContainer(projectName, serviceName, container, application) {
