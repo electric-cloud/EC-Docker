@@ -78,7 +78,6 @@ public class ImportMicroservices extends EFClient {
             ]
         }*/
 
-        // TODO
         def unsupportedParams = []
 
         // Services
@@ -86,12 +85,12 @@ public class ImportMicroservices extends EFClient {
             checkForUnsupportedParameters(name, serviceConfig, unsupportedParams)
             def efService = buildServiceDefinition(name, serviceConfig)
             efService.network = networks
-            efService.globalVolume =
             efServices.push(efService)
         }
 
         if(unsupportedParams) {
-            publishSummaryReportWithUnsupportedComposeParameters(unsupportedParams)
+            def unsupportedParamsTable = buildSummaryReport(unsupportedParams)
+            publishSummaryReportWithUnsupportedComposeParameters(unsupportedParamsTable)
         }
 
         efServices
@@ -652,21 +651,31 @@ public class ImportMicroservices extends EFClient {
     def publishLink(String name, String link) {
         setEFProperty("${REPORT_URL_PROPERTY}${name}", link)
         try {
-            setEFProperty("/myJob/report-urls/ec_summary/${name}",
-                    "<html><a href=\"${link}\" target=\"_blank\">${name}</a></html>",
-                    true, /* use job step id */
-                    false, /* fail on error */)
+            setEFProperty("/myJob/report-urls/${name}",
+                    "<html><a href=\"${link}\" target=\"_blank\">${name}</a></html>")
         }
         catch (Throwable e) {
             logger ERROR, "ImportMicroservices - publishLink error: ${e}"
         }
     }
 
+    def buildSummaryReport(def reportList){
+        def writer = new StringWriter()
+        def markup = new groovy.xml.MarkupBuilder(writer)
+        markup.html{
+            reportList.each{ item ->
+                tr {
+                    td(class:"text-center", item)
+                }
+            }
+        }
+        writer.toString()
+    }
+
     def renderReportForUnsupportedParam(def unsupportedParams, String template) {
         def engine = new groovy.text.SimpleTemplateEngine()
         def templateParams = [:]
-        templateParams.listUnsupParams = unsupportedParams
-        //templateParams.pathToLogo
+        templateParams.unsupParams = unsupportedParams
 
         def text = engine.createTemplate(template).make(templateParams).toString()
         return text
