@@ -23,6 +23,7 @@ public class ImportMicroservices extends EFClient {
     def importedSummary = [:]
 
     static final String CREATED_DESCRIPTION = "Created by Container ImportMicroservices"
+    static final String DEPLOY_PROCESS_NAME = "Deploy"
 
     def ImportMicroservices(def composeConfig, def yamlConfig) {
         this.composeConfig = composeConfig
@@ -239,7 +240,7 @@ public class ImportMicroservices extends EFClient {
 
         // dependencies
         def processDependency = serviceConfig.dependsOn?.collect {
-            [processDependencyName: it.dependency, targetProcessStepName: name, branchType: 'ALWAYS']
+            [processDependencyName: it, targetProcessStepName: name, branchType: 'ALWAYS', targetService: name, sourceService: it]
         }
         efService.service.processDependency = processDependency
 
@@ -359,6 +360,12 @@ public class ImportMicroservices extends EFClient {
             if (svc && !applicationName) {
                 def serviceId = svc.serviceId
                 setEFProperty("/myJob/report-urls/Microservice: ${svc.serviceName}", "/flow/#services/$serviceId")
+            }
+        }
+
+        if (applicationName) {
+            services.each {
+                createDeployProcessSteps(it.service.serviceName, services, projectName, applicationName)
             }
         }
 
@@ -507,6 +514,85 @@ public class ImportMicroservices extends EFClient {
         }
     }
 
+    def createDeployProcessSteps(serviceName, services, projectName, applicationName) {
+        ElectricFlow ef = new ElectricFlow()
+
+        def dependencies = services.collect {
+            buildDependencies(it.service.serviceName, services)
+        }
+        def createProcessStepName = {
+            "deploy-${it}"
+        }
+        dependencies.each { List dependencyLine ->
+            def ordered = dependencyLine.reverse()
+            ordered.eachWithIndex{ entry, index ->
+                def processStepName = createProcessStepName(entry)
+                try {
+                    ef.createProcessStep(projectName: projectName,
+                        applicationName: applicationName,
+                        subservice: entry,
+                        processStepType: 'service',
+                        processName: DEPLOY_PROCESS_NAME,
+                        processStepName: processStepName,
+                    )
+                    logger INFO, "Created process step ${processStepName} for service ${serviceName}"
+
+                } catch (Throwable e) {
+
+                }
+                if (index != 0) {
+                    def dependency = createProcessStepName(ordered.get(index - 1))
+                    try {
+                        ef.createProcessDependency(
+                            projectName: projectName,
+                            applicationName: applicationName,
+                            subservice: serviceName,
+                            processName: DEPLOY_PROCESS_NAME,
+                            processStepName: dependency,
+                            targetProcessStepName: processStepName,
+                        )
+                        logger INFO, "Created dependency: $dependency -> $processStepName"
+                    } catch (Throwable e) {
+
+                    }
+                }
+            }
+        }
+
+
+//        "processDependency": [
+//            {
+//                "processDependencyName": "db",
+//                "targetProcessStepName": "wordpress",
+//                "branchType": "ALWAYS"
+//            }
+//        ]
+
+    }
+
+    def buildDependencies(serviceName, services, acc = []) {
+        assert serviceName
+        if (serviceName in acc) {
+            throw new RuntimeException("Circular dependency found: ${serviceName}")
+        }
+        acc << serviceName
+        def service = services.find { it.service.serviceName == serviceName }
+        if (!service || !service.service.processDependency) {
+            return acc
+        }
+        service.service.processDependency.each { dep ->
+            def name = dep.processDependencyName
+            def parent = buildDependencies(name, services, acc)
+            if (parent) {
+                acc.addAll(parent)
+            }
+            else {
+                acc << name
+            }
+        }
+        acc
+    }
+
     def createEFContainer(projectName, serviceName, container, application) {
         logger DEBUG, "Container payload:"
         logger DEBUG, prettyPrint(container)
@@ -540,8 +626,8 @@ public class ImportMicroservices extends EFClient {
         logger INFO, "Process ${processName} has been created for applicationName: '${applicationName}'"
     }
 
-    def createAppDeployProcessStep(projectName, applicationName, serviceName) {
-        def processName = 'Deploy'
+    def createAppDeployProcessStep(projectName, applicationName, serviceName, service) {
+        def processName = DEPLOY_PROCESS_NAME
         def processStepName = "deployService-${serviceName}"
         createAppProcessStep(projectName, applicationName, processName, [
                 processStepName: processStepName,
@@ -551,7 +637,7 @@ public class ImportMicroservices extends EFClient {
     }
 
     def createDeployProcess(projectName, serviceName) {
-        def processName = 'Deploy'
+        def processName = DEPLOY_PROCESS_NAME
         createProcess(projectName, serviceName, [processName: processName, processType: 'DEPLOY'])
         logger INFO, "Process ${processName} has been created for ${serviceName}"
         def processStepName = 'deployService'
@@ -581,7 +667,7 @@ public class ImportMicroservices extends EFClient {
         ]
         def svc = ef.createService(argsForService)?.service
         if (applicationName) {
-            createAppDeployProcessStep(projectName, applicationName, serviceName)
+//            createAppDeployProcessStep(projectName, applicationName, serviceName, service)
         }
         svc
     }
