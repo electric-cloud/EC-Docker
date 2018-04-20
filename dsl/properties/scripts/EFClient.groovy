@@ -351,7 +351,7 @@ public class EFClient extends BaseClient {
         if (payload.volumes) {
             payload.volumeMount = new JsonBuilder(payload.volumes).toString()
         }
-        payload.serviceName = buildApplicationDsl
+        payload.serviceName = serviceName
         if (applicationName) {
             payload.applicationName = applicationName
         }
