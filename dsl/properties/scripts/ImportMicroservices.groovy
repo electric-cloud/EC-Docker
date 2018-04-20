@@ -1,7 +1,7 @@
 /**	Docker Compose File structure:
  *
  *	version:
- *	'2'
+ *	'3'
  *	services:
  *   web:
  *	    image: nginx:13.1
@@ -69,14 +69,6 @@ public class ImportMicroservices extends EFClient {
         if(globalServicesVolumesParams) {
             volumes = globalServicesVolumesParams
         }
-        /*def volumes =
-        if (globalServicesVolumesParams) {
-            volumes = [
-                    volumeName: globalServiceNetworksParams?.network.networkName ? globalServiceNetworksParams?.network.networkName.get(0) : null,
-                    driver     : globalServiceNetworksParams?.serviceMapping.driver ? globalServiceNetworksParams?.serviceMapping.driver.get(0) : null,
-                    device     : globalServiceNetworksParams?.serviceMapping.subnet ? globalServiceNetworksParams?.serviceMapping.subnet.get(0) : null
-            ]
-        }*/
 
         def unsupportedParams = []
 
@@ -159,9 +151,9 @@ public class ImportMicroservices extends EFClient {
     def buildServiceDefinition(def name, def serviceConfig) {
         def efServiceName = name
         def efService = [
-            service: [
-                serviceName: efServiceName
-            ]
+                service: [
+                        serviceName: efServiceName
+                ]
         ]
 
         // Service Fields
@@ -191,7 +183,7 @@ public class ImportMicroservices extends EFClient {
             [environmentVariableName: it.key, type: 'string', value: it.value]
         }
 
-         // port config
+        // port config
         logger INFO, "Reading port configs: " + prettyPrint(serviceConfig.ports)
         def containerPorts = []
         def servicePorts = []
@@ -202,14 +194,32 @@ public class ImportMicroservices extends EFClient {
 
         efService.service.ports = servicePorts
 
-        /*// Volumes
-        String serviceVolumeValue = null
-        def servicesVolumes = serviceConfig.volumes?.source
-        if(servicesVolumes != null) {
-            serviceVolumeValue = servicesVolumes.first()
-        }
+        // Volumes
+        def containerVolumes = []
+        def serviceVolumes = []
 
-        efService.service.volume = serviceVolumeValue
+        serviceConfig.volumes.each { volume ->
+            def containerVolume = [:]
+            def serviceVolume = [:]
+
+            def containerVolumeName
+            def containerVolumeMountPath
+            def serviceVolumeName
+            def serviceVolumeHostPath
+            if(volume.type && volume.type.equals("volume")) {
+                serviceVolumeName = volume?.source
+                containerVolumeName = volume?.source
+                containerVolumeMountPath = volume?.target
+            }
+            else if (volume.type && volume.type.equals("bind")) {
+                serviceVolumeName = volume.source ? name + "_serviceVolume_" + volume.source : name + "_serviceVolume"
+                serviceVolumeHostPath = volume?.source
+                containerVolumeName = volume.source ? name + "_containerVolume_" + volume.source : name + "__containerVolume"
+                containerVolumeMountPath = volume?.target
+            }
+
+            containerVolume.name = containerVolumeName
+            containerVolume.mountPath = containerVolumeMountPath
 
         String containerVolumeValue = null
         def containerVolumes = serviceConfig.volumes?.target
@@ -244,7 +254,7 @@ public class ImportMicroservices extends EFClient {
 
             containerVolume.name = containerVolumeName
             containerVolume.mountPath = containerVolumeMountPath
-
+          
             serviceVolume.name = serviceVolumeName
             serviceVolume.hostPath = serviceVolumeHostPath
 
@@ -258,9 +268,9 @@ public class ImportMicroservices extends EFClient {
                 containerName: efServiceName,
                 command: serviceConfig.command?.parts?.join(',') ?: null,
                 entryPoint: serviceConfig.entrypoint ?: null,
-            registryUri: url,
-            imageName: imageName,
-            imageVersion: version,
+                registryUri: url,
+                imageName: imageName,
+                imageVersion: version,
                 memoryLimit: convertToMBs(serviceConfig.deploy?.resources?.limits?.memory),
                 memorySize: convertToMBs(serviceConfig.deploy?.resources?.reservations?.memory),
                 cpuLimit: serviceConfig.deploy?.resources?.limits?.nanoCpus,
@@ -268,6 +278,7 @@ public class ImportMicroservices extends EFClient {
                 volumes: containerVolumes,
                 //volumeMount: containerVolumeValue,
             ports: containerPorts
+
         ]
 
         efService.container = container
