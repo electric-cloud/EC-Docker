@@ -206,39 +206,6 @@ public class ImportMicroservices extends EFClient {
             def containerVolumeMountPath
             def serviceVolumeName
             def serviceVolumeHostPath
-            if(volume.type && volume.type.equals("volume")) {
-                serviceVolumeName = volume?.source
-                containerVolumeName = volume?.source
-                containerVolumeMountPath = volume?.target
-            }
-            else if (volume.type && volume.type.equals("bind")) {
-                serviceVolumeName = volume.source ? name + "_serviceVolume_" + volume.source : name + "_serviceVolume"
-                serviceVolumeHostPath = volume?.source
-                containerVolumeName = volume.source ? name + "_containerVolume_" + volume.source : name + "__containerVolume"
-                containerVolumeMountPath = volume?.target
-            }
-
-            containerVolume.name = containerVolumeName
-            containerVolume.mountPath = containerVolumeMountPath
-
-        String containerVolumeValue = null
-        def containerVolumes = serviceConfig.volumes?.target
-        if(containerVolumes != null) {
-            containerVolumeValue = containerVolumes.first()
-        }*/
-
-        // Volumes
-        def containerVolumes = []
-        def serviceVolumes = []
-
-        serviceConfig.volumes.each { volume ->
-            def containerVolume = [:]
-            def serviceVolume = [:]
-
-            def containerVolumeName
-            def containerVolumeMountPath
-            def serviceVolumeName
-            def serviceVolumeHostPath
             logger DEBUG, "SERVICE ${name} !!VOLUME type: ${volume?.type}, source: ${volume?.source}, target: ${volume.target} \n"
             if(volume.type && volume.type.equals("volume")) {
                 serviceVolumeName = volume?.source
