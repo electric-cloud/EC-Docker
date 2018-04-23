@@ -1,7 +1,7 @@
 /**	Docker Compose File structure:
  *
  *	version:
- *	'2'
+ *	'3'
  *	services:
  *   web:
  *	    image: nginx:13.1
@@ -23,6 +23,7 @@ public class ImportMicroservices extends EFClient {
     def importedSummary = [:]
 
     static final String CREATED_DESCRIPTION = "Created by Container ImportMicroservices"
+    static final String DEPLOY_PROCESS_NAME = "Deploy"
 
     def ImportMicroservices(def composeConfig, def yamlConfig) {
         this.composeConfig = composeConfig
@@ -64,21 +65,12 @@ public class ImportMicroservices extends EFClient {
         if(globalServicesVolumesParams) {
             volumes = globalServicesVolumesParams
         }
-        /*def volumes =
-        if (globalServicesVolumesParams) {
-            volumes = [
-                    volumeName: globalServiceNetworksParams?.network.networkName ? globalServiceNetworksParams?.network.networkName.get(0) : null,
-                    driver     : globalServiceNetworksParams?.serviceMapping.driver ? globalServiceNetworksParams?.serviceMapping.driver.get(0) : null,
-                    device     : globalServiceNetworksParams?.serviceMapping.subnet ? globalServiceNetworksParams?.serviceMapping.subnet.get(0) : null
-            ]
-        }*/
 
         // Services
         composeConfig.services.each { name, serviceConfig ->
             checkForUnsupportedParameters(name, serviceConfig)
             def efService = buildServiceDefinition(name, serviceConfig)
             efService.network = networks
-            efService.globalVolume =
             efServices.push(efService)
         }
 
@@ -139,18 +131,18 @@ public class ImportMicroservices extends EFClient {
     def buildVolumeDefinition(def name, def volumeConfig) {
         def efVolumeName = name
         def efVolume = [
-            volumeName: efVolumeName,
-            configName: volumeConfig?.name,
-            driverName: volumeConfig?.driver
+                volumeName: efVolumeName,
+                configName: volumeConfig?.name,
+                driverName: volumeConfig?.driver
         ]
     }
 
     def buildServiceDefinition(def name, def serviceConfig) {
         def efServiceName = name
         def efService = [
-            service: [
-                serviceName: efServiceName
-            ]
+                service: [
+                        serviceName: efServiceName
+                ]
         ]
 
         // Service Fields
@@ -180,7 +172,7 @@ public class ImportMicroservices extends EFClient {
             [environmentVariableName: it.key, type: 'string', value: it.value]
         }
 
-         // port config
+        // port config
         logger INFO, "Reading port configs: " + prettyPrint(serviceConfig.ports)
         def containerPorts = []
         def servicePorts = []
@@ -190,21 +182,6 @@ public class ImportMicroservices extends EFClient {
         }
 
         efService.service.ports = servicePorts
-
-        /*// Volumes
-        String serviceVolumeValue = null
-        def servicesVolumes = serviceConfig.volumes?.source
-        if(servicesVolumes != null) {
-            serviceVolumeValue = servicesVolumes.first()
-        }
-
-        efService.service.volume = serviceVolumeValue
-
-        String containerVolumeValue = null
-        def containerVolumes = serviceConfig.volumes?.target
-        if(containerVolumes != null) {
-            containerVolumeValue = containerVolumes.first()
-        }*/
 
         // Volumes
         def containerVolumes = []
@@ -218,7 +195,6 @@ public class ImportMicroservices extends EFClient {
             def containerVolumeMountPath
             def serviceVolumeName
             def serviceVolumeHostPath
-            logger DEBUG, "SERVICE ${name} !!VOLUME type: ${volume?.type}, source: ${volume?.source}, target: ${volume.target} \n"
             if(volume.type && volume.type.equals("volume")) {
                 serviceVolumeName = volume?.source
                 containerVolumeName = volume?.source
@@ -247,16 +223,16 @@ public class ImportMicroservices extends EFClient {
                 containerName: efServiceName,
                 command: serviceConfig.command?.parts?.join(',') ?: null,
                 entryPoint: serviceConfig.entrypoint ?: null,
-            registryUri: url,
-            imageName: imageName,
-            imageVersion: version,
+                registryUri: url,
+                imageName: imageName,
+                imageVersion: version,
                 memoryLimit: convertToMBs(serviceConfig.deploy?.resources?.limits?.memory),
                 memorySize: convertToMBs(serviceConfig.deploy?.resources?.reservations?.memory),
                 cpuLimit: serviceConfig.deploy?.resources?.limits?.nanoCpus,
                 cpuCount: serviceConfig.deploy?.resources?.reservations?.nanoCpus,
                 volumes: containerVolumes,
                 //volumeMount: containerVolumeValue,
-            ports: containerPorts
+                ports: containerPorts
         ]
 
         efService.container = container
@@ -264,7 +240,7 @@ public class ImportMicroservices extends EFClient {
 
         // dependencies
         def processDependency = serviceConfig.dependsOn?.collect {
-            [processDependencyName: it.dependency, targetProcessStepName: name, branchType: 'ALWAYS']
+            [processDependencyName: it, targetProcessStepName: name, branchType: 'ALWAYS', targetService: name, sourceService: it]
         }
         efService.service.processDependency = processDependency
 
@@ -384,6 +360,12 @@ public class ImportMicroservices extends EFClient {
             if (svc && !applicationName) {
                 def serviceId = svc.serviceId
                 setEFProperty("/myJob/report-urls/Microservice: ${svc.serviceName}", "/flow/#services/$serviceId")
+            }
+        }
+
+        if (applicationName) {
+            services.each {
+                createDeployProcessSteps(it.service.serviceName, services, projectName, applicationName)
             }
         }
 
@@ -532,6 +514,85 @@ public class ImportMicroservices extends EFClient {
         }
     }
 
+    def createDeployProcessSteps(serviceName, services, projectName, applicationName) {
+        ElectricFlow ef = new ElectricFlow()
+
+        def dependencies = services.collect {
+            buildDependencies(it.service.serviceName, services)
+        }
+        def createProcessStepName = {
+            "deploy-${it}"
+        }
+        dependencies.each { List dependencyLine ->
+            def ordered = dependencyLine.reverse()
+            ordered.eachWithIndex{ entry, index ->
+                def processStepName = createProcessStepName(entry)
+                try {
+                    ef.createProcessStep(projectName: projectName,
+                        applicationName: applicationName,
+                        subservice: entry,
+                        processStepType: 'service',
+                        processName: DEPLOY_PROCESS_NAME,
+                        processStepName: processStepName,
+                    )
+                    logger INFO, "Created process step ${processStepName} for service ${serviceName}"
+
+                } catch (Throwable e) {
+
+                }
+                if (index != 0) {
+                    def dependency = createProcessStepName(ordered.get(index - 1))
+                    try {
+                        ef.createProcessDependency(
+                            projectName: projectName,
+                            applicationName: applicationName,
+                            subservice: serviceName,
+                            processName: DEPLOY_PROCESS_NAME,
+                            processStepName: dependency,
+                            targetProcessStepName: processStepName,
+                        )
+                        logger INFO, "Created dependency: $dependency -> $processStepName"
+                    } catch (Throwable e) {
+
+                    }
+                }
+            }
+        }
+
+
+//        "processDependency": [
+//            {
+//                "processDependencyName": "db",
+//                "targetProcessStepName": "wordpress",
+//                "branchType": "ALWAYS"
+//            }
+//        ]
+
+    }
+
+    def buildDependencies(serviceName, services, acc = []) {
+        assert serviceName
+        if (serviceName in acc) {
+            throw new RuntimeException("Circular dependency found: ${serviceName}")
+        }
+        acc << serviceName
+        def service = services.find { it.service.serviceName == serviceName }
+        if (!service || !service.service.processDependency) {
+            return acc
+        }
+        service.service.processDependency.each { dep ->
+            def name = dep.processDependencyName
+            def parent = buildDependencies(name, services, acc)
+            if (parent) {
+                acc.addAll(parent)
+            }
+            else {
+                acc << name
+            }
+        }
+        acc
+    }
+
     def createEFContainer(projectName, serviceName, container, application) {
         logger DEBUG, "Container payload:"
         logger DEBUG, prettyPrint(container)
@@ -565,8 +626,8 @@ public class ImportMicroservices extends EFClient {
         logger INFO, "Process ${processName} has been created for applicationName: '${applicationName}'"
     }
 
-    def createAppDeployProcessStep(projectName, applicationName, serviceName) {
-        def processName = 'Deploy'
+    def createAppDeployProcessStep(projectName, applicationName, serviceName, service) {
+        def processName = DEPLOY_PROCESS_NAME
         def processStepName = "deployService-${serviceName}"
         createAppProcessStep(projectName, applicationName, processName, [
                 processStepName: processStepName,
@@ -576,7 +637,7 @@ public class ImportMicroservices extends EFClient {
     }
 
     def createDeployProcess(projectName, serviceName) {
-        def processName = 'Deploy'
+        def processName = DEPLOY_PROCESS_NAME
         createProcess(projectName, serviceName, [processName: processName, processType: 'DEPLOY'])
         logger INFO, "Process ${processName} has been created for ${serviceName}"
         def processStepName = 'deployService'
@@ -606,7 +667,7 @@ public class ImportMicroservices extends EFClient {
         ]
         def svc = ef.createService(argsForService)?.service
         if (applicationName) {
-            createAppDeployProcessStep(projectName, applicationName, serviceName)
+//            createAppDeployProcessStep(projectName, applicationName, serviceName, service)
         }
         svc
     }
