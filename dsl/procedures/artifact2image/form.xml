@@ -18,44 +18,44 @@
 <editor>
     <formElement>
         <type>entry</type>
-        <label>Configuration Name:</label>
+        <label>EC-Docker Configuration:</label>
         <property>config</property>
         <required>1</required>
-        <documentation>Previously defined configuration.</documentation>
+        <documentation>Name of the existing EC-Docker plugin configuration</documentation>
     </formElement>
     <formElement>
         <type>entry</type>
-        <label>Artifact Name:</label>
+        <label>EC-Artifact Name:</label>
         <property>ecp_docker_artifactName</property>
         <required>0</required>
-        <documentation>Artifact name in form group:artifact. Artifact will be taken from EF repository.</documentation>
+        <documentation>If reading artifact from the ElectricFlow Artifact repository: provide the name in the format 'group:artifact'</documentation>
     </formElement>
     <formElement>
         <type>entry</type>
-        <label>Artifact Version:</label>
+        <label>EC-Artifact Version:</label>
         <required>0</required>
         <property>ecp_docker_versionRange</property>
-        <documentation>Artifact version for retrieval, e.g. 0.0.1. If left empty, latest artifact version will be retrieved.</documentation>
+        <documentation>Provide the artifact version that will be retrieved from EC-Artifact repository (e.g. 0.0.1).  If left empty, the latest artifact version will be retrieved.</documentation>
     </formElement>
     <formElement>
         <type>textarea</type>
         <label>Artifact Filesystem Location:</label>
         <required>0</required>
         <property>ecp_docker_artifactLocation</property>
-        <documentation>Path to the folder where the artifact was retrieved or to the artifact itself, e.g. /myArtifactStorage/artifact.war or /my-storage/artifact1/.</documentation>
+        <documentation>If reading the artifact directly from a filesystem location, provide the path to the folder containing the artifact or to the artifact itself (e.g. /myArtifactStorage/artifact.war or /my-storage/artifact1/)</documentation>
     </formElement>
     <formElement>
         <type>entry</type>
-        <label>EC-Artifactory Configuration Name:</label>
+        <label>Artifactory - Configuration Name:</label>
         <property>ecp_docker_artifactoryConfigName</property>
-        <documentation>Previously defined configuiration name for EC-Artifactory plugin. Please note, that EC-Artifactory plugin must be installed and promoted.</documentation>
+        <documentation>If reading artifact from Artifactory: Name of an existing configuration for the EC-Artifactory plugin. Please note: the EC-Artifactory plugin must be installed and promoted.</documentation>
         <required>0</required>
     </formElement>
     <formElement>
         <type>select</type>
-        <label>Repository Type (Artifactory):</label>
+        <label>Artifactory Repository Type:</label>
         <property>ecp_docker_artifactoryRepoType</property>
-        <documentation>Artifactory repository type. Required if Artifactory is used.</documentation>
+        <documentation>Required if retrieving from Artifactory</documentation>
         <required>0</required>
         <option>
             <value>Maven</value>
@@ -72,37 +72,37 @@
     </formElement>
     <formElement>
         <type>entry</type>
-        <label>Repository Key (Artifactory):</label>
+        <label>Artifactory Repository Key:</label>
         <property>ecp_docker_artifactoryRepoKey</property>
         <documentation>Repository key for the repository in Artifactory, e.g. myrepo, libs-release-local. Required if Artifactory is used.</documentation>
         <required>0</required>
     </formElement>
     <formElement>
         <type>entry</type>
-        <label>Organization Path (Artifactory):</label>
+        <label>Artifactory Organization Path:</label>
         <property>ecp_docker_artifactoryOrgPath</property>
         <documentation>Organization path for the artifact in Artifactory, e.g. com/mycompany. Required if Artifactory is used.</documentation>
         <required>0</required>
     </formElement>
     <formElement>
         <type>entry</type>
-        <label>Artifact Name (Artifactory):</label>
+        <label>Artifactory Artifact Name:</label>
         <property>ecp_docker_artifactoryArtifactName</property>
         <documentation>Name of the artifact (module name) in the artifactory. E.g. my-artifact. Required if Artifactory is used.</documentation>
         <required>0</required>
     </formElement>
     <formElement>
         <type>entry</type>
-        <label>Artifact Version (Artifactory):</label>
+        <label>Artifactory Artifact Version:</label>
         <property>ecp_docker_artifactoryVersion</property>
-        <documentation>Artifact's version in Artifactory, e.g. 1.0.0. If left blank, the latest version will be retrieved (Artifactory Pro is required for non-Maven repositories to retrieve the latest version). Required if Artifactory is used.</documentation>
+        <documentation>Artifact version in Artifactory, e.g. 1.0.0. If left blank, the latest version will be retrieved (Artifactory Pro is required for non-Maven repositories to retrieve the latest version). Required if retrieving from Artifactory.</documentation>
         <required>0</required>
     </formElement>
     <formElement>
         <type>entry</type>
-        <label>Extension (Artifactory):</label>
+        <label>Artifactory Artifact Extension:</label>
         <property>ecp_docker_artifactoryExtension</property>
-        <documentation>Artifact extension, e.g. jar or war. Required if Artifactory is used.</documentation>
+        <documentation>Artifact extension, e.g. jar or war. Required if retrieving from Artifactory.</documentation>
         <required>0</required>
     </formElement>
     <formElement>
@@ -110,7 +110,7 @@
         <required>1</required>
         <property>ecp_docker_imageName</property>
         <label>Image Name:</label>
-        <documentation>Name for the image, e.g. myrepo/image:v1.0.</documentation>
+        <documentation>Name and version of the new container image, provided in format: myrepo/image:v1.0.</documentation>
     </formElement>
     <formElement>
         <type>entry</type>
@@ -123,9 +123,9 @@
         <type>credential</type>
         <required>0</required>
         <property>ecp_docker_credential</property>
-        <label>Username and Password:</label>
+        <label>Docker Connection Credential:</label>
         <attachedAsParameterToStep>artifact2image</attachedAsParameterToStep>
-        <documentation>Username and password to connect to Docker registry.</documentation>
+        <documentation>Select an existing credential to use to connect to the Docker Registry</documentation>
     </formElement>
     <formElement>
         <type>entry</type>

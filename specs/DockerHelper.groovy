@@ -18,7 +18,7 @@ class DockerHelper extends ContainerHelper {
             project '$projectName', {
                 environment '$envName', {
                     cluster '$clusterName', {
-                        pluginKey = 'EC-Dcoker'
+                        pluginKey = 'EC-Docker'
                         provisionParameter = [
                             config: '$configName'
                         ]
@@ -54,31 +54,6 @@ class DockerHelper extends ContainerHelper {
             null,
             props
         )
-
-//
-//        if (System.getenv('RECREATE_CONFIG')) {
-//            deleteConfiguration('EC-Docker', configName)
-//        }
-//
-//        def result = dsl """
-//            runProcedure(
-//                projectName: "/plugins/EC-Docker/project",
-//                procedureName: 'CreateConfiguration',
-//                actualParameter: [
-//                    config: '$configName',
-//                    endpoint: "$endpoint",
-//                    logLevel: '2',
-//                    testConnection: "false",
-//                    credential: 'credential'
-//                ]
-//            )
-//        """
-//
-//        assert result?.jobId
-//        waitUntil {
-//            jobCompleted(result)
-//        }
-//        assert jobStatus(result.jobId).outcome == 'success'
     }
 
     def cleanupCluster(configName) {
