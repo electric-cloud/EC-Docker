@@ -260,10 +260,10 @@ public class ImportMicroservices extends EFClient {
             composeConfig.networks?.each { networkName, networkConfig ->
                 if (networkName in networkList ) {
                     networkConfig.ipam?.config?.each {
-                        if (it.subnet) {
+                        if (it.hasProperty('subnet')) {
                             subnetList << it.subnet
                         }
-                        if (it.gateway) {
+                        if (it.hasProperty('gateway')) {
                             gatewayList << it.gateway
                         }
                     }
