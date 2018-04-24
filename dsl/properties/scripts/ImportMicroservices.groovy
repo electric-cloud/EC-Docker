@@ -17,6 +17,11 @@ import groovy.json.JsonBuilder
 
 public class ImportMicroservices extends EFClient {
 
+    static def REPORT_URL_PROPERTY = '/myJob/report-urls/'
+    static def REPORT_TEMPLATE_UNSUPPORTED_PARAMS = '''
+    $[/myProject/resources/report]
+    '''
+
     def composeConfig
     // For networks params
     def yamlConfig
@@ -66,74 +71,81 @@ public class ImportMicroservices extends EFClient {
             volumes = globalServicesVolumesParams
         }
 
+        def unsupportedParams = []
+
         // Services
         composeConfig.services.each { name, serviceConfig ->
-            checkForUnsupportedParameters(name, serviceConfig)
+            checkForUnsupportedParameters(name, serviceConfig, unsupportedParams)
             def efService = buildServiceDefinition(name, serviceConfig)
             efService.network = networks
             efServices.push(efService)
         }
 
+        if(unsupportedParams) {
+            def unsupportedParamsTable = buildSummaryReport(unsupportedParams)
+            publishSummaryReportWithUnsupportedComposeParameters(unsupportedParamsTable)
+        }
+
         efServices
     }
 
-    def checkForUnsupportedParameters(def name, def serviceConfig) {
+    def checkForUnsupportedParameters(def name, def serviceConfig, def unsupportedParams) {
         if(serviceConfig.capAdd != null) {
-            logger WARNING, "Service ${name} has unsupported option cap_add: ${serviceConfig.capAdd}"
+            unsupportedParams.push("Service ${name} has unsupported option cap_add: ${serviceConfig.capAdd}")
         }
         if(serviceConfig.envFile != null) {
-            logger WARNING, "Service ${name} has unsupported option env_file: ${serviceConfig.envFile}"
+            unsupportedParams.push("Service ${name} has unsupported option env_file: ${serviceConfig.envFile}")
         }
         if(serviceConfig.extraHosts != null) {
-            logger WARNING, "Service ${name} has unsupported option extra_hosts: ${serviceConfig.extraHosts}"
+            unsupportedParams.push("Service ${name} has unsupported option extra_hosts: ${serviceConfig.extraHosts}")
         }
         if(serviceConfig.healthcheck != null) {
-            logger WARNING, "Service ${name} has unsupported option healthcheck: ${serviceConfig.healthcheck}"
+            unsupportedParams.push("Service ${name} has unsupported option healthcheck: ${serviceConfig.healthcheck}")
         }
         if(serviceConfig.hostname != null) {
-            logger WARNING, "Service ${name} has unsupported option hostname: ${serviceConfig.hostname}"
+            unsupportedParams.push("Service ${name} has unsupported option hostname: ${serviceConfig.hostname}")
         }
         if(serviceConfig.labels != null) {
-            logger WARNING, "Service ${name} has unsupported option labels: ${serviceConfig.labels}"
+            unsupportedParams.push("Service ${name} has unsupported option labels: ${serviceConfig.labels}")
         }
         if(serviceConfig.logging != null) {
-            logger WARNING, "Service ${name} has unsupported option logging: ${serviceConfig.logging}"
+            unsupportedParams.push("Service ${name} has unsupported option logging: ${serviceConfig.logging}")
         }
         if(serviceConfig.pid != null) {
-            logger WARNING, "Service ${name} has unsupported option pid: ${serviceConfig.pid}"
+            unsupportedParams.push("Service ${name} has unsupported option pid: ${serviceConfig.pid}")
         }
         if(serviceConfig.secrets != null) {
-            logger WARNING, "Service ${name} has unsupported option secrets: ${serviceConfig.secrets}"
+            unsupportedParams.push("Service ${name} has unsupported option secrets: ${serviceConfig.secrets}")
         }
         if(serviceConfig.stdinOpen != null) {
-            logger WARNING, "Service ${name} has unsupported option stdin_open: ${serviceConfig.stdinOpen}"
+            unsupportedParams.push("Service ${name} has unsupported option stdin_open: ${serviceConfig.stdinOpen}")
         }
         if(serviceConfig.stopGracePeriod != null) {
-            logger WARNING, "Service ${name} has unsupported option stop_grace_period: ${serviceConfig.stopGracePeriod}"
+            unsupportedParams.push("Service ${name} has unsupported option stop_grace_period: ${serviceConfig.stopGracePeriod}")
         }
         if(serviceConfig.stopSignal != null) {
-            logger WARNING, "Service ${name} has unsupported option stop_signal: ${serviceConfig.stopSignal}"
+            unsupportedParams.push("Service ${name} has unsupported option stop_signal: ${serviceConfig.stopSignal}")
         }
         if(serviceConfig.tty != null) {
-            logger WARNING, "Service ${name} has unsupported option tty: ${serviceConfig.tty}"
+            unsupportedParams.push("Service ${name} has unsupported option tty: ${serviceConfig.tty}")
         }
         if(serviceConfig.ulimits != null) {
-            logger WARNING, "Service ${name} has unsupported option ulimits: ${serviceConfig.ulimits}"
+            unsupportedParams.push("Service ${name} has unsupported option ulimits: ${serviceConfig.ulimits}")
         }
         if(serviceConfig.user != null) {
-            logger WARNING, "Service ${name} has unsupported option user: ${serviceConfig.user}"
+            unsupportedParams.push("Service ${name} has unsupported option user: ${serviceConfig.user}")
         }
         if(serviceConfig.workingDir != null) {
-            logger WARNING, "Service ${name} has unsupported option working_dir: ${serviceConfig.workingDir}"
+            unsupportedParams.push("Service ${name} has unsupported option working_dir: ${serviceConfig.workingDir}")
         }
     }
 
     def buildVolumeDefinition(def name, def volumeConfig) {
         def efVolumeName = name
         def efVolume = [
-                volumeName: efVolumeName,
-                configName: volumeConfig?.name,
-                driverName: volumeConfig?.driver
+            volumeName: efVolumeName,
+            configName: volumeConfig?.name,
+            driverName: volumeConfig?.driver
         ]
     }
 
@@ -195,6 +207,7 @@ public class ImportMicroservices extends EFClient {
             def containerVolumeMountPath
             def serviceVolumeName
             def serviceVolumeHostPath
+            logger DEBUG, "SERVICE ${name} !!VOLUME type: ${volume?.type}, source: ${volume?.source}, target: ${volume.target} \n"
             if(volume.type && volume.type.equals("volume")) {
                 serviceVolumeName = volume?.source
                 containerVolumeName = volume?.source
@@ -209,7 +222,7 @@ public class ImportMicroservices extends EFClient {
 
             containerVolume.name = containerVolumeName
             containerVolume.mountPath = containerVolumeMountPath
-
+          
             serviceVolume.name = serviceVolumeName
             serviceVolume.hostPath = serviceVolumeHostPath
 
@@ -232,7 +245,8 @@ public class ImportMicroservices extends EFClient {
                 cpuCount: serviceConfig.deploy?.resources?.reservations?.nanoCpus,
                 volumes: containerVolumes,
                 //volumeMount: containerVolumeValue,
-                ports: containerPorts
+            ports: containerPorts
+
         ]
 
         efService.container = container
@@ -680,6 +694,55 @@ public class ImportMicroservices extends EFClient {
             name = name.replaceAll('-', '.')
         }
         return normalizer(oneName) == normalizer(anotherName)
+    }
+
+    def publishSummaryReportWithUnsupportedComposeParameters(def unsupportedParams) {
+        def text = renderReportForUnsupportedParam(unsupportedParams, REPORT_TEMPLATE_UNSUPPORTED_PARAMS)
+
+        def dir = new File('artifacts').mkdir()
+        def random = new Random()
+        def randomSuffix = random.nextInt(10 ** 5)
+
+        def reportFilename = "dockerImportMicroservices_${randomSuffix}.html"
+        def report = new File("artifacts/${reportFilename}")
+        report.write(text)
+        String jobStepId = System.getenv('COMMANDER_JOBSTEPID')
+
+        def reportName = "Docker Import Microservices Report (${randomSuffix})"
+        publishLink(reportName, "/commander/jobSteps/${jobStepId}/${reportFilename}")
+    }
+
+    def publishLink(String name, String link) {
+        setEFProperty("${REPORT_URL_PROPERTY}${name}", link)
+        try {
+            setEFProperty("/myJob/report-urls/${name}",
+                    "<html><a href=\"${link}\" target=\"_blank\">${name}</a></html>")
+        }
+        catch (Throwable e) {
+            logger ERROR, "ImportMicroservices - publishLink error: ${e}"
+        }
+    }
+
+    def buildSummaryReport(def reportList){
+        def writer = new StringWriter()
+        def markup = new groovy.xml.MarkupBuilder(writer)
+        markup.html{
+            reportList.each{ item ->
+                tr {
+                    td(class:"text-center", item)
+                }
+            }
+        }
+        writer.toString()
+    }
+
+    def renderReportForUnsupportedParam(def unsupportedParams, String template) {
+        def engine = new groovy.text.SimpleTemplateEngine()
+        def templateParams = [:]
+        templateParams.unsupParams = unsupportedParams
+
+        def text = engine.createTemplate(template).make(templateParams).toString()
+        return text
     }
 
     def prettyPrint(object) {
