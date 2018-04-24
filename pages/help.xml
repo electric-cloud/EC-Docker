@@ -322,7 +322,31 @@ More information about how to setup TLS certificates on Docker endpoint can be f
     
     <div id="ImportMicroservices">
         <h2>Import Microservices</h2>
-        <p>Import microcervices using Docker Compose file and creates corresponding application models for them in ElectricFlow</p>
+        <p>Create microservices in ElectricFlow by importing a Docker Compose file.
+<div>
+    <ol>
+        <li><b>Copy and enter the content of your Docker Compose File (version 3 or greater).</b></li>
+        <li><b>Determine how the new microservices will be created in ElectricFlow</b>
+            <ul>
+                <li><b>Create the microservices individually at the top-level within the project.</b> All microservices will be created at the top-level. Enter the following parameters:
+                    <ul>
+                        <li>Project Name: Enter the name of the project where the microservices will be created</li>
+                    </ul></li>
+                <li><b>Create the Microservices within an application in ElectricFlow.</b> All microservices will be created as services within a new application. Enter the following parameters:
+                    <ul>
+                        <li>Project Name: Enter the name of the project where the new application will be created</li>
+                        <li>Create Microservices within and Application: Select the checkbox</li>
+                        <li>Application Name:  The name of a new application which will be created in ElectricFlow containing the new services.</li>
+                    </ul></li>
+            </ul></li>
+        <li><b>Optionally map the services to an existing Environment Cluster</b> Select an existing Environment that contains a cluster with EC-Docker configuration details where the new microservices can be deployed. Enter the following parameters:
+            <ul>
+                <li>Environment Project Name: The project containing the ElectricFlow environment where the services will be deployed.</li>
+                <li>Environment Name: The name of the existing environment that contains a cluster where the newly created microservice(s) will be deployed.</li>
+                <li>Cluster Name: The name of an existing EC-Docker backed cluster in the environment above where the newly created microservice(s) will be deployed.</li>
+            </ul></li>
+    </ol>
+</div></p>
         
         <h3>Import Microservices Parameters</h3>
         <table class="grid">
@@ -335,38 +359,38 @@ More information about how to setup TLS certificates on Docker endpoint can be f
             <tbody>
             
             <tr>
-                <td class="required">Docker Compose file</td>
-                <td>Docker Compose file contents</td>
+                <td class="required">Docker Compose File Content</td>
+                <td>Content of the Docker Compose File</td>
             </tr>
             
             <tr>
                 <td class="required">Project Name</td>
-                <td>The name of project in which the application or the services will be created.</td>
+                <td>The name of project in which the application or microservices will be created.</td>
             </tr>
             
             <tr>
-                <td >Create application-scoped microservices</td>
-                <td>Whether all the services defined in the Docker Compose file should be created within one application in ElectricFlow. If checked, then the application name must be provided.</td>
+                <td >Create Microservices within an Application</td>
+                <td>(Optional) Select to create all services defined in the Docker Compose file within one application in ElectricFlow. If selected, then the application name must be provided. If unselected, microservices will be created at the top-level in the project.</td>
             </tr>
             
             <tr>
                 <td >Application Name</td>
-                <td>The name of the application to create, within which the microservices will be created. Required if 'Create application-scoped microservices' is checked.</td>
+                <td>(Optional) The name of the new application that will contain the microservices. Required only if 'Create Microservices within an Application' is selected.</td>
             </tr>
             
             <tr>
                 <td >Environment Project Name</td>
-                <td>The name of project that the environment belongs to.</td>
+                <td>(Optional) The project containing the Environment where the services will be deployed.</td>
             </tr>
             
             <tr>
                 <td >Environment Name</td>
-                <td>The name of the environment containing the cluster where the newly created microservice(s) will be deployed.</td>
+                <td>(Optional) The name of an existing environment that contains a cluster where the newly created microservice(s) will be deployed.</td>
             </tr>
             
             <tr>
                 <td >Cluster Name</td>
-                <td>The name of the EC-Docker backed cluster within the environment where the newly created microservice(s) will be deployed.</td>
+                <td>(Optional) The name of the existing EC-Docker backed cluster in the environment above where the newly created microservice(s) will be deployed.</td>
             </tr>
             
             </tbody>
@@ -764,63 +788,63 @@ CMD [${COMMAND}]
             <tbody>
             
             <tr>
-                <td class="required">Configuration Name</td>
-                <td>Previously defined configuration.</td>
+                <td class="required">EC-Docker Configuration</td>
+                <td>Name of the existing EC-Docker plugin configuration</td>
             </tr>
             
             <tr>
-                <td >Artifact Name</td>
-                <td>Artifact name in form group:artifact. Artifact will be taken from EF repository.</td>
+                <td >EC-Artifact Name</td>
+                <td>If reading artifact from the ElectricFlow Artifact repository: provide the name in the format 'group:artifact'</td>
             </tr>
             
             <tr>
-                <td >Artifact Version</td>
-                <td>Artifact version for retrieval, e.g. 0.0.1. If left empty, latest artifact version will be retrieved.</td>
+                <td >EC-Artifact Version</td>
+                <td>Provide the artifact version that will be retrieved from EC-Artifact repository (e.g. 0.0.1).  If left empty, the latest artifact version will be retrieved.</td>
             </tr>
             
             <tr>
                 <td >Artifact Filesystem Location</td>
-                <td>Path to the folder where the artifact was retrieved or to the artifact itself, e.g. /myArtifactStorage/artifact.war or /my-storage/artifact1/.</td>
+                <td>If reading the artifact directly from a filesystem location, provide the path to the folder containing the artifact or to the artifact itself (e.g. /myArtifactStorage/artifact.war or /my-storage/artifact1/)</td>
             </tr>
             
             <tr>
-                <td >EC-Artifactory Configuration Name</td>
-                <td>Previously defined configuiration name for EC-Artifactory plugin. Please note, that EC-Artifactory plugin must be installed and promoted.</td>
+                <td >Artifactory - Configuration Name</td>
+                <td>If reading artifact from Artifactory: Name of an existing configuration for the EC-Artifactory plugin. Please note: the EC-Artifactory plugin must be installed and promoted.</td>
             </tr>
             
             <tr>
-                <td >Repository Type (Artifactory)</td>
-                <td>Artifactory repository type. Required if Artifactory is used.</td>
+                <td >Artifactory Repository Type</td>
+                <td>Required if retrieving from Artifactory</td>
             </tr>
             
             <tr>
-                <td >Repository Key (Artifactory)</td>
+                <td >Artifactory Repository Key</td>
                 <td>Repository key for the repository in Artifactory, e.g. myrepo, libs-release-local. Required if Artifactory is used.</td>
             </tr>
             
             <tr>
-                <td >Organization Path (Artifactory)</td>
+                <td >Artifactory Organization Path</td>
                 <td>Organization path for the artifact in Artifactory, e.g. com/mycompany. Required if Artifactory is used.</td>
             </tr>
             
             <tr>
-                <td >Artifact Name (Artifactory)</td>
+                <td >Artifactory Artifact Name</td>
                 <td>Name of the artifact (module name) in the artifactory. E.g. my-artifact. Required if Artifactory is used.</td>
             </tr>
             
             <tr>
-                <td >Artifact Version (Artifactory)</td>
-                <td>Artifact's version in Artifactory, e.g. 1.0.0. If left blank, the latest version will be retrieved (Artifactory Pro is required for non-Maven repositories to retrieve the latest version). Required if Artifactory is used.</td>
+                <td >Artifactory Artifact Version</td>
+                <td>Artifact version in Artifactory, e.g. 1.0.0. If left blank, the latest version will be retrieved (Artifactory Pro is required for non-Maven repositories to retrieve the latest version). Required if retrieving from Artifactory.</td>
             </tr>
             
             <tr>
-                <td >Extension (Artifactory)</td>
-                <td>Artifact extension, e.g. jar or war. Required if Artifactory is used.</td>
+                <td >Artifactory Artifact Extension</td>
+                <td>Artifact extension, e.g. jar or war. Required if retrieving from Artifactory.</td>
             </tr>
             
             <tr>
                 <td class="required">Image Name</td>
-                <td>Name for the image, e.g. myrepo/image:v1.0.</td>
+                <td>Name and version of the new container image, provided in format: myrepo/image:v1.0.</td>
             </tr>
             
             <tr>
@@ -829,8 +853,8 @@ CMD [${COMMAND}]
             </tr>
             
             <tr>
-                <td >Username and Password</td>
-                <td>Username and password to connect to Docker registry.</td>
+                <td >Docker Connection Credential</td>
+                <td>Select an existing credential to use to connect to the Docker Registry</td>
             </tr>
             
             <tr>
