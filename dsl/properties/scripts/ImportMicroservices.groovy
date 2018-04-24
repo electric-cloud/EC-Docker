@@ -147,7 +147,12 @@ public class ImportMicroservices extends EFClient {
         def efServiceName = name
         def efService = [
             service: [
-                serviceName: efServiceName
+                serviceName: efServiceName,
+                serviceMapping: [
+                        networkList: [],
+                        subnetList: [],
+                        gatewayList: []
+                ]
             ]
         ]
 
@@ -173,27 +178,45 @@ public class ImportMicroservices extends EFClient {
             url = getRegistryUri(serviceConfig.image)
         }
 
-        //network
-        def networks = []
-
+        //networks
         def networkList = []
         if(serviceConfig.networks) {
             serviceConfig.networks.each { key, value ->
                 networkList.push(key)
             }
         }
-        efService.service.networkList = networkList
 
+        def subnetList = []
+        def gatewayList = []
         if(globalNetworks && networkList) {
+            efService.service.serviceMapping.networkList = networkList
             globalNetworks.each { globalNetworkConfig ->
-                for(int i = 0; i < networkList.size(); i++)
-                    if(globalNetworkConfig.networkName == networkList.get(i)) {
-                        networks.push(globalNetworkConfig)
+                for (int i = 0; i < networkList.size(); i++) {
+                    if (globalNetworkConfig.networkName == networkList.get(i)) {
+                        if (globalNetworkConfig.subnet) {
+                            String subnet = globalNetworkConfig.subnet
+                            subnet = subnet.replaceAll(',', '|')
+                            subnet = subnet.replaceAll(' ', '')
+                            subnetList.push(subnet)
+                        }
+                        if (globalNetworkConfig.gateway) {
+                            String gateway = globalNetworkConfig.gateway
+                            gateway = gateway.replaceAll(',', '|')
+                            gateway = gateway.replaceAll(' ', '')
+                            gatewayList.push(gateway)
+                        }
                     }
+
+                }
             }
         }
 
-        efService.service.networks = networks
+        if(subnetList) {
+            efService.service.serviceMapping.subnetList = subnetList
+        }
+        if(gatewayList) {
+            efService.service.serviceMapping.gatewayList = gatewayList
+        }
 
         // ENV variables
         def envVars = serviceConfig.environment.entries?.collect{
@@ -537,7 +560,7 @@ public class ImportMicroservices extends EFClient {
                     actualParameters.add([actualParameterName: k, value: v])
                 }
             }
-            payload.actualParameter = actualParameters
+            payload.actualParameters = actualParameters
         }
 
         if(applicationName) {
