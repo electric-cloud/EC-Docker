@@ -28,9 +28,16 @@ dependencies {
 test {
     systemProperties['COMMANDER_SERVER'] = 'ubuntu-esxi'
     systemProperties["COMMANDER_SECURE"] = '1'
-    systemProperties['EC_SPECS_CLI'] = '1'
 
     testLogging {
         showStandardStreams = true
+    }
+    outputs.upToDateWhen { false }
+    systemProperties['EC_SPECS_CLI'] = true
+
+    if (reportDestination) {
+        reports {
+            html.destination = reportDestination
+        }
     }
 }
