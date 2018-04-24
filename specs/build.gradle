@@ -6,6 +6,8 @@ description = "EC-Docker Specs"
 
 sourceCompatibility = 1.8
 
+defaultTasks 'test'
+
 repositories {
     jcenter()
     mavenCentral()
@@ -26,7 +28,8 @@ dependencies {
 }
 
 test {
-    systemProperties['COMMANDER_SERVER'] = 'ubuntu-esxi'
+    def server = findProperty('server') ?: 'localhost'
+    systemProperties['COMMANDER_SERVER'] = server
     systemProperties["COMMANDER_SECURE"] = '1'
 
     testLogging {
@@ -35,9 +38,10 @@ test {
     outputs.upToDateWhen { false }
     systemProperties['EC_SPECS_CLI'] = true
 
-    if (reportDestination) {
+    def destination = findProperty('reportDestination') ?: "spec-report"
+    if (destination) {
         reports {
-            html.destination = reportDestination
+            html.destination = destination
         }
     }
 }
