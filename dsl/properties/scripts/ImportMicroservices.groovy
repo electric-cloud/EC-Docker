@@ -69,18 +69,6 @@ public class ImportMicroservices extends EFClient {
             volumes = globalServicesVolumesParams
         }
 
-        // Global volumes
-        composeConfig.volumes.each { name, volumeConfig ->
-            def efVolume = buildVolumeDefinition(name, volumeConfig)
-            logger INFO, "Reading global volumes parameters: " + prettyPrint(efVolume)
-            globalServicesVolumesParams.push(efVolume)
-        }
-
-        def volumes
-        if(globalServicesVolumesParams) {
-            volumes = globalServicesVolumesParams
-        }
-
         // Services
         composeConfig.services.each { name, serviceConfig ->
             checkForUnsupportedParameters(name, serviceConfig)
