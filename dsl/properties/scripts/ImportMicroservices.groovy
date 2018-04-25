@@ -208,14 +208,10 @@ public class ImportMicroservices extends EFClient {
                     if (globalNetworkConfig.networkName == networkList.get(i)) {
                         if (globalNetworkConfig.subnet) {
                             String subnet = globalNetworkConfig.subnet
-                            subnet = subnet.replaceAll(',', '|')
-                            subnet = subnet.replaceAll(' ', '')
                             subnetList.push(subnet)
                         }
                         if (globalNetworkConfig.gateway) {
                             String gateway = globalNetworkConfig.gateway
-                            gateway = gateway.replaceAll(',', '|')
-                            gateway = gateway.replaceAll(' ', '')
                             gatewayList.push(gateway)
                         }
                     }
@@ -260,7 +256,6 @@ public class ImportMicroservices extends EFClient {
             def containerVolumeMountPath
             def serviceVolumeName
             def serviceVolumeHostPath
-            logger DEBUG, "SERVICE ${name} !!VOLUME type: ${volume?.type}, source: ${volume?.source}, target: ${volume.target} \n"
             if(volume.type && volume.type.equals("volume")) {
                 serviceVolumeName = volume?.source
                 containerVolumeName = volume?.source
@@ -382,14 +377,14 @@ public class ImportMicroservices extends EFClient {
         def subnet = null
         def gateway = null
 
-        if(networkConfig.ipam?.config) {
-            networkConfig.ipam.config.subnet?.each{ param ->
+        if(networkConfig?.ipam && networkConfig.ipam?.config) {
+            networkConfig.ipam.config?.subnet?.each{ param ->
                 if(param != null) {
                     subnet = param
                 }
             }
 
-            networkConfig.ipam.config.gateway?.each { param ->
+            networkConfig.ipam.config?.gateway?.each { param ->
                 if(param != null) {
                     gateway = param
                 }
