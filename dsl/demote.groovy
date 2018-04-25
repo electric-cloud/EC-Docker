@@ -5,8 +5,9 @@ import com.electriccloud.commander.dsl.util.BasePlugin
 @BaseScript BasePlugin baseScript
 
 def pluginName = args.pluginName
+def otherPluginName = args.otherPluginName
 def pluginKey = getProject("/plugins/$pluginName/project").pluginKey
 
-cleanup(pluginKey, pluginName)
+cleanup(pluginKey, otherPluginName)
 
-return "Plugin $pluginKey demoted"
+return "Plugin $otherPluginName demoted"
