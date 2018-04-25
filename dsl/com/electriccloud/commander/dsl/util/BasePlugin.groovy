@@ -73,15 +73,21 @@ abstract class BasePlugin extends DslDelegatingScript {
 			def addStepPicker = shouldAddStepPicker(pluginName, proc.procedureName)
 			// delete the step picker if it was added by setupPluginMetadata
 			if (addStepPicker) {
-				def label = "$pluginKey - $proc.procedureName"
-				def propName = "/server/ec_customEditors/pickerStep/$label"
-				def stepPickerProp = getProperty(propName, suppressNoSuchPropertyException: true)
-				if (stepPickerProp) {
-					deleteProperty propertyName: propName
-				}
+				deleteStepPicker(pluginKey, proc.procedureName)
 			}
 
 		}
+	}
+
+	def deleteStepPicker(String pluginKey, String procName) {
+
+		def label = "$pluginKey - $procName"
+		def propName = "/server/ec_customEditors/pickerStep/$label"
+		def stepPickerProp = getProperty(propName, suppressNoSuchPropertyException: true)
+		if (stepPickerProp) {
+			deleteProperty propertyName: propName
+		}
+
 	}
 
 	def determinePluginCategory(String pluginDir) {
