@@ -49,7 +49,6 @@ public class ImportMicroservices extends EFClient {
             }
         }
 
-
         def networks = []
         if (globalServiceNetworksParams) {
             networks = [
@@ -153,10 +152,9 @@ public class ImportMicroservices extends EFClient {
     def buildServiceDefinition(def name, def serviceConfig) {
         def efServiceName = name
         def efService = [
-            service: [
-                    serviceName: efServiceName
-            ],
-            serviceMapping: [:]
+                service: [
+                        serviceName: efServiceName
+                ]
         ]
 
         // Service Fields
@@ -262,31 +260,6 @@ public class ImportMicroservices extends EFClient {
 
         logger INFO, "Service definition read from the Docker Compose file:"
         logger INFO, prettyPrint(efService)
-
-        if (serviceConfig.networks) {
-            def networkList = []
-            serviceConfig.networks.each { networkName, config ->
-                networkList << networkName
-            }
-            efService.serviceMapping.networkList = networkList?.join(', ')
-            def subnetList = []
-            def gatewayList = []
-            composeConfig.networks?.each { networkName, networkConfig ->
-                if (networkName in networkList ) {
-                    networkConfig.ipam?.config?.each {
-                        if (it.hasProperty('subnet')) {
-                            subnetList << it.subnet
-                        }
-                        if (it.hasProperty('gateway')) {
-                            gatewayList << it.gateway
-                        }
-                    }
-                }
-            }
-            efService.serviceMapping.subnetList = subnetList?.join(', ')
-            efService.serviceMapping.gatewayList = gatewayList?.join(', ')
-        }
-
         efService
     }
 
