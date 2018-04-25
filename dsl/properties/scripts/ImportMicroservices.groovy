@@ -79,12 +79,7 @@ public class ImportMicroservices extends EFClient {
         // Services
         composeConfig.services.each { name, serviceConfig ->
             checkForUnsupportedParameters(name, serviceConfig, unsupportedParams)
-            def efService = null
-            if (networks) {
-                efService = buildServiceDefinition(name, serviceConfig, networks)
-            } else {
-                efService = buildServiceDefinition(name, serviceConfig)
-            }
+            def efService = buildServiceDefinition(name, serviceConfig)
             efServices.push(efService)
         }
 
@@ -156,17 +151,13 @@ public class ImportMicroservices extends EFClient {
         ]
     }
 
-    def buildServiceDefinition(def name, def serviceConfig, def globalNetworks = null) {
+    def buildServiceDefinition(def name, def serviceConfig) {
         def efServiceName = name
         def efService = [
             service: [
                 serviceName: efServiceName,
-                serviceMapping: [
-                        networkList: [],
-                        subnetList: [],
-                        gatewayList: []
-                ]
-            ]
+            ],
+            serviceMapping: [:]
         ]
 
         // Service Fields
@@ -199,32 +190,40 @@ public class ImportMicroservices extends EFClient {
             }
         }
 
+        networkList = networkList.sort()
+
         def subnetList = []
         def gatewayList = []
-        if(globalNetworks && networkList) {
-            efService.service.serviceMapping.networkList = networkList
-            globalNetworks.each { globalNetworkConfig ->
-                for (int i = 0; i < networkList.size(); i++) {
-                    if (globalNetworkConfig.networkName == networkList.get(i)) {
-                        if (globalNetworkConfig.subnet) {
-                            String subnet = globalNetworkConfig.subnet
-                            subnetList.push(subnet)
-                        }
-                        if (globalNetworkConfig.gateway) {
-                            String gateway = globalNetworkConfig.gateway
-                            gatewayList.push(gateway)
-                        }
+
+//        The order is important and depends on the order of networks
+//        Comma separated (CSV) list of subnet IPs (in IP/netmask format, IP should not end with 0)
+//        for networks mentioned in 'Networks' field. Multiple subnets for same network must be separated by '|'
+//        (pipe). For example, 10.200.1.10/24|10.200.2.10/24, 192.168.10.10/24. To use default values for any network
+//        in list skip it using commas like ,,192.168.10.10/24
+
+        if (networkList) {
+            efService.serviceMapping.networkList = networkList.join(', ')
+            networkList.each { networkName ->
+                def conf = composeConfig.networks?.find { it.key == networkName }?.value
+                def subnets = []
+                def gateways = []
+                conf?.ipam?.config?.each {
+                    if (it.hasProperty('subnet')) {
+                        subnets << it.subnet
                     }
-
+                    if (it.hasProperty('gateway')) {
+                        gateways << it.gateway
+                    }
                 }
+                subnetList << subnets.join('|')
+                gatewayList << gateways.join('|')
             }
-        }
-
-        if(subnetList) {
-            efService.service.serviceMapping.subnetList = subnetList
-        }
-        if(gatewayList) {
-            efService.service.serviceMapping.gatewayList = gatewayList
+            if (subnetList.find { it }) {
+                efService.serviceMapping.subnetList = subnetList.join(', ').trim()
+            }
+            if (gatewayList.find { it }) {
+                efService.serviceMapping.gatewayList = gatewayList.join(', ').trim()
+            }
         }
 
         // ENV variables
@@ -270,7 +269,7 @@ public class ImportMicroservices extends EFClient {
 
             containerVolume.name = containerVolumeName
             containerVolume.mountPath = containerVolumeMountPath
-          
+
             serviceVolume.name = serviceVolumeName
             serviceVolume.hostPath = serviceVolumeHostPath
 
@@ -561,7 +560,7 @@ public class ImportMicroservices extends EFClient {
                     actualParameters.add([actualParameterName: k, value: v])
                 }
             }
-            payload.actualParameters = actualParameters
+            payload.actualParameter = actualParameters
         }
 
         if(applicationName) {
