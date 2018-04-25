@@ -34,7 +34,7 @@ abstract class BasePlugin extends DslDelegatingScript {
 			println "/projects/${pluginName}/procedures/${proc.procedureName}/standardStepPicker: '$addStepPicker'"
 			if (addStepPicker) {
 				def label = "$pluginKey - $proc.procedureName"
-				def description = proc.description
+				def description = descriptionForStepPicker(pluginName, proc.procedureName) ?: proc.description
 				stepPicker (label, pluginKey, proc.procedureName, pluginCategory, description)
 			}
 			if (proc.procedureName == 'CreateConfiguration' && stepsWithAttachedCredentials) {
@@ -73,15 +73,21 @@ abstract class BasePlugin extends DslDelegatingScript {
 			def addStepPicker = shouldAddStepPicker(pluginName, proc.procedureName)
 			// delete the step picker if it was added by setupPluginMetadata
 			if (addStepPicker) {
-				def label = "$pluginKey - $proc.procedureName"
-				def propName = "/server/ec_customEditors/pickerStep/$label"
-				def stepPickerProp = getProperty(propName, suppressNoSuchPropertyException: true)
-				if (stepPickerProp) {
-					deleteProperty propertyName: propName
-				}
+				deleteStepPicker(pluginKey, proc.procedureName)
 			}
 
 		}
+	}
+
+	def deleteStepPicker(String pluginKey, String procName) {
+
+		def label = "$pluginKey - $procName"
+		def propName = "/server/ec_customEditors/pickerStep/$label"
+		def stepPickerProp = getProperty(propName, suppressNoSuchPropertyException: true)
+		if (stepPickerProp) {
+			deleteProperty propertyName: propName
+		}
+
 	}
 
 	def determinePluginCategory(String pluginDir) {
@@ -99,6 +105,11 @@ abstract class BasePlugin extends DslDelegatingScript {
 		// If the property is not set, then we add the step-picker by default
 		// If the property is set, then we check if the user requested stepPicker not be added.
 		return value == null || (value != 'false' && value != '0')
+	}
+
+	def descriptionForStepPicker(def pluginName, def procedureName) {
+		def prop = getProperty("/projects/${pluginName}/procedures/${procedureName}/stepPickerDescription", suppressNoSuchPropertyException: true)
+		prop?.value
 	}
 
 	def loadPluginProperties(String pluginDir, String pluginName) {

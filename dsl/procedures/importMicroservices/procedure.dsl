@@ -27,6 +27,10 @@ procedure 'Import Microservices',
     </ol>
 </div></html>''', {
 
+    //Using a simple description for use with the step picker since it cannot handle HTML content
+    property 'stepPickerDescription',
+        value: 'Create microservices in ElectricFlow by importing a Docker Compose file.'
+
 	step 'setup',
           subproject: '',
           subprocedure: 'Setup',

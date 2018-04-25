@@ -169,3 +169,6 @@ objTypes.each { type ->
 // version to this version. At the same time, also attach
 // the credentials to the required plugin procedure steps.
 upgrade(upgradeAction, pluginName, otherPluginName, stepsWithAttachedCredentials)
+
+//delete the step picker for the Deprecated 'Discover' procedure
+deleteStepPicker(pluginKey, 'Discover')
