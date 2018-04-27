@@ -29,11 +29,6 @@ class DockerHelper extends ContainerHelper {
         """
    }
 
-
-    def deleteConfig(configName) {
-        deleteConfiguration('EC-Docker', configName)
-    }
-
     def createConfig(configName) {
         def endpoint = System.getenv('EC_DOCKER_ENDPOINT')
         assert endpoint

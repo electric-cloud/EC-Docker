@@ -44,6 +44,7 @@ class ImportMicroservices extends DockerHelper {
     def "servicec deploy"() {
         given:
             def sampleName = 'my-service--deploy'
+            deleteService(projectName, serviceName)
             dockerYAMLFile = 
 '''
 version: '3\'
@@ -89,6 +90,8 @@ networks:
                 )
             """
         then:
+            def logs = readJobLogs(result.jobId)
+            logger.info(logs)
             logger.debug(result.logs)
             def service = getService(
                 projectName,
@@ -101,6 +104,7 @@ networks:
     def "servicec application scoped deploy"() {
         given:
         def sampleName = 'my-service-application-deploy'
+        deleteService(projectName, serviceName)
         dockerYAMLFile =
                 '''
 version: '3\'
@@ -148,6 +152,8 @@ networks:
                 )
             """
         then:
+        def logs = readJobLogs(result.jobId)
+        logger.info(logs)
         logger.debug(result.logs)
         def service = getService(
                 projectName,

@@ -8,7 +8,7 @@ project projName, {
         type = 'textarea'
       }
     }
-    step 'Import Microservices', {
+    step 'ImportMicroservices', {
       subproject = '/plugins/EC-Docker/project'
       subprocedure = 'Import Microservices'
 
