@@ -1043,13 +1043,13 @@ For more information on docker networking, see <a href="https://docs.docker.com/
     <h3>@PLUGIN_KEY@ 1.3.0</h3>
     <ul>
         
-        <li>Added <i>Import Microservices</i> procedure.</li>
+        <li>Added <i>Import Microservices</i> procedure which can be used through the <i>Import Docker Compose file</i> catalog item in the <i>Containers</i> service catalog for creating microservice models in ElectricFlow.</li>
         
         <li>Added <i>Artifact2Image</i> procedure.</li>
         
-        <li>Discover procedure is <i>Deprecated</i>. Use the "Import Microservices" procedure to create microservice models based on the given Docker Compose file contents</li>
-        
-        <li>Internal improvements for 8.3 release.</li>
+        <li>Discover procedure is <i>Deprecated</i>. Use the <i>Import Microservices</i> procedure to create microservice models based on the given Docker Compose file contents</li>
+
+        <li>Added support for retrieving and creating the plugin configurations through the <i>Configurations</i> option on the application process step and the pipeline stage task editors.</li>
         
     </ul>
     
