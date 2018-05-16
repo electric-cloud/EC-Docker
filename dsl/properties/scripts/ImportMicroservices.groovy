@@ -850,18 +850,17 @@ public class ImportMicroservices extends EFClient {
         report.write(text)
         String jobStepId = System.getenv('COMMANDER_JOBSTEPID')
 
-        def reportName = "Docker Import Microservices Report (${randomSuffix})"
+        def reportName = "Docker Import Microservices Report"
         publishLink(reportName, "/commander/jobSteps/${jobStepId}/${reportFilename}")
     }
 
     def publishLink(String name, String link) {
         setEFProperty("${REPORT_URL_PROPERTY}${name}", link)
         try {
-            setEFProperty("/myJob/report-urls/${name}",
-                    "<html><a href=\"${link}\" target=\"_blank\">${name}</a></html>")
+            setEFProperty("/myJob/report-urls/${name}", link)
         }
         catch (Throwable e) {
-            logger ERROR, "ImportMicroservices - publishLink error: ${e}"
+            logger ERROR, "ImportMicroservices - publishLink error, cause: ${e}"
         }
     }
 
