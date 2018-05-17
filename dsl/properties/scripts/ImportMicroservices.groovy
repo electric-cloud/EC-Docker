@@ -856,12 +856,6 @@ public class ImportMicroservices extends EFClient {
 
     def publishLink(String name, String link) {
         setEFProperty("${REPORT_URL_PROPERTY}${name}", link)
-        try {
-            setEFProperty("/myJob/report-urls/${name}", link)
-        }
-        catch (Throwable e) {
-            logger ERROR, "ImportMicroservices - publishLink error, cause: ${e}"
-        }
     }
 
     def buildSummaryReport(def reportList){
