@@ -14,8 +14,6 @@ excludeProcedures:
   - Setup
   - Define Container
   - Define Service
-deprecatedProcedures:
-  - Discover
 proceduresOrder:
   - Check Cluster
   - Create Ingress
