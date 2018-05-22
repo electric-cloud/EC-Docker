@@ -36,4 +36,5 @@
   - Discover procedure is <i>Deprecated</i>. Use the <i>Import Microservices</i> procedure to create microservice models based on the given Docker Compose file contents
   - Added support for retrieving and creating the plugin configurations through the <i>Configurations</i> option on the application process step and the pipeline stage task editors.
 1.4.0:
+  - Previously deprecated <i>Discover</i> procedure has been removed. Use the <i>Import Microservices</i> procedure to create microservice models based on the given Docker Compose file contents.
   - Fixed the report link for unsupported tags that were not processed by the <i>Import Microservices</i>.

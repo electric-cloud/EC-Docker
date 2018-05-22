@@ -13,6 +13,9 @@
 <div class="help">
     <h1>@PLUGIN_KEY@</h1>
     <p>Plugin version @PLUGIN_VERSION@</p>
+    
+    <p>Revised on May 22, 2018</p>
+    
     <hr style="margin-left: -10px; margin-top: 10px; height: 1px; width: 100%; color: #5981BD;" noshade="noshade"/>
     <h3>Overview</h3>
     <p><p>Docker is an open platform for developing, shipping, and running applications.
@@ -106,9 +109,6 @@ More information about how to setup TLS certificates on Docker endpoint can be f
         
 
         <li><a href="#DeployService">Deploy Service</a></li>
-        
-
-        <li><a href="#Discover">Discover (DEPRECATED)</a></li>
         
     </ul>
     
@@ -322,7 +322,7 @@ More information about how to setup TLS certificates on Docker endpoint can be f
     
     <div id="ImportMicroservices">
         <h2>Import Microservices</h2>
-        <p>Create microservices in ElectricFlow by importing a Docker Compose file.
+        Create microservices in ElectricFlow by importing a Docker Compose file.
 <div>
     <ol>
         <li><b>Copy and enter the content of your Docker Compose File (version 3 or greater).</b></li>
@@ -346,7 +346,7 @@ More information about how to setup TLS certificates on Docker endpoint can be f
                 <li>Cluster Name: The name of an existing EC-Docker backed cluster in the environment above where the newly created microservice(s) will be deployed.</li>
             </ul></li>
     </ol>
-</div></p>
+</div>
         
         <h3>Import Microservices Parameters</h3>
         <table class="grid">
@@ -987,46 +987,6 @@ For more information on docker networking, see <a href="https://docs.docker.com/
     </div>
 
     
-    <div id="Discover">
-        <h2>Discover (DEPRECATED)</h2>
-        <p>[Deprecated] This procedure is deprecated. Use the "Import Microservices" procedure to create microservice models based on the given Docker Compose file contents.</p>
-        
-        <h3>Discover Parameters</h3>
-        <table class="grid">
-            <thead>
-            <tr>
-                <th>Parameter</th>
-                <th>Description</th>
-            </tr>
-            </thead>
-            <tbody>
-            
-            <tr>
-                <td class="required">Docker Compose File Content</td>
-                <td>Docker Compose YAML File Content</td>
-            </tr>
-            
-            <tr>
-                <td class="required">Project</td>
-                <td>Name of the project in which application would be created.</td>
-            </tr>
-            
-            <tr>
-                <td class="required">Application</td>
-                <td>Name of the application to be created as part of discovery.</td>
-            </tr>
-            
-            <tr>
-                <td >Recreate application</td>
-                <td>Whether the application should be deleted if it already exists before recreating it based on the Docker Compose file content. If not checked, and the application already exists, the application will not be modified.</td>
-            </tr>
-            
-            </tbody>
-        </table>
-        
-    </div>
-
-    
 
     
 
@@ -1040,6 +1000,15 @@ For more information on docker networking, see <a href="https://docs.docker.com/
 
     <h1 id="releaseNotes">Release Notes</h1>
     
+    <h3>@PLUGIN_KEY@ 1.4.0</h3>
+    <ul>
+        
+        <li>Previously deprecated <i>Discover</i> procedure has been removed. Use the <i>Import Microservices</i> procedure to create microservice models based on the given Docker Compose file contents.</li>
+        
+        <li>Fixed the report link for unsupported tags that were not processed by the <i>Import Microservices</i>.</li>
+        
+    </ul>
+    
     <h3>@PLUGIN_KEY@ 1.3.0</h3>
     <ul>
         
@@ -1048,7 +1017,7 @@ For more information on docker networking, see <a href="https://docs.docker.com/
         <li>Added <i>Artifact2Image</i> procedure.</li>
         
         <li>Discover procedure is <i>Deprecated</i>. Use the <i>Import Microservices</i> procedure to create microservice models based on the given Docker Compose file contents</li>
-
+        
         <li>Added support for retrieving and creating the plugin configurations through the <i>Configurations</i> option on the application process step and the pipeline stage task editors.</li>
         
     </ul>

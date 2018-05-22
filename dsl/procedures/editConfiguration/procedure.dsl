@@ -25,6 +25,4 @@ procedure 'EditConfiguration',
             resourceName: '$[grabbedResource]',
             shell: 'ec-groovy',
             timeLimitUnits: 'minutes'
-
-
 }
