@@ -14,7 +14,7 @@
     <h1>@PLUGIN_KEY@</h1>
     <p>Plugin version @PLUGIN_VERSION@</p>
     
-    <p>Revised on May 22, 2018</p>
+    <p>Revised on June 25, 2018</p>
     
     <hr style="margin-left: -10px; margin-top: 10px; height: 1px; width: 100%; color: #5981BD;" noshade="noshade"/>
     <h3>Overview</h3>
@@ -69,6 +69,7 @@ More information about how to setup TLS certificates on Docker endpoint can be f
     <ul>
     <li><a href="#overview">Overview</a></li>
     
+    
     <li><a href="#CreateConfiguration">Plugin Configuration</a></li>
     
     <li><a href="#procedures">Plugin Procedures</a></li>
@@ -117,6 +118,8 @@ More information about how to setup TLS certificates on Docker endpoint can be f
     
     <li><a href="#releaseNotes">Release Notes</a></li>
 </ul>
+    
+
     
     <div id="CreateConfiguration">
         <a name='CreateConfiguration' id="CreateConfiguration"> </a>
@@ -1006,6 +1009,8 @@ For more information on docker networking, see <a href="https://docs.docker.com/
         <li>Previously deprecated <i>Discover</i> procedure has been removed. Use the <i>Import Microservices</i> procedure to create microservice models based on the given Docker Compose file contents.</li>
         
         <li>Fixed the report link for unsupported tags that were not processed by the <i>Import Microservices</i>.</li>
+        
+        <li>Configured the plugin to allow the ElectricFlow UI to create configs inline of procedure form.</li>
         
     </ul>
     
