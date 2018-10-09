@@ -31,6 +31,10 @@ to the grape root directory configured with ec-groovy.
 use File::Copy::Recursive qw(rcopy);
 use File::Path;
 use ElectricCommander;
+use Digest::MD5 qw(md5_hex);
+use MIME::Base64;
+use File::Temp qw(tempfile tempdir);
+use Archive::Zip;
 
 use warnings;
 use strict;
@@ -43,9 +47,45 @@ sub main() {
     my $ec = ElectricCommander->new();
     $ec->abortOnError(1);
 
-    retrieveGrapeDependency($ec, 'com.electriccloud:EC-Docker-Grapes:1.0.3');
+    my $pluginName = eval {
+        $ec->getProperty('additionalPluginName')->findvalue('//value')->string_value
+    };
+    my $projectName;
+    if ($pluginName) {
+        # This is a new one
+        $projectName = $ec->getPlugin($pluginName)->findvalue('//projectName')->string_value;
+    }
+
+    my @projects = ();
+    push @projects, '$[/myProject/projectName]';
+    if ($projectName) {
+        push @projects, $projectName;
+    }
+    retrieveDependencies($ec, @projects);
+
+    # This part remains as is
     if ($::gAdditionalArtifactVersion ne '') {
-        retrieveGrapeDependency($ec, $::gAdditionalArtifactVersion);
+        my @versions = split(/\s*,\s*/, $::gAdditionalArtifactVersion);
+        for my $version (@versions) {
+            retrieveGrapeDependency($ec, $version);
+        }
+    }
+}
+
+
+sub retrieveDependencies {
+    my ($ec, @projects) = @_;
+
+    my $dep = EC::DependencyManager->new($ec);
+    $dep->grabResource();
+    eval {
+        $dep->sendDependencies(@projects);
+    };
+    if ($@) {
+        my $err = $@;
+        print "$err\n";
+        $ec->setProperty('/myJobStep/summary', $err);
+        exit 1;
     }
 }
 
@@ -84,9 +124,11 @@ sub retrieveGrapeDependency($){
     my $resource = $ec->getProperty('/myJobStep/assignedResourceName')->findvalue('//value')->string_value;
     $ec->setProperty({propertyName => '/myJob/grabbedResource', value => $resource});
     print "Grabbed Resource: $resource\n";
-
 }
 
 main();
 
 1;
+
+
+$[/myProject/scripts/EC/DependencyManager]
