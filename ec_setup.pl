@@ -1,3 +1,5 @@
+# Version: Thu Oct 25 16:10:18 2018
+# Plugin-specific setup code
 my $setup = ECSetup->new(
     commander => $commander,
     pluginName => $pluginName,
