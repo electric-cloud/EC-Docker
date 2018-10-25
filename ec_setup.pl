@@ -1,4 +1,3 @@
-# Plugin-specific setup code
 my $setup = ECSetup->new(
     commander => $commander,
     pluginName => $pluginName,
