@@ -1,3 +1,4 @@
+# Version: Thu Oct 25 16:10:18 2018
 # Plugin-specific setup code
 my $setup = ECSetup->new(
     commander => $commander,
@@ -7,8 +8,9 @@ my $setup = ECSetup->new(
     promoteAction => $promoteAction,
 );
 $setup->promotePlugin([
-    {artifactName => '@PLUGIN_KEY@-Grapes', artifactVersion => '1.0.3', fromDirectory => 'lib'}
+    {artifactName => '@PLUGIN_KEY@-Grapes', artifactVersion => '1.0.0', fromDirectory => 'lib/grapes'}
 ]);
+
 
 # ec_setup.pl shared code
 #####################################
@@ -16,6 +18,8 @@ package ECSetup;
 
 use strict;
 use warnings;
+
+no warnings 'redefine';
 
 use File::Spec;
 use Archive::Zip;
@@ -44,6 +48,25 @@ sub promoteAction { shift->{promoteAction} }
 sub upgradeAction { shift->{upgradeAction} }
 sub pluginName { shift->{pluginName} }
 sub otherPluginName { shift->{otherPluginName} }
+
+sub removeArtifact {
+    my ($self, $artifactName, $artifactVersion, $fromDirectory) = @_;
+
+    $artifactName or die 'Artifact name should be provided!';
+    $artifactVersion or die 'Artifact version should be provided!';
+    $fromDirectory or die 'fromDirectory should be provided!';
+
+    # This is here because we cannot do publishArtifactVersion in dsl today
+    # delete artifact if it exists first
+    my $commander = $self->commander;
+    eval {
+        $commander->deleteArtifact("com.electriccloud:$artifactName");
+    };
+    if ($@) {
+        # It may fail to connect to the repository. No worries though.
+        warn "Warning: failed to remove old dependency artifact $artifactName: $@";
+    }
+}
 
 sub publishArtifact {
     my ($self, $artifactName, $artifactVersion, $fromDirectory) = @_;
@@ -187,14 +210,12 @@ sub promotePlugin {
         },
     );
 
-
     $logfile .= $dslReponse->findnodes_as_string("/");
-
     my $errorMessage = $commander->getError();
     if ( !$errorMessage ) {
         if ($dependencies) {
             for my $dependency (@$dependencies) {
-                $logfile .= $self->publishArtifact($dependency->{artifactName}, $dependency->{artifactVersion}, $dependency->{fromDirectory});
+                $logfile .= $self->removeArtifact($dependency->{artifactName}, $dependency->{artifactVersion}, $dependency->{fromDirectory});
             }
         }
     }
