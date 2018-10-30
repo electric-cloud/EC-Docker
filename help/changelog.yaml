@@ -26,10 +26,10 @@
       <li>For Docker Swarm instances, <i>Deploy Service</i> procedure creates a user defined overlay network if network name given in service mapping page. Procedure uses this network to deploy Docker Swarm services.</li>
     </ul>
 1.2.2:
-  - Registered the <i>Undeploy Service</i> procedure as an <i>Undeploy Service</i> operation to enable undeploying micro-services modeled in ElectricFlow from Docker using the service process.        
+  - Registered the <i>Undeploy Service</i> procedure as an <i>Undeploy Service</i> operation to enable undeploying micro-services modeled in ElectricFlow from Docker using the service process.
   - Added <i>Create Ingress</i> and <i>Delete Network</i> procedures.
   - Added support for container update on standalone docker engine.
-  - Added support for attaching additional networks during container update. 
+  - Added support for attaching additional networks during container update.
 1.3.0:
   - Added <i>Import Microservices</i> procedure which can be used through the <i>Import Docker Compose file</i> catalog item in the <i>Containers</i> service catalog for creating microservice models in ElectricFlow.
   - Added <i>Artifact2Image</i> procedure.
@@ -39,3 +39,5 @@
   - Previously deprecated <i>Discover</i> procedure has been removed. Use the <i>Import Microservices</i> procedure to create microservice models based on the given Docker Compose file contents.
   - Fixed the report link for unsupported tags that were not processed by the <i>Import Microservices</i>.
   - Configured the plugin to allow the ElectricFlow UI to create configs inline of procedure form.
+1.5.0:
+  - "Changed the way of storing and loading dependencies: the Repository is not required anymore. Now the depencencies and loaded through STOMP."

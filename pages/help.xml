@@ -14,9 +14,72 @@
     <h1>@PLUGIN_KEY@</h1>
     <p>Plugin version @PLUGIN_VERSION@</p>
     
-    <p>Revised on June 25, 2018</p>
+    <p>Revised on October 30, 2018</p>
     
     <hr style="margin-left: -10px; margin-top: 10px; height: 1px; width: 100%; color: #5981BD;" noshade="noshade"/>
+    <h1>Contents</h1>
+    <ul>
+    <li><a href="#overview">Overview</a></li>
+    
+    <li><a href="#prerequisites">Prerequisites</a></li>
+    
+
+    
+
+    
+    <li><a href="#CreateConfiguration">Plugin Configuration</a></li>
+    
+
+    <li><a href="#procedures">Plugin Procedures</a></li>
+    
+
+    <ul>
+        
+
+        <li><a href="#CheckCluster">Check Cluster</a></li>
+        
+
+        <li><a href="#CreateIngress">Create Ingress</a></li>
+        
+
+        <li><a href="#DeleteNetwork">Delete Network</a></li>
+        
+
+        <li><a href="#ImportMicroservices">Import Microservices</a></li>
+        
+
+        <li><a href="#PopulateCerts">Populate Certs</a></li>
+        
+
+        <li><a href="#RemoveDockerService">Remove Docker Service</a></li>
+        
+
+        <li><a href="#runDockerBuild">runDockerBuild</a></li>
+        
+
+        <li><a href="#runDockerPull">runDockerPull</a></li>
+        
+
+        <li><a href="#runDockerRun">runDockerRun</a></li>
+        
+
+        <li><a href="#UndeployService">Undeploy Service</a></li>
+        
+
+        <li><a href="#Artifact2Image">Artifact2Image</a></li>
+        
+
+        <li><a href="#DeployService">Deploy Service</a></li>
+        
+    </ul>
+
+    
+    
+    
+    <li><a href="#knownIssues">Known Issues</a></li>
+    
+    <li><a href="#releaseNotes">Release Notes</a></li>
+</ul>
     <h3>Overview</h3>
     <p><p>Docker is an open platform for developing, shipping, and running applications.
 Docker is designed to deliver your applications faster. With Docker, you can separate
@@ -65,60 +128,29 @@ More information about how to setup TLS certificates on Docker endpoint can be f
 <p>If TLS support is not enabled on Docker endpoint then leave "CA Certificate", "Client Certificate" and "Client Private Key" input parameters on plugin configuration page empty. Plugin will establish simple HTTP connection with such Docker endpoint.</p>
 </p>
     
-    <h1>Contents</h1>
-    <ul>
-    <li><a href="#overview">Overview</a></li>
     
-    
-    <li><a href="#CreateConfiguration">Plugin Configuration</a></li>
-    
-    <li><a href="#procedures">Plugin Procedures</a></li>
-    <ul>
-        
-
-        <li><a href="#CheckCluster">Check Cluster</a></li>
-        
-
-        <li><a href="#CreateIngress">Create Ingress</a></li>
-        
-
-        <li><a href="#DeleteNetwork">Delete Network</a></li>
-        
-
-        <li><a href="#ImportMicroservices">Import Microservices</a></li>
-        
-
-        <li><a href="#PopulateCerts">Populate Certs</a></li>
-        
-
-        <li><a href="#RemoveDockerService">Remove Docker Service</a></li>
-        
-
-        <li><a href="#runDockerBuild">runDockerBuild</a></li>
-        
-
-        <li><a href="#runDockerPull">runDockerPull</a></li>
-        
-
-        <li><a href="#runDockerRun">runDockerRun</a></li>
-        
-
-        <li><a href="#UndeployService">Undeploy Service</a></li>
-        
-
-        <li><a href="#Artifact2Image">Artifact2Image</a></li>
-        
-
-        <li><a href="#DeployService">Deploy Service</a></li>
-        
-    </ul>
-    
-    
-    <li><a href="#knownIssues">Known Issues</a></li>
-    
-    <li><a href="#releaseNotes">Release Notes</a></li>
+    <div id="prerequisites">
+        <h2>Prerequisites</h2>
+        <p>Binary dependencies (Grapes) are loaded from ElectricFlow server through STOMP or (in case Agent and Server are located on the same machine) copied directly from the plugin folder into $COMMANDER_DATA/grape folder.</p>
+<p>ElectricFlow Agent should be able to write to $COMMANDER_DATA/grape folder.</p>
+<p>In case the plugin procedures are running on a different from local resource, local resource should be available in the system. It can be set through server properties:</p>
+<pre><code>ectool setProperty /server/settings/localResourceName &lt;my local resource name&gt;
+</code></pre>
+<p>In case the local resource is not set, the dependency handling subprocedure will try to find local resource by the following criterias:</p>
+<ul>
+<li>It has a name &quot;local&quot;</li>
+<li>Or its hostname is one of the following: localhost, 127.0.0.1 or &lt;server hostname&gt;.</li>
 </ul>
+<p>If neither local resource is found in the resource nor its name is provided in the server settings, the dependencies wil fail to load.</p>
+<p>STOMP server should be configured correctly and be available from the Agent resource. STOMP server is using port 61613 by default. See 
+<a href="https://helpcenter.electric-cloud.com/hc/en-us/articles/214884463-KBEC-00352-Configuring-Stomp-for-Preflight-and-EC-FileOps-file-transfers" target="_blank">https://helpcenter.electric-cloud.com/hc/en-us/articles/214884463-KBEC-00352-Configuring-Stomp-for-Preflight-and-EC-FileOps-file-transfers</a>
+ for the instructions.</p>
+
+    </div>
     
+
+    
+    <!--TODO custom blocks-->
 
     
     <div id="CreateConfiguration">
@@ -211,11 +243,15 @@ More information about how to setup TLS certificates on Docker endpoint can be f
 
     <h1 id="procedures">Plugin Procedures</h1>
     
+    
 
     
     <div id="CheckCluster">
         <h2>Check Cluster</h2>
+        
+        
         <p>Checks that the Docker endpoint specified in the plugin configuration is reachable</p>
+        
         
         <h3>Check Cluster Parameters</h3>
         <table class="grid">
@@ -240,7 +276,10 @@ More information about how to setup TLS certificates on Docker endpoint can be f
     
     <div id="CreateIngress">
         <h2>Create Ingress</h2>
+        
+        
         <p>Configures default ingress network in Docker Swarm cluster</p>
+        
         
         <h3>Create Ingress Parameters</h3>
         <table class="grid">
@@ -295,7 +334,10 @@ More information about how to setup TLS certificates on Docker endpoint can be f
     
     <div id="DeleteNetwork">
         <h2>Delete Network</h2>
+        
+        
         <p>Deletes a network</p>
+        
         
         <h3>Delete Network Parameters</h3>
         <table class="grid">
@@ -325,6 +367,8 @@ More information about how to setup TLS certificates on Docker endpoint can be f
     
     <div id="ImportMicroservices">
         <h2>Import Microservices</h2>
+        
+        
         Create microservices in ElectricFlow by importing a Docker Compose file.
 <div>
     <ol>
@@ -350,6 +394,7 @@ More information about how to setup TLS certificates on Docker endpoint can be f
             </ul></li>
     </ol>
 </div>
+        
         
         <h3>Import Microservices Parameters</h3>
         <table class="grid">
@@ -404,7 +449,10 @@ More information about how to setup TLS certificates on Docker endpoint can be f
     
     <div id="PopulateCerts">
         <h2>Populate Certs</h2>
+        
+        
         <p>Dump TLS certificates (ca-cert, client cert and client key) on agent machine in temp dir</p>
+        
         
         <h3>Populate Certs Parameters</h3>
         <table class="grid">
@@ -429,7 +477,10 @@ More information about how to setup TLS certificates on Docker endpoint can be f
     
     <div id="RemoveDockerService">
         <h2>Remove Docker Service</h2>
+        
+        
         <p>Removes service deployed on a stand-alone Docker host or a Docker Swarm cluster.</p>
+        
         
         <h3>Remove Docker Service Parameters</h3>
         <table class="grid">
@@ -459,7 +510,10 @@ More information about how to setup TLS certificates on Docker endpoint can be f
     
     <div id="runDockerBuild">
         <h2>runDockerBuild</h2>
+        
+        
         <p>Performs a docker build</p>
+        
         
             <p><b>Note:</b> This procedure does not use the plugin configuration to connect to a Docker host. It uses the Docker command line <i>docker</i> on the resource that the procedure step is running on to interact with the Docker engine. The procedure expects any required Docker client config files to be available in the default location at $HOME/.docker on the resource.</p>
 
@@ -503,7 +557,10 @@ More information about how to setup TLS certificates on Docker endpoint can be f
     
     <div id="runDockerPull">
         <h2>runDockerPull</h2>
+        
+        
         <p>Performs a docker pull on the requested image</p>
+        
         
             <p><b>Note:</b> This procedure does not use the plugin configuration to connect to a Docker host. It uses the Docker command line <i>docker</i> on the resource that the procedure step is running on to interact with the Docker engine. The procedure expects any required Docker client config files to be available in the default location at $HOME/.docker on the resource.</p>
 
@@ -549,7 +606,10 @@ More information about how to setup TLS certificates on Docker endpoint can be f
     
     <div id="runDockerRun">
         <h2>runDockerRun</h2>
+        
+        
         <p>Performs a docker run</p>
+        
         
             <p><b>Note:</b> This procedure does not use the plugin configuration to connect to a Docker host. It uses the Docker command line <i>docker</i> on the resource that the procedure step is running on to interact with the Docker engine. The procedure expects any required Docker client config files to be available in the default location at $HOME/.docker on the resource.</p>
 
@@ -637,7 +697,10 @@ More information about how to setup TLS certificates on Docker endpoint can be f
     
     <div id="UndeployService">
         <h2>Undeploy Service</h2>
+        
+        
         <p>Undeploys a previously deployed service on a stand-alone Docker host or a Docker Swarm cluster</p>
+        
         
         <h3>Undeploy Service Parameters</h3>
         <table class="grid">
@@ -697,7 +760,10 @@ More information about how to setup TLS certificates on Docker endpoint can be f
     
     <div id="Artifact2Image">
         <h2>Artifact2Image</h2>
+        
+        
         <p>Creates and pushes a new docker image from the existing artifact</p>
+        
         
             <p>The following artifacts are supported:</p>
 <ul>
@@ -897,7 +963,10 @@ CMD [${COMMAND}]
     
     <div id="DeployService">
         <h2>Deploy Service</h2>
+        
+        
         <p>Deploys or updates a service on a stand-alone Docker host or a Docker Swarm cluster</p>
+        
         
             <p>
 User can provide a comma-separated list of networks on which to deploy the container or the swarm service in the service mapping page when mapping the service to a cluster in ElectricFlow. If the network does not already exist then the procedure will create one with the provided subnet and gateway. If no subnet and gateway is specified, Docker uses default values. Each of the user-defined networks can have multiple subnets and gateways. In that case, multiple subnets/gateways must be separated by '|'(pipe). If deploying to a stand-alone Docker engine then the user-defined <b>"bridge"</b> network is created.  If deploying to a Docker swarm cluster then the user-defined <b>"overlay"</b> network is created.
@@ -1002,6 +1071,13 @@ For more information on docker networking, see <a href="https://docs.docker.com/
     
 
     <h1 id="releaseNotes">Release Notes</h1>
+    
+    <h3>@PLUGIN_KEY@ 1.5.0</h3>
+    <ul>
+        
+        <li>Changed the way of storing and loading dependencies: the Repository is not required anymore. Now the depencencies and loaded through STOMP.</li>
+        
+    </ul>
     
     <h3>@PLUGIN_KEY@ 1.4.0</h3>
     <ul>
