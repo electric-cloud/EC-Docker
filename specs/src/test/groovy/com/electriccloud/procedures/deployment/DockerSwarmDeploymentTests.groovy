@@ -57,7 +57,7 @@ class DockerSwarmDeploymentTests extends DockerTestBase {
                     .each { it.Status.State == "running" }
         }
         await('Wait for success connection with service').until {
-            given().when().get("http://${getHost(endpointSwarm)}:81/").statusCode() == 200
+            req.when().get("http://${getHost(endpointSwarm)}:81/").statusCode() == 200
         }
         def master = req.get("http://${getHost(endpointSwarm)}:81/")
         def node = req.get("http://${getHost(nodeSwarm)}:81/")
@@ -95,7 +95,7 @@ class DockerSwarmDeploymentTests extends DockerTestBase {
                     .each { it.Status.State == "running" }
         }
         await('Wait for success connection with service').until {
-            given().when().get("http://${getHost(endpointSwarm)}:81/").statusCode() == 200
+            req.when().get("http://${getHost(endpointSwarm)}:81/").statusCode() == 200
         }
         def master = req.get("http://${getHost(endpointSwarm)}:81/")
         def node = req.get("http://${getHost(nodeSwarm)}:81/")
@@ -132,7 +132,7 @@ class DockerSwarmDeploymentTests extends DockerTestBase {
                     .each { it.Status.State == "running" }
         }
         await('Wait for success connection with service').until {
-            given().when().get("http://${getHost(endpointSwarm)}:81/").statusCode() == 200
+            req.when().get("http://${getHost(endpointSwarm)}:81/").statusCode() == 200
         }
         def master = req.get("http://${getHost(endpointSwarm)}:81/")
         def node = req.get("http://${getHost(nodeSwarm)}:81/")

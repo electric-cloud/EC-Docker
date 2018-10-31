@@ -57,7 +57,7 @@ class DockerComDeploymentTests extends DockerTestBase {
                     .State == "running"
         }
         await('Wait for success connection with service').until {
-            given().when().get("http://${getHost(endpointCommunity)}:81/").statusCode() == 200
+            req.when().get("http://${getHost(endpointCommunity)}:81/").statusCode() == 200
         }
         def containers = dockerApi.client.ps().content
         def container = containers.find { it.Names.last() == "/${serviceName}" }
@@ -90,7 +90,7 @@ class DockerComDeploymentTests extends DockerTestBase {
                     .State == "running"
         }
         await('Wait for success connection with service').until {
-            given().when().get("http://${getHost(endpointCommunity)}:81/").statusCode() == 200
+            req.when().get("http://${getHost(endpointCommunity)}:81/").statusCode() == 200
         }
         def containers = dockerApi.client.ps().content
         def container = containers.find { it.Names.last() == "/${serviceName}" }
@@ -123,7 +123,7 @@ class DockerComDeploymentTests extends DockerTestBase {
                     .State == "running"
         }
         await('Wait for success connection with service').until {
-            given().when().get("http://${getHost(endpointCommunity)}:81/").statusCode() == 200
+            req.when().get("http://${getHost(endpointCommunity)}:81/").statusCode() == 200
         }
         def containers = dockerApi.client.ps().content
         def container = containers.find { it.Names.last() == "/${serviceName}" }
