@@ -13,15 +13,15 @@ services:
     tty: true
 
 #Not today
-#  docker:
-#    image: "docker:stable-dind"
-#    ports:
-#      - "2375:2375"
-#    networks:
-#      - internal
-#    container_name: docker
-#    tty: true
-#    privileged: true
+  docker:
+    image: "docker:stable-dind"
+    ports:
+      - "2375:2375"
+    networks:
+      - internal
+    container_name: docker
+    tty: true
+    privileged: true
 
 networks:
   internal:

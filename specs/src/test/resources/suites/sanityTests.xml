@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
+
+<suite name = "Sanity tests" parallel="false" thread-count="3">
+
+    <test name="Configuration Tests">
+        <groups>
+            <run>
+                <include name="Positive">
+                    <classes>
+                        <class name="com.electriccloud.procedures.configuration.CreateConfigurationTests"/>
+                        <class name="com.electriccloud.procedures.configuration.ProvisionTests"/>
+                    </classes>
+                </include>
+            </run>
+        </groups>
+    </test>
+
+    <test name="Deployment Tests">
+        <groups>
+            <run>
+                <include name="Positive">
+                    <classes>
+                        <class name="com.electriccloud.procedures.deployment.DockerSwarmDeploymentTests"/>
+                        <class name="com.electriccloud.procedures.deployment.DockerTlsDeploymentTests"/>
+                        <class name="com.electriccloud.procedures.deployment.DockerComDeploymentTests"/>
+                    </classes>
+                </include>
+            </run>
+        </groups>
+    </test>
+
+    <test name="Import Tests">
+        <groups>
+            <run>
+                <include name="Positive">
+                    <classes>
+                        <class name="com.electriccloud.procedures.import_ms.ImportTests"/>
+                    </classes>
+                </include>
+            </run>
+        </groups>
+    </test>
+
+    <test name="Artifact2Image Tests">
+        <groups>
+            <run>
+                <include name="Positive">
+                    <classes>
+                        <class name="com.electriccloud.procedures.artifact_2_image.Artifact2ImageArtifactoryTypeTests"/>
+                        <class name="com.electriccloud.procedures.artifact_2_image.Artifact2ImageImageTemplateTests"/>
+                    </classes>
+                </include>
+            </run>
+        </groups>
+    </test>
+
+
+
+</suite>
