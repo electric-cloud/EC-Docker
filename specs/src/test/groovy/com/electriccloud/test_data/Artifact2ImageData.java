@@ -81,8 +81,8 @@ public class Artifact2ImageData {
                 {
                         netArtifact,
                         "1.0.0",
-                        artifactsDir + "/aspnetapp",
-                        null,
+                        artifactsDir,
+                        "com.mycompany.AspNetSample.1.0.0.zip",
                         dockerHubId + "/" + netRepo,
                         netRepo,
                         new Artifactory(null, MAVEN, null, null, null, null, null),

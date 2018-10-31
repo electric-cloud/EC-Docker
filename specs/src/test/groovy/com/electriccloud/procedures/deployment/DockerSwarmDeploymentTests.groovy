@@ -56,6 +56,11 @@ class DockerSwarmDeploymentTests extends DockerTestBase {
             dockerApi.client.tasks().content
                     .each { it.Status.State == "running" }
         }
+        await('Wait for success connection with service').until {
+            given().when().get("http://${getHost(endpointSwarm)}:81/").statusCode() == 200
+        }
+        def master = req.get("http://${getHost(endpointSwarm)}:81/")
+        def node = req.get("http://${getHost(nodeSwarm)}:81/")
         def service = dockerApi.client.inspectService(serviceName).content
         def tasks = dockerApi.client.tasks().content
         assert service.Spec.Name == serviceName
@@ -69,6 +74,10 @@ class DockerSwarmDeploymentTests extends DockerTestBase {
         assert tasks.each { assert it.Spec.ContainerSpec.Image == "nginx:latest" }
         assert tasks.each { assert it.Status.State == "running" }
         assert tasks.each { assert it.Status.Message == "started" }
+        assert master.statusCode() == 200
+        assert master.body().asString().contains("Hello World")
+        assert node.statusCode() == 200
+        assert node.body().asString().contains("Hello World")
     }
 
 
@@ -85,6 +94,11 @@ class DockerSwarmDeploymentTests extends DockerTestBase {
             dockerApi.client.tasks().content
                     .each { it.Status.State == "running" }
         }
+        await('Wait for success connection with service').until {
+            given().when().get("http://${getHost(endpointSwarm)}:81/").statusCode() == 200
+        }
+        def master = req.get("http://${getHost(endpointSwarm)}:81/")
+        def node = req.get("http://${getHost(nodeSwarm)}:81/")
         def service = dockerApi.client.inspectService(serviceName).content
         def tasks = dockerApi.client.tasks().content
         assert service.Spec.Name == serviceName
@@ -98,6 +112,10 @@ class DockerSwarmDeploymentTests extends DockerTestBase {
         assert tasks.each { assert it.Spec.ContainerSpec.Image == "nginx:latest" }
         assert tasks.each { assert it.Status.State == "running" }
         assert tasks.each { assert it.Status.Message == "started" }
+        assert master.statusCode() == 200
+        assert master.body().asString().contains("Hello World")
+        assert node.statusCode() == 200
+        assert node.body().asString().contains("Hello World")
     }
 
 
@@ -113,6 +131,11 @@ class DockerSwarmDeploymentTests extends DockerTestBase {
             dockerApi.client.tasks().content
                     .each { it.Status.State == "running" }
         }
+        await('Wait for success connection with service').until {
+            given().when().get("http://${getHost(endpointSwarm)}:81/").statusCode() == 200
+        }
+        def master = req.get("http://${getHost(endpointSwarm)}:81/")
+        def node = req.get("http://${getHost(nodeSwarm)}:81/")
         def service = dockerApi.client.inspectService(serviceName).content
         def tasks = dockerApi.client.tasks().content
         assert service.Spec.Name == serviceName
@@ -126,6 +149,10 @@ class DockerSwarmDeploymentTests extends DockerTestBase {
         assert tasks.each { assert it.Spec.ContainerSpec.Image == "nginx:latest" }
         assert tasks.each { assert it.Status.State == "running" }
         assert tasks.each { assert it.Status.Message == "started" }
+        assert master.statusCode() == 200
+        assert master.body().asString().contains("Hello World")
+        assert node.statusCode() == 200
+        assert node.body().asString().contains("Hello World")
     }
 
 

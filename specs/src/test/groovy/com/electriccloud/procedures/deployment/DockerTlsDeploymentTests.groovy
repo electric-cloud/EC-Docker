@@ -54,6 +54,10 @@ class DockerTlsDeploymentTests extends DockerTestBase {
                     .find { it.Names.last() == "/${serviceName}" }
                     .State == "running"
         }
+        await('Wait for success connection with service').until {
+            given().when().get("http://${getHost(endpointTls)}:81/").statusCode() == 200
+        }
+        def resp = req.get("http://${getHost(endpointTls)}:81/")
         def containers = dockerApi.client.ps().content
         def container = containers.find { it.Names.last() == "/${serviceName}" }
         assert containers.size() == 1
@@ -66,6 +70,7 @@ class DockerTlsDeploymentTests extends DockerTestBase {
         assert container.Mounts[0].Source == '/var/html'
         assert container.Mounts[0].Destination == '/usr/share/nginx/html'
         assert resp.statusCode() == 200
+        assert resp.body().asString().contains("Hello World")
     }
 
 
@@ -82,6 +87,10 @@ class DockerTlsDeploymentTests extends DockerTestBase {
                     .find { it.Names.last() == "/${serviceName}" }
                     .State == "running"
         }
+        await('Wait for success connection with service').until {
+            given().when().get("http://${getHost(endpointTls)}:81/").statusCode() == 200
+        }
+        def resp = req.get("http://${getHost(endpointTls)}:81/")
         def containers = dockerApi.client.ps().content
         def container = containers.find { it.Names.last() == "/${serviceName}" }
         assert containers.size() == 1
@@ -94,6 +103,7 @@ class DockerTlsDeploymentTests extends DockerTestBase {
         assert container.Mounts[0].Source == '/var/html'
         assert container.Mounts[0].Destination == '/usr/share/nginx/html'
         assert resp.statusCode() == 200
+        assert resp.body().asString().contains("Hello World")
     }
 
 
@@ -110,6 +120,10 @@ class DockerTlsDeploymentTests extends DockerTestBase {
                     .find { it.Names.last() == "/${serviceName}" }
                     .State == "running"
         }
+        await('Wait for success connection with service').until {
+            given().when().get("http://${getHost(endpointTls)}:81/").statusCode() == 200
+        }
+        def resp = req.get("http://${getHost(endpointTls)}:81/")
         def containers = dockerApi.client.ps().content
         def container = containers.find { it.Names.last() == "/${serviceName}" }
         assert containers.size() == 1
@@ -122,6 +136,7 @@ class DockerTlsDeploymentTests extends DockerTestBase {
         assert container.Mounts[0].Source == '/var/html'
         assert container.Mounts[0].Destination == '/usr/share/nginx/html'
         assert resp.statusCode() == 200
+        assert resp.body().asString().contains("Hello World")
     }
 
 

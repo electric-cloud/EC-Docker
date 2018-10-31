@@ -56,8 +56,12 @@ class DockerComDeploymentTests extends DockerTestBase {
                     .find { it.Names.last() == "/${serviceName}" }
                     .State == "running"
         }
+        await('Wait for success connection with service').until {
+            given().when().get("http://${getHost(endpointCommunity)}:81/").statusCode() == 200
+        }
         def containers = dockerApi.client.ps().content
         def container = containers.find { it.Names.last() == "/${serviceName}" }
+        def resp = req.get("http://${getHost(endpointCommunity)}:81/")
         assert containers.size() == 1
         assert container.Names.last() == "/${serviceName}"
         assert container.Image == "nginx:latest"
@@ -67,6 +71,8 @@ class DockerComDeploymentTests extends DockerTestBase {
         assert container.Mounts[0].Type == "bind"
         assert container.Mounts[0].Source == '/var/html'
         assert container.Mounts[0].Destination == '/usr/share/nginx/html'
+        assert resp.statusCode() == 200
+        assert resp.body().asString().contains("Hello World")
     }
 
 
@@ -83,8 +89,12 @@ class DockerComDeploymentTests extends DockerTestBase {
                     .find { it.Names.last() == "/${serviceName}" }
                     .State == "running"
         }
+        await('Wait for success connection with service').until {
+            given().when().get("http://${getHost(endpointCommunity)}:81/").statusCode() == 200
+        }
         def containers = dockerApi.client.ps().content
         def container = containers.find { it.Names.last() == "/${serviceName}" }
+        def resp = req.get("http://${getHost(endpointCommunity)}:81/")
         assert containers.size() == 1
         assert container.Names.last() == "/${serviceName}"
         assert container.Image == "nginx:latest"
@@ -94,6 +104,8 @@ class DockerComDeploymentTests extends DockerTestBase {
         assert container.Mounts[0].Type == "bind"
         assert container.Mounts[0].Source == '/var/html'
         assert container.Mounts[0].Destination == '/usr/share/nginx/html'
+        assert resp.statusCode() == 200
+        assert resp.body().asString().contains("Hello World")
     }
 
 
@@ -110,8 +122,12 @@ class DockerComDeploymentTests extends DockerTestBase {
                     .find { it.Names.last() == "/${serviceName}" }
                     .State == "running"
         }
+        await('Wait for success connection with service').until {
+            given().when().get("http://${getHost(endpointCommunity)}:81/").statusCode() == 200
+        }
         def containers = dockerApi.client.ps().content
         def container = containers.find { it.Names.last() == "/${serviceName}" }
+        def resp = req.get("http://${getHost(endpointCommunity)}:81/")
         assert containers.size() == 1
         assert container.Names.last() == "/${serviceName}"
         assert container.Image == "nginx:latest"
@@ -121,6 +137,8 @@ class DockerComDeploymentTests extends DockerTestBase {
         assert container.Mounts[0].Type == "bind"
         assert container.Mounts[0].Source == '/var/html'
         assert container.Mounts[0].Destination == '/usr/share/nginx/html'
+        assert resp.statusCode() == 200
+        assert resp.body().asString().contains("Hello World")
     }
 
 
