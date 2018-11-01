@@ -3,3 +3,5 @@ out/*
 EC-Docker.jar
 build/*
 .DS_Store
+.*
+*.iml
