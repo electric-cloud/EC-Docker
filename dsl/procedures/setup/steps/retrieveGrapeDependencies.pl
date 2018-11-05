@@ -32,6 +32,12 @@ to the grape root directory configured with ec-groovy.
 use File::Copy::Recursive qw(rcopy);
 use File::Path;
 use ElectricCommander;
+use JSON;
+use Archive::Zip;
+use MIME::Base64 qw(decode_base64);
+use File::Temp qw(tempfile tempdir);
+use File::Path qw(mkpath);
+use File::Basename qw(dirname);
 
 use warnings;
 use strict;
@@ -59,7 +65,12 @@ sub main() {
         }
     }
 
-    retrieveDependencies($ec, @projects);
+    my $dep = EC::DependencyManager->new($ec);
+    $dep->grabResource();
+    for my $project (@projects) {
+        $dep->transferWithDsl($project);
+    }
+
 
     # This part remains as is
     if ($::gAdditionalArtifactVersion ne '') {
@@ -133,9 +144,11 @@ use File::Spec;
 use JSON qw(decode_json encode_json);
 use File::Copy::Recursive qw(rcopy rmove);
 use File::Find;
-use Digest::MD5;
+use Digest::MD5 qw(md5_hex);
 use Data::Dumper;
 use subs qw(info debug);
+use MIME::Base64 qw(decode_base64);
+use File::Basename qw(dirname);
 
 our $saveChecksumSub;
 
@@ -143,6 +156,9 @@ sub new {
     my ($class, $ec, %options) = @_;
 
     my $self = { ec => $ec };
+    if (!$ENV{COMMANDER_DATA}) {
+        die "Environment variable COMMANDER_DATA must be set";
+    }
     $self->{dest} = $options{destination} || "$ENV{COMMANDER_DATA}/grape";
 
     # Rather strange way of declaring the subroutine, it has to be accessible from the spawned step and from the main code
@@ -172,7 +188,7 @@ sub doSaveChecksum {
 
     # Relative to grape/ folder
     my $checksums = {files => \@files, checksum => $digest->hexdigest};
-    $ec->setProperty("/projects/$project/ec_dependencies", encode_json($checksums), {description => 'List of dependencies files and checksum'});
+    $ec->setProperty("/projects/$project/ec_dependenciesCache", encode_json($checksums), {description => 'List of dependencies files and checksum'});
 }
 
     };
@@ -196,7 +212,6 @@ sub grabResource {
     $self->ec->setProperty('/myJob/grabbedResource', $resName);
     print "Grabbed Resource: $resName\n";
 }
-
 
 
 
@@ -254,6 +269,7 @@ sub getLocalResource {
     return $resourceName;
 }
 
+
 sub copyDependencies {
     my ($self, $projectName) = @_;
 
@@ -284,6 +300,8 @@ sub getPluginsFolder {
     return $self->ec->getProperty('/server/settings/pluginsDirectory')->findvalue('//value')->string_value;
 }
 
+
+
 sub sendDependencies {
     my ($self, @projects) = @_;
 
@@ -296,7 +314,7 @@ sub sendDependencies {
 
     if ($checksumsOk) {
         info "Dependencies cache is ok, no dependency transfer is required";
-        $self->setSummary("Dependencies will be taken from the local cache");
+        $self->setSummary("Binary dependencies will be taken from the local cache");
         return 0;
     }
 
@@ -515,7 +533,7 @@ sub checkChecksums {
     my ($self, $project) = @_;
 
     my $deps = eval {
-        my $string = $self->ec->getProperty("/projects/$project/ec_dependencies")->findvalue('//value')->string_value;
+        my $string = $self->ec->getProperty("/projects/$project/ec_dependenciesCache")->findvalue('//value')->string_value;
         decode_json($string);
     };
 
@@ -573,5 +591,162 @@ sub checkStomp {
     info "STOMP URI is $uri, it should be accessible from the agent machine";
 }
 
-1;
 
+
+sub transferWithDsl {
+    my ($self, $projectName) = @_;
+
+    my $checksumsOk = 1;
+    unless($self->checkChecksums($projectName)) {
+        $checksumsOk = 0;
+    }
+
+    if ($checksumsOk) {
+        info "Dependencies cache is ok, no dependency transfer is required";
+        $self->setSummary("Dependencies will be taken from the local cache");
+        return 0;
+    }
+
+    my $serverResource;
+    eval {
+        $serverResource = $self->getLocalResource();
+    };
+    # We don't have a local resource on SAAS
+    if ($serverResource) {
+        my $currentResource = '$[/myResource/resourceName]';
+        if ($serverResource eq $currentResource) {
+            $self->copyDependencies($projectName);
+            return;
+        }
+    }
+
+    my $dsl = q{
+import java.util.zip.*
+import java.security.MessageDigest
+import groovy.json.JsonOutput
+
+def path = args.path
+def chunkSize = args.chunkSize ?: 1024 * 1024
+def number = args.counter ?: 0
+File lib = new File(path)
+
+def files = []
+lib.eachFileRecurse { f ->
+    if (f.isFile()) {
+        files << f
+    }
+}
+
+def encodedFiles = [:]
+def fileList = []
+files.sort { a, b -> a.absolutePath <=> b.absolutePath }.each { f ->
+    def relPath = lib.toURI().relativize(f.toURI()).toString()
+    fileList << relPath
+    def base64 = f.bytes.encodeBase64().toString()
+    encodedFiles[relPath] = base64
+}
+
+def result = JsonOutput.toJson(encodedFiles).getBytes().encodeBase64().toString()
+def length = result.length()
+
+def start = number * chunkSize
+def end = (number + 1) * chunkSize - 1
+def hasMore = true
+if (end >= length) {
+    end = length - 1
+    hasMore = false
+}
+
+def chunk = result[start .. end]
+return [
+  chunk: chunk,
+  chunkLength: chunk.length(),
+  length: length,
+  hasMore: hasMore,
+  checksum: generateMD5(result.bytes),
+  files: fileList
+]
+
+// Older version of Groovy does not have String.md5()
+def generateMD5(byte[] bytes) {
+   MessageDigest digest = MessageDigest.getInstance("MD5")
+   digest.update(bytes)
+   byte[] md5sum = digest.digest()
+   BigInteger bigInt = new BigInteger(1, md5sum)
+   return bigInt.toString(16).padLeft(32, '0')
+}
+};
+
+    my $libPath = $self->ec->getProperty('/server/settings/pluginsDirectory')->findvalue('//value')->string_value . "/$projectName/lib";
+    my $chunkSize = 1024 * 1024;
+    my $hasMore = 1;
+    my $base64 = '';
+    my $counter = 0;
+    my $checksum = '';
+
+    my $fileList;
+    while($hasMore) {
+        my $parameters = encode_json({
+            chunkSize => $chunkSize,
+            path => $libPath,
+            counter => $counter + 0,
+        });
+        my $xpath = $self->ec->evalDsl({
+            dsl => $dsl,
+            parameters => $parameters,
+            debug => 'false'
+        });
+        my $json = $xpath->findvalue('//value')->string_value;
+        my $data = decode_json($json);
+        $hasMore = $data->{hasMore};
+        $base64 .= $data->{chunk};
+
+        $counter ++;
+        $checksum = $data->{checksum};
+        my $printable = $data;
+        delete $printable->{chunk};
+        debug Dumper $printable;
+        $fileList = $data->{files};
+    }
+
+    my $resultChecksum = md5_hex($base64);
+    if ($resultChecksum ne $checksum) {
+        die "Wrong checksum: $checksum ne $resultChecksum";
+    }
+
+    my $files = decode_json(decode_base64($base64));
+    my $grape = $ENV{COMMANDER_DATA} . "/grape";
+
+    for my $file (keys %$files) {
+        my $destination = File::Spec->catfile($grape, $file);
+        my $dir = dirname($destination);
+        unless( -e $dir) {
+            mkpath($dir);
+        }
+        open my $fh, ">$destination" or die "Cannot open $destination: $!";
+        binmode $fh;
+        my $binary = decode_base64($files->{$file});
+        print $fh $binary;
+        close $fh;
+        debug "Saved file $destination";
+    }
+    # Checksum
+    my $digest = Digest::MD5->new;
+    for my $file (@{$fileList}) {
+        my $filename = File::Spec->catfile($self->destination, $file);
+        next if $filename =~ /ivydata/; # this one changes
+        open my $fh, $filename or return 0;
+        binmode $fh;
+        my $content = join('', <$fh>);
+        close $fh;
+        $digest->add($content);
+    }
+
+    $self->ec->setProperty("/projects/$projectName/ec_dependenciesCache", encode_json({checksum => $digest->hexdigest, files => $fileList}));
+    info "Saved dependencies into cache";
+    $self->setSummary("Dependencies are downloaded and saved into local cache");
+}
+
+
+
+1;

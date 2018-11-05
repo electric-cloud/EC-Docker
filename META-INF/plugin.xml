@@ -9,4 +9,5 @@
   <configure>ec_config</configure>
   <label>EC-Docker</label>
   <version>1.5.0</version>
+  <pluginWizardBased>false</pluginWizardBased>
 </plugin>
