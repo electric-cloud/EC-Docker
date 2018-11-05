@@ -32,12 +32,6 @@ to the grape root directory configured with ec-groovy.
 use File::Copy::Recursive qw(rcopy);
 use File::Path;
 use ElectricCommander;
-use JSON;
-use Archive::Zip;
-use MIME::Base64 qw(decode_base64);
-use File::Temp qw(tempfile tempdir);
-use File::Path qw(mkpath);
-use File::Basename qw(dirname);
 
 use warnings;
 use strict;
