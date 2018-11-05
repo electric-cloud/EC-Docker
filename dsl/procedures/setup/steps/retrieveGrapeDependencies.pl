@@ -68,7 +68,13 @@ sub main() {
     my $dep = EC::DependencyManager->new($ec);
     $dep->grabResource();
     for my $project (@projects) {
-        $dep->transferWithDsl($project);
+        eval {
+            $dep->transferWithDsl($project);
+            1;
+        } or do {
+            $ec->setProperty('/myJobStep/summary', "Failed to download dependencies: $@");
+            exit 1;
+        };
     }
 
 
@@ -210,7 +216,7 @@ sub grabResource {
 
     my $resName = '$[/myResource/resourceName]';
     $self->ec->setProperty('/myJob/grabbedResource', $resName);
-    print "Grabbed Resource: $resName\n";
+    info "Grabbed Resource: $resName";
 }
 
 
@@ -228,7 +234,7 @@ sub getLocalResource {
     };
 
     if ($serverResource) {
-        print "Configured Local Resource is $serverResource (taken from $propertyPath)\n";
+        info "Configured Local Resource is $serverResource (taken from $propertyPath)";
         return $serverResource;
     }
 
@@ -607,18 +613,18 @@ sub transferWithDsl {
         return 0;
     }
 
-    my $serverResource;
-    eval {
-        $serverResource = $self->getLocalResource();
-    };
-    # We don't have a local resource on SAAS
-    if ($serverResource) {
-        my $currentResource = '$[/myResource/resourceName]';
-        if ($serverResource eq $currentResource) {
-            $self->copyDependencies($projectName);
-            return;
-        }
-    }
+    # my $serverResource;
+    # eval {
+    #     $serverResource = $self->getLocalResource();
+    # };
+    # # We don't have a local resource on SAAS
+    # if ($serverResource && 0) {
+    #     my $currentResource = '$[/myResource/resourceName]';
+    #     if ($serverResource eq $currentResource) {
+    #         $self->copyDependencies($projectName);
+    #         return;
+    #     }
+    # }
 
     my $dsl = q{
 import java.util.zip.*
