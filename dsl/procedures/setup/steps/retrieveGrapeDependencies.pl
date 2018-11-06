@@ -1,4 +1,4 @@
-# Version: Thu Nov  1 14:53:06 2018
+# Version: Tue Nov  6 19:00:08 2018
 #
 #  Copyright 2016 Electric Cloud, Inc.
 #
@@ -213,24 +213,32 @@ sub checkChecksums {
     return 0 unless $deps->{files};
     return 0 unless $deps->{checksum};
 
-    my $digest = Digest::MD5->new;
+    my $checksum = $self->calculateCacheChecksum($deps->{files});
+    if ($checksum ne $deps->{checksum}) {
+        info "Checksums do not match: $deps->{checksum} and $checksum\n";
+        return 0;
+    }
+    return 1;
+}
 
-    for my $file (@{$deps->{files}}) {
+
+sub calculateCacheChecksum {
+    my ($self, $files) = @_;
+
+    my $digest = Digest::MD5->new;
+    for my $file (@{$files}) {
         my $filename = File::Spec->catfile($self->destination, $file);
-        next if $filename =~ /ivydata/; # this one changes
         open my $fh, $filename or return 0;
         binmode $fh;
+        next unless $filename =~ /jar$/; # descriptors tend to change slightly upon ec-groovy runs - xml reformatting, dates etc.
+
         my $content = join('', <$fh>);
         close $fh;
         $digest->add($content);
     }
 
     my $checksum = $digest->hexdigest;
-    if ($checksum ne $deps->{checksum}) {
-        info "Checksums do not match: $deps->{checksum} and $checksum\n";
-        return 0;
-    }
-    return 1;
+    return $checksum;
 }
 
 sub setSummary {
@@ -284,16 +292,19 @@ sub transferWithDsl {
     my ($self, $projectName) = @_;
 
     my $resourceName = '$[/myResource/resourceName]';
+    info "Processing dependencies for plugin $projectName";
     my $lock = $self->acquireLock($projectName, $resourceName);
     if (!$lock) {
         print "[INFO] Someone else is downloading dependencies for the project $projectName ($resourceName), waiting...";
     }
+    my $newline = 0;
     while (!$lock) {
         print '.';
         sleep 2;
         $lock = $self->acquireLock($projectName, $resourceName);
+        $newline = 1;
     }
-    print "\n";
+    print "\n" if $newline;
 
     my $checksumsOk = 1;
     unless($self->checkChecksums($projectName)) {
@@ -306,19 +317,6 @@ sub transferWithDsl {
         $self->releaseLock($projectName, $resourceName);
         return 0;
     }
-
-    # my $serverResource;
-    # eval {
-    #     $serverResource = $self->getLocalResource();
-    # };
-    # # We don't have a local resource on SAAS
-    # if ($serverResource && 0) {
-    #     my $currentResource = '$[/myResource/resourceName]';
-    #     if ($serverResource eq $currentResource) {
-    #         $self->copyDependencies($projectName);
-    #         return;
-    #     }
-    # }
 
     my $dsl = q{
 import java.util.zip.*
@@ -434,21 +432,11 @@ def generateMD5(byte[] bytes) {
         debug "Saved file $destination";
     }
 
-    # Checksum
-    my $digest = Digest::MD5->new;
-    for my $file (@{$fileList}) {
-        my $filename = File::Spec->catfile($self->destination, $file);
-        next if $filename =~ /ivydata/; # this one changes
-        open my $fh, $filename or return 0;
-        binmode $fh;
-        my $content = join('', <$fh>);
-        close $fh;
-        $digest->add($content);
-    }
+    my $cacheChecksum = $self->calculateCacheChecksum($fileList);
 
-    $self->ec->setProperty("/projects/$projectName/ec_dependenciesCache", encode_json({checksum => $digest->hexdigest, files => $fileList}));
+    $self->ec->setProperty("/projects/$projectName/ec_dependenciesCache", encode_json({checksum => $cacheChecksum, files => $fileList}));
     info "Saved dependencies into cache";
-    $self->setSummary("Dependencies are downloaded and saved into local cache");
+    $self->setSummary("Dependencies are downloaded and saved into local cache for project $projectName");
     $self->releaseLock($projectName, $resourceName);
 }
 
