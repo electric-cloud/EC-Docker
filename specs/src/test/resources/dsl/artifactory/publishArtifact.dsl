@@ -1,6 +1,6 @@
 package dsl.artifactory
 
-def names = args.names,
+def names = args.params,
         pluginName             = 'EC-Artifactory',
         artifact               = names.artifact,
         artifactPath           = names.artifactPath,

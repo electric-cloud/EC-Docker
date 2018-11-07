@@ -49,6 +49,7 @@ class NamingTestBase {
     public static String netArtifact     = 'hello-world:net'
     public static String netRepo         = 'hello-world-net'
     public static String containerId
+    Credential dockerHubCreds
     DockerClient dockerClient
     DockerApi dockerApi
     DockerHubApi dockerHub

@@ -1,15 +1,15 @@
 package dsl.docker
 
 
-def names = args.names,
-        config = names.config,
+def params = args.params,
+        config = params.config,
         desc = 'EC-Docker Swarm Configuration',
-        dockerEndpoint = names.dockerEndpoint,
-        username = names.username,
-        caPem = names.caPem,
-        certPem = names.certPem,
-        keyPem = names.keyPem,
-        testConnection = names.testConnection,
+        dockerEndpoint = params.dockerEndpoint,
+        username = params.username,
+        caPem = params.caPem,
+        certPem = params.certPem,
+        keyPem = params.keyPem,
+        testConnection = params.testConnection,
         logLevel = '1'
 
 

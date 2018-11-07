@@ -18,7 +18,6 @@ import static org.awaitility.Awaitility.*;
 @Feature('Artifact2Image')
 class Artifact2ImageImageTemplateTests extends DockerTestBase {
 
-    def dockerHubCreds
 
     @BeforeClass(alwaysRun = true)
     void setUpTests(){
@@ -42,14 +41,23 @@ class Artifact2ImageImageTemplateTests extends DockerTestBase {
         dockerApi.client.rmi("${dockerHubId}/${jettyRepo}")
         dockerApi.client.rmi("${dockerHubId}/${jarRepo}")
         dockerApi.client.rmi("${dockerHubId}/${netRepo}")
-        dockerHub.deleteRepository(jettyRepo).deleteRepository(jarRepo).deleteRepository(netRepo)
     }
 
 
+    @BeforeMethod(alwaysRun = true)
+    void setUpTest(){
+        dockerApi.client.ps().content.each {
+            dockerApi.client.rm(dockerApi.client.inspectContainer(it.Id).content.Config.Hostname, [force: true])
+        }
+        dockerApi.client.pruneContainers()
+    }
+
     @AfterMethod(alwaysRun = true)
     void tearDownTest(){
-        dockerApi.client.stop(containerId)
-        dockerApi.client.rm(containerId)
+        //dockerApi.client.stop(containerId)
+        dockerApi.client.ps().content.each {
+            dockerApi.client.rm(dockerApi.client.inspectContainer(it.Id).content.Config.Hostname, [force: true])
+        }
         dockerApi.client.pruneContainers()
     }
 
@@ -89,8 +97,7 @@ class Artifact2ImageImageTemplateTests extends DockerTestBase {
         assert tasks.first().Ports.first().PublicPort == 81
         assert repo.user == dockerHub.username
         assert repo.name == repository
-
-
+        dockerHub.deleteRepository(jettyRepo)
     }
 
 

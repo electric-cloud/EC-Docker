@@ -3,7 +3,7 @@
 
 <suite name = "Sanity tests" parallel="false" thread-count="3">
 
-    <!--<test name="Configuration Tests">
+    <test name="Configuration Tests">
         <groups>
             <run>
                 <include name="Positive">
@@ -14,7 +14,7 @@
                 </include>
             </run>
         </groups>
-    </test>-->
+    </test>
 
     <test name="Deployment Tests">
         <groups>
@@ -48,13 +48,10 @@
                 <include name="Positive">
                     <classes>
                         <class name="com.electriccloud.procedures.artifact_2_image.Artifact2ImageArtifactoryTypeTests"/>
-                        <class name="com.electriccloud.procedures.artifact_2_image.Artifact2ImageImageTemplateTests"/>
                     </classes>
                 </include>
             </run>
         </groups>
     </test>
-
-
 
 </suite>

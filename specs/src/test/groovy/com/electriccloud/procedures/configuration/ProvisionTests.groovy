@@ -14,6 +14,7 @@ class ProvisionTests extends DockerTestBase {
 
     @BeforeClass(alwaysRun = true)
     void setUpTests(){
+        dockerClient.deleteConfiguration(configName)
         dockerClient.createConfiguration(configName, endpointSwarm, userName, null, null, null, true, DEBUG)
         dockerClient.createEnvironment(configName)
     }

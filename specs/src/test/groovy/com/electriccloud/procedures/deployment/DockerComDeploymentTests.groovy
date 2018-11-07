@@ -35,7 +35,9 @@ class DockerComDeploymentTests extends DockerTestBase {
 
     @AfterMethod(alwaysRun = true)
     void tearDownTes() {
-        dockerApi.client.ps().content.each { dockerApi.client.stop(it.Id) }
+        dockerApi.client.ps().content.each {
+            dockerApi.client.rm(dockerApi.client.inspectContainer(it.Id).content.Config.Hostname, [force: true])
+        }
         dockerApi.client.pruneContainers()
         dockerClient.client.deleteProject(projectName)
     }

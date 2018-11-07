@@ -1,14 +1,13 @@
 package com.electriccloud.client.plugin
 
 import com.electriccloud.client.commander.CommanderClient
-import com.electriccloud.helpers.enums.LogLevels
 import io.qameta.allure.Step
 
 import static com.electriccloud.helpers.enums.LogLevels.LogLevel.*
 import static com.electriccloud.helpers.config.ConfigHelper.message
 import static com.electriccloud.helpers.config.ConfigHelper.dslPath
 
-class ArtifactoryClient extends CommanderClient{
+class ArtifactoryClient extends CommanderClient {
 
 
     ArtifactoryClient() {
@@ -24,8 +23,8 @@ class ArtifactoryClient extends CommanderClient{
                             password,
                             logLevel = DEBUG) {
         message("creating artifactory config")
-        def json = jsonHelper.artifactoryConfigJson(configName, artifactoryUrl, userName, password, logLevel.getValue())
-        def response = client.dslFile(dslPath(plugin, 'config'), client.encode(json.toString()))
+        def params = [params: [configName: configName, artifactoryUrl: artifactoryUrl, userName: userName, password: password, logLevel: logLevel.getValue()]]
+        def response = client.dslFileMap dslPath(plugin, 'config'), params
         client.waitForJobToComplete(response.json.jobId, timeout, 2, "Configuration: ${configName} with Artifactory URL ${artifactoryUrl} is successfully created.")
         return response
     }
@@ -43,18 +42,22 @@ class ArtifactoryClient extends CommanderClient{
                         artifactExtension,
                         repositoryType, artifactType, artifactVersion){
         message("publishing artifact")
-        def json = jsonHelper.artifactoryPushJson(configName,
-                artifactName,
-                artifactDir,
-                artClassifier,
-                repo,
-                repoLayout,
-                repoPath,
-                organization,
-                organizationPath,
-                artifactExtension,
-                repositoryType, artifactType, artifactVersion)
-        def response = client.dslFile(dslPath(plugin, 'publishArtifact'), client.encode(json.toString()))
+        def params = [params: [
+                artifact: artifactName,
+                artifactPath: artifactDir,
+                classifier: artClassifier,
+                config: configName,
+                extension: artifactExtension,
+                org: organization,
+                orgPath: organizationPath,
+                repository: repo,
+                repositoryLayout: repoLayout,
+                repositoryPath: repoPath,
+                repoType: repositoryType,
+                type: artifactType,
+                version: artifactVersion
+        ]]
+        def response = client.dslFileMap dslPath(plugin, 'publishArtifact'), params
         client.waitForJobToComplete(response.json.jobId, timeout, 2, "Artifact is .")
         return response
     }

@@ -1,7 +1,6 @@
 package com.electriccloud.procedures.artifact_2_image
 
 import com.electriccloud.client.api.DockerApi
-import com.electriccloud.helpers.objects.Artifactory
 import com.electriccloud.helpers.objects.Credential
 import com.electriccloud.procedures.DockerTestBase
 import com.electriccloud.test_data.Artifact2ImageData
@@ -16,7 +15,8 @@ import static com.electriccloud.helpers.enums.LogLevels.LogLevel.*
 
 class Artifact2ImageArtifactoryTypeTests extends DockerTestBase {
 
-    def dockerHubCreds
+
+
 
     @BeforeClass(alwaysRun = true)
     void setUpTests(){
@@ -43,13 +43,18 @@ class Artifact2ImageArtifactoryTypeTests extends DockerTestBase {
 
     @BeforeMethod(alwaysRun = true)
     void setUpTest(){
+        dockerApi.client.ps().content.each {
+            dockerApi.client.rm(dockerApi.client.inspectContainer(it.Id).content.Config.Hostname, [force: true])
+        }
         dockerApi.client.pruneContainers()
     }
 
     @AfterMethod(alwaysRun = true)
     void tearDownTest(){
-        dockerApi.client.stop(containerId)
-        dockerApi.client.rm(containerId)
+        //dockerApi.client.stop(containerId)
+        dockerApi.client.ps().content.each {
+            dockerApi.client.rm(dockerApi.client.inspectContainer(it.Id).content.Config.Hostname, [force: true])
+        }
         dockerApi.client.pruneContainers()
     }
 
@@ -76,8 +81,7 @@ class Artifact2ImageArtifactoryTypeTests extends DockerTestBase {
         def repo = dockerHub.getRepository(repository).json
         def images = dockerApi.client.images().content
         def image = images.find { it.RepoTags.first() == "${imageName}:latest" }
-        def containerId = dockerApi.client.run(image.Id, containerConfig(image.Id, ports),
-                '', 'hello-world-app').container.content.Id
+        def containerId = dockerApi.client.run(image.Id, containerConfig(image.Id, ports), '', 'my-app').container.content.Id
         def tasks = dockerApi.client.ps().content
         def jobStatus = dockerClient.client.getJobStatus(jobId).json
         assert jobStatus.status == "completed"
@@ -85,12 +89,11 @@ class Artifact2ImageArtifactoryTypeTests extends DockerTestBase {
         assert image.RepoTags.first() == "${imageName}:latest"
         assert containerId == tasks.first().Id
         assert image.Id == tasks.first().ImageID
-        assert tasks.first().Names.first() == '/hello-world-app'
+        assert tasks.first().Names.first() == '/my-app'
         assert repo.user == dockerHub.username
         assert repo.name == repository
         dockerHub.deleteRepository(repository)
     }
-
 
 
 }

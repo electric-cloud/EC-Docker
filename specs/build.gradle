@@ -11,7 +11,6 @@ ext {
     allureVersion = '2.7.0'
     testNgVersion = '6.14.3'
     restAssuredVersion = '3.1.0'
-
 }
 
 
@@ -62,7 +61,7 @@ repositories {
 
 
 dependencies {
-    compile(
+    implementation(
             'org.codehaus.groovy:groovy-all:2.4.5:indy',
             "org.codehaus.groovy.modules.http-builder:http-builder:0.7.1",
             "org.testng:testng:$testNgVersion",
@@ -77,11 +76,11 @@ dependencies {
             "org.hamcrest:hamcrest-all:1.3",
             'com.google.guava:guava:27.0-jre'
     )
-    testCompile( 'com.athaydes:spock-reports:1.6.0' ) {
+    testImplementation( 'com.athaydes:spock-reports:1.6.0' ) {
         transitive = false // this avoids affecting your version of Groovy/Spock
     }
-    compile group: 'log4j', name: 'log4j', version: '1.2.17'
-    compile group: 'org.slf4j', name: 'slf4j-simple', version: '1.7.25'
+    implementation group: 'log4j', name: 'log4j', version: '1.2.17'
+    implementation group: 'org.slf4j', name: 'slf4j-simple', version: '1.7.25'
     // Docker API
     compile group: 'de.gesellix', name: 'docker-client', version: '2018-01-26T21-28-05'
     compile group: 'de.gesellix', name: 'docker-engine', version: '2018-01-22T23-17-39'
@@ -167,3 +166,25 @@ test {
     }
 }.finalizedBy systemTest
 
+
+
+task sanityTests(type: Test){
+
+    systemProperty "file.encoding", "utf-8"
+    systemProperty "log4j.configuration", "file:///${rootDir.absolutePath}/src/main/resources/log4j.properties"
+    systemProperty "allure.link.issue.pattern", "http://jira.electric-cloud.com/browse/{}"
+    systemProperty "allure.link.tms.pattern", "https://ecflow.testrail.net/index.php?/cases/view/{}"
+    ignoreFailures = true
+    useTestNG() {
+        suites "${suiteDir}/sanityTests.xml"
+    }
+    testLogging.showStandardStreams = true
+
+    def destination = findProperty('reportDestination') ?: "${rootDir}/build/reports/allure-report"
+    if (destination) {
+        reports {
+            html.destination = "$destination"
+        }
+    }
+
+}

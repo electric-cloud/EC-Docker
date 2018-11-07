@@ -1,6 +1,6 @@
-package dsl.docker
+package dsl.flow
 
-def names = args.names,
+def names = args.params,
         project = names.project,
         environment = names.environment,
         service = names.service,
@@ -11,5 +11,5 @@ runServiceProcess(
         serviceName: service,
         environmentName: environment,
         environmentProjectName: envProject,
-        processName: 'Undeploy',
+        processName: 'Deploy',
 )

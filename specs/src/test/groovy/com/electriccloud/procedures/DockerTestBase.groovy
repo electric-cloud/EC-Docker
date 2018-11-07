@@ -23,6 +23,7 @@ import static org.awaitility.Awaitility.setDefaultTimeout
 class DockerTestBase extends NamingTestBase {
 
 
+
     def getHost = { uri -> new URL(uri).host }
 
     def req = given().relaxedHTTPSValidation()

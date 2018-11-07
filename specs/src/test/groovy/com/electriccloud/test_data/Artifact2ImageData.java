@@ -24,7 +24,7 @@ public class Artifact2ImageData {
                         false
                 },
                 {
-                        "com.mycompany.AspNetSample.1.0.0.zip",
+                        "com.mycompany.AspNetSample-1.0.0.zip",
                         new Artifactory(artifactoryConfig, NUGET, "nuget-local", "com/mycompany", "AspNetSample", "1.0.0", "nupkg"),
                         dockerHubId + "/" + netRepo,
                         netRepo,
@@ -33,7 +33,7 @@ public class Artifact2ImageData {
                         false
                 },
                 {
-                        "com.mycompany.AspNetSample.1.0.0.zip",
+                        "com.mycompany.AspNetSample-1.0.0.zip",
                         new Artifactory(artifactoryConfig, GENERIC, "generic-local", "com/mycompany", "AspNetSample", "1.0.0", "zip"),
                         dockerHubId + "/" + netRepo,
                         netRepo,
@@ -82,7 +82,7 @@ public class Artifact2ImageData {
                         netArtifact,
                         "1.0.0",
                         artifactsDir,
-                        "com.mycompany.AspNetSample.1.0.0.zip",
+                        "com.mycompany.AspNetSample-1.0.0.zip",
                         dockerHubId + "/" + netRepo,
                         netRepo,
                         new Artifactory(null, MAVEN, null, null, null, null, null),

@@ -1,6 +1,6 @@
 package dsl.docker
 
-def names = args.names,
+def names = args.params,
         credentialName = names.credentialName,
         configName = names.configName,
         imageName = names.imageName,
@@ -21,14 +21,15 @@ def names = args.names,
         artifactVersion = names.artifactVersion,
         removeAfterPush = names.removeAfterPush,
         userName = names.userName,
-        password = names.password
-
+        password = names.password,
+        resource = names.resource
 
 def pluginProjectName = getPlugin(pluginName: "EC-Docker").projectName
 
 runProcedure(
         projectName: pluginProjectName,
         procedureName: 'Artifact2Image',
+        resourceName: resource,
         actualParameter: [
                 ecp_docker_credential: credentialName,
                 config: configName,

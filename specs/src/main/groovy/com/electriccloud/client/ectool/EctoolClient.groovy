@@ -18,7 +18,6 @@ class EctoolClient {
     def out
 
     EctoolClient() {
-
         ectoolPath             = System.getenv("ECTOOL_HOME") as String
         electricFlowServerUrl  = System.getenv("COMMANDER_HOST") as String
         ecUsername             = System.getenv("COMMANDER_LOGIN") as String

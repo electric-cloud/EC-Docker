@@ -1,6 +1,6 @@
 package dsl.docker
 
-def names = args.names,
+def names = args.params,
     templateYaml = names.templateYaml
     projectName = names.projectName
     applicationScoped = names.applicationScoped
@@ -8,6 +8,7 @@ def names = args.names,
     envProjectName = names.envProjectName
     environmentName = names.environmentName
     clusterName = names.clusterName
+    resource = names.resource
 
 
 // Create plugin configuration
@@ -16,6 +17,7 @@ def pluginProjectName = getPlugin(pluginName: 'EC-Docker').projectName
 runProcedure(
         projectName: pluginProjectName,
         procedureName: 'Import Microservices',
+        resourceName: resource,
         actualParameter: [
                 docker_compose_file_content: templateYaml,
                 docker_project: projectName,

@@ -88,7 +88,7 @@ class DockerSwarmDeploymentTests extends DockerTestBase {
     @Description("Update Project-level Microservice on Docker-Swarm with same creds")
     void updateProjectLevelMicroserviceWithTheSameCreds(){
         dockerClient.deployService(projectName, serviceName)
-        dockerClient.updateService(2, volumes)
+        dockerClient.createService(2, volumes)
         dockerClient.deployService(projectName, serviceName)
         await('Wait for services to have status: running').until {
             dockerApi.client.tasks().content
@@ -125,7 +125,7 @@ class DockerSwarmDeploymentTests extends DockerTestBase {
     @Description("Update Project-level Microservice on Docker-Swarm")
     void updateProjectLevelMicroservice(){
         dockerClient.deployService(projectName, serviceName)
-        dockerClient.updateService(3, volumes)
+        dockerClient.createService(3, volumes)
         dockerClient.deployService(projectName, serviceName)
         await('Wait for services to have status: running').until {
             dockerApi.client.tasks().content

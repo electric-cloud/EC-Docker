@@ -25,7 +25,7 @@ class JfrogArtifactoryApi {
         if (repoType == "Maven"){
             basePath = "$orgPath/${artifactName}/${version}/${artifactName}-${version}.${extension}"
         } else {
-            basePath = "$orgPath/${artifactName}/${artifactName}.${version}.${extension}"
+            basePath = "$orgPath/${artifactName}/${artifactName}-${version}.${extension}"
         }
         log.info("Uploading artifact: " + basePath)
         artifactory.repository(repoName)

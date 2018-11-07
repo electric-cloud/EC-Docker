@@ -117,13 +117,13 @@ class ImportTests extends DockerTestBase {
                 environmentProjectName,
                 environmentName,
                 clusterName,
-                false, null)
+                false, null, resource)
         def jobId = dockerClient.importService(serviceName,
                 projectName,
                 environmentProjectName,
                 environmentName,
                 clusterName,
-                false, null).json.jobId
+                false, null, resource).json.jobId
         def services = dockerClient.client.getServices(projectName).json.service
         def service = dockerClient.client.getService(projectName, serviceName).json.service
         def container = dockerClient.client.getServiceContainer(projectName, serviceName, containerName).json.container
@@ -159,13 +159,13 @@ class ImportTests extends DockerTestBase {
                     environmentProjectName,
                     environmentName,
                     clusterName,
-                    true, applicationName)
+                    true, applicationName, resource)
             dockerClient.importService(serviceName,
                     projectName,
                     environmentProjectName,
                     environmentName,
                     clusterName,
-                    true, applicationName).json.jobId
+                    true, applicationName, resource).json.jobId
         } catch (e){
             def jobId = e.cause.message
             def errorLog = dockerClient.client.getJobLogs(jobId)
@@ -203,7 +203,7 @@ class ImportTests extends DockerTestBase {
     @Description("Import Microservice with invalid data")
     void invalidServiceImport(yamlFile, isApp, appName, project, envName, clusterName, errorMessage){
         try {
-            dockerClient.importService(yamlFile, project, project, envName, clusterName, isApp, appName)
+            dockerClient.importService(yamlFile, project, project, envName, clusterName, isApp, appName, resource)
         } catch (e){
             def jobId = e.cause.message
             String errorLog = dockerClient.client.getJobLogs(jobId)

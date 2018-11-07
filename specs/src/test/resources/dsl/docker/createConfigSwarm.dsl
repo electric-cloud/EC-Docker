@@ -2,7 +2,7 @@ package dsl.docker
 
 def configName 	   = "dockerConfigSwarm",
     pluginName 	   = 'EC-Docker',
-    endpoint 	   = 'tcp://10.200.1.107:2376',
+    endpoint 	   = 'tcp://10.200.1.219:2376',
 // ca.pem
     cacert     	   = "",
 // cert.pem

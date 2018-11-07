@@ -1,5 +1,6 @@
 package com.electriccloud.client
 
+import groovy.json.JsonBuilder
 
 import java.nio.file.Paths
 import java.util.concurrent.TimeoutException
@@ -39,9 +40,11 @@ class APIClient extends HttpClient {
         dsl(dslText, null)
     }
 
+
+    // Dsl File implementation from Json as parameters
     def dsl(dslText, params) {
         def _params = params ? "&parameters=$params" : ''
-        request(baseUri,"server/dsl?dsl=${encode(dslText)}$_params", POST, null, defaultHeaders(), null, false)
+        request(baseUri,"server/dsl?dsl=${encode(dslText)}${_params}", POST, null, defaultHeaders(), null, false)
     }
 
     def dslFile(dslFilePath) {
@@ -51,6 +54,19 @@ class APIClient extends HttpClient {
     def dslFile(dslFilePath, params) {
         dsl(new File(dslFilePath).text, params)
     }
+
+    // Dsl File implementation from Map as parameters
+    def dslMap(dslText, params) {
+        def par = encode(new JsonBuilder(params).toString())
+        def _params = par ? "&parameters=$par" : ''
+        request(baseUri,"server/dsl?dsl=${encode(dslText)}${_params}", POST, null, defaultHeaders(), null, false)
+    }
+
+    def dslFileMap(dslFilePath, params ) {
+        dslMap(new File(dslFilePath).text, params)
+    }
+
+
 
     // Job
 
