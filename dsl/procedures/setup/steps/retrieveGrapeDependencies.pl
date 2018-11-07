@@ -215,7 +215,7 @@ sub checkChecksums {
 
     my $checksum = $self->calculateCacheChecksum($deps->{files});
     if ($checksum ne $deps->{checksum}) {
-        info "Checksums do not match: $deps->{checksum} and $checksum\n";
+        info "Checksums do not match: $deps->{checksum} and $checksum";
         return 0;
     }
     return 1;
