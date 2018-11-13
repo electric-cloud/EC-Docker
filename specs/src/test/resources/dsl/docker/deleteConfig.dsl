@@ -1,4 +1,4 @@
-package dsl.flow
+package dsl.docker
 
 def names = args.params,
         pluginName = 'EC-Docker',

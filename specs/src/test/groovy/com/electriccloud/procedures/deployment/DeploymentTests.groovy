@@ -1,27 +1,21 @@
 package com.electriccloud.procedures.deployment
 
 import com.electriccloud.client.api.DockerApi
-import com.electriccloud.helpers.enums.LogLevels
 import com.electriccloud.procedures.DockerTestBase
+import groovy.json.JsonBuilder
 import io.qameta.allure.Description
 import io.qameta.allure.Feature
 import io.qameta.allure.Story
-import io.qameta.allure.TmsLink
 import org.testng.annotations.AfterClass
 import org.testng.annotations.AfterMethod
 import org.testng.annotations.BeforeClass
 import org.testng.annotations.BeforeMethod
 import org.testng.annotations.Test
 
-import static com.electriccloud.helpers.enums.LogLevels.LogLevel.*
-import static io.restassured.RestAssured.given
+import static com.electriccloud.helpers.enums.LogLevels.LogLevel.DEBUG
 import static org.awaitility.Awaitility.await
 
-
-@Feature("Deploy")
-class DockerSwarmDeploymentTests extends DockerTestBase {
-
-
+class DeploymentTests extends DockerTestBase {
 
     @BeforeClass(alwaysRun = true)
     void setUpTests(){
@@ -37,27 +31,24 @@ class DockerSwarmDeploymentTests extends DockerTestBase {
     }
 
     @AfterMethod(alwaysRun = true)
-    void tearDownTes(){
-        dockerApi.client.services().content.each { dockerApi.client.rmService(it.Spec.Name) }
-        dockerApi.client.pruneContainers()
+    void tearDownTest(){
+        dockerClient.removeService(configSwarm, serviceName, "local")
+    }
+
+    @AfterClass(alwaysRun = true)
+    void tearDownTests(){
         dockerClient.client.deleteProject(projectName)
     }
 
 
 
-
     @Test(groups = "Positive")
-    @TmsLink("")
     @Story('Deploy on Docker-Swarm')
-    @Description("Deploy Project-level Microservice on Docker-Swarm")
     void deployProjectLevelMicroservice(){
-        dockerClient.deployService(projectName, serviceName)
+        dockerClient.deploy(projectName, environmentProjectName, environmentName, clusterName, serviceName)
         await('Wait for services to have status: running').until {
-            dockerApi.client.tasks().content
-                    .each { it.Status.State == "running" }
+            dockerApi.client.tasks().content.each { it.Status.State == "running" }
         }
-        def master = req.get("http://${getHost(endpointSwarm)}:81/")
-        def node = req.get("http://${getHost(nodeSwarm)}:81/")
         def service = dockerApi.client.inspectService(serviceName).content
         def tasks = dockerApi.client.tasks().content
         assert service.Spec.Name == serviceName
@@ -71,12 +62,7 @@ class DockerSwarmDeploymentTests extends DockerTestBase {
         assert tasks.each { assert it.Spec.ContainerSpec.Image == "nginx:latest" }
         assert tasks.each { assert it.Status.State == "running" }
         assert tasks.each { assert it.Status.Message == "started" }
-        assert master.statusCode() == 200
-        assert master.body().asString().contains("Hello World")
-        assert node.statusCode() == 200
-        assert node.body().asString().contains("Hello World")
     }
-
 
 
 
@@ -84,15 +70,12 @@ class DockerSwarmDeploymentTests extends DockerTestBase {
     @Story('Deploy on Docker-Swarm')
     @Description("Update Project-level Microservice on Docker-Swarm with same creds")
     void updateProjectLevelMicroserviceWithTheSameCreds(){
-        dockerClient.deployService(projectName, serviceName)
+        dockerClient.deploy(projectName, environmentProjectName, environmentName, clusterName, serviceName)
         dockerClient.createService(2, volumes)
-        dockerClient.deployService(projectName, serviceName)
+        dockerClient.deploy(projectName, environmentProjectName, environmentName, clusterName, serviceName)
         await('Wait for services to have status: running').until {
-            dockerApi.client.tasks().content
-                    .each { it.Status.State == "running" }
+            dockerApi.client.tasks().content.each { it.Status.State == "running" }
         }
-        def master = req.get("http://${getHost(endpointSwarm)}:81/")
-        def node = req.get("http://${getHost(nodeSwarm)}:81/")
         def service = dockerApi.client.inspectService(serviceName).content
         def tasks = dockerApi.client.tasks().content
         assert service.Spec.Name == serviceName
@@ -106,10 +89,6 @@ class DockerSwarmDeploymentTests extends DockerTestBase {
         assert tasks.each { assert it.Spec.ContainerSpec.Image == "nginx:latest" }
         assert tasks.each { assert it.Status.State == "running" }
         assert tasks.each { assert it.Status.Message == "started" }
-        assert master.statusCode() == 200
-        assert master.body().asString().contains("Hello World")
-        assert node.statusCode() == 200
-        assert node.body().asString().contains("Hello World")
     }
 
 
@@ -118,15 +97,12 @@ class DockerSwarmDeploymentTests extends DockerTestBase {
     @Story('Deploy on Docker-Swarm')
     @Description("Update Project-level Microservice on Docker-Swarm")
     void updateProjectLevelMicroservice(){
-        dockerClient.deployService(projectName, serviceName)
+        dockerClient.deploy(projectName, environmentProjectName, environmentName, clusterName, serviceName)
         dockerClient.createService(3, volumes)
-        dockerClient.deployService(projectName, serviceName)
+        dockerClient.deploy(projectName, environmentProjectName, environmentName, clusterName, serviceName)
         await('Wait for services to have status: running').until {
-            dockerApi.client.tasks().content
-                    .each { it.Status.State == "running" }
+            dockerApi.client.tasks().content.each { it.Status.State == "running" }
         }
-        def master = req.get("http://${getHost(endpointSwarm)}:81/")
-        def node = req.get("http://${getHost(nodeSwarm)}:81/")
         def service = dockerApi.client.inspectService(serviceName).content
         def tasks = dockerApi.client.tasks().content
         assert service.Spec.Name == serviceName
@@ -140,10 +116,6 @@ class DockerSwarmDeploymentTests extends DockerTestBase {
         assert tasks.each { assert it.Spec.ContainerSpec.Image == "nginx:latest" }
         assert tasks.each { assert it.Status.State == "running" }
         assert tasks.each { assert it.Status.Message == "started" }
-        assert master.statusCode() == 200
-        assert master.body().asString().contains("Hello World")
-        assert node.statusCode() == 200
-        assert node.body().asString().contains("Hello World")
     }
 
 
@@ -154,8 +126,8 @@ class DockerSwarmDeploymentTests extends DockerTestBase {
     @Story('Undeploy on Docker-Swarm')
     @Description("Undeploy Project-level Microservice on Docker-Swarm")
     void undeployProjcetLevelMicroservice(){
-        dockerClient.deployService(projectName, serviceName)
-        dockerClient.undeployService(projectName, serviceName)
+        dockerClient.deploy(projectName, environmentProjectName, environmentName, clusterName, serviceName)
+        dockerClient.undeploy(projectName, environmentProjectName, environmentName, clusterName, serviceName)
         await('Until size of containers equals: 0').until{
             dockerApi.client.services().content.size() == 0
         }
@@ -166,7 +138,6 @@ class DockerSwarmDeploymentTests extends DockerTestBase {
         assert tasks.size() == 0
         assert services.size() == 0
     }
-
 
 
 }

@@ -17,16 +17,15 @@ class Artifact2ImageArtifactoryTypeTests extends DockerTestBase {
 
 
 
-
     @BeforeClass(alwaysRun = true)
     void setUpTests(){
-        dockerApi = new DockerApi(endpointCommunity, certsPath, false)
+        dockerApi = new DockerApi(endpointSwarm, certsPath, false)
         dockerHubCreds = new Credential("DockerHub", dockerHubId, dockerHubPass, "test")
 
         dockerClient.client.deleteProject(projectName)
         dockerClient.deleteConfiguration(configName)
         artifactoryClient.deleteConfiguration(artifactoryConfig)
-        dockerClient.createConfiguration(configName, endpointCommunity, userName, null, null, null, true, DEBUG)
+        dockerClient.createConfiguration(configName, endpointSwarm, userName, null, null, null, true, DEBUG)
         artifactoryClient.createConfiguration(artifactoryConfig, artifactoryUrl, artifactoryUsername, artifactoryPassword, DEBUG)
 
         dockerClient.createEnvironment(configName)
@@ -51,7 +50,6 @@ class Artifact2ImageArtifactoryTypeTests extends DockerTestBase {
 
     @AfterMethod(alwaysRun = true)
     void tearDownTest(){
-        //dockerApi.client.stop(containerId)
         dockerApi.client.ps().content.each {
             dockerApi.client.rm(dockerApi.client.inspectContainer(it.Id).content.Config.Hostname, [force: true])
         }

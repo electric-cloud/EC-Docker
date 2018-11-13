@@ -1,14 +1,14 @@
 package dsl.docker
 
 def names = args.params,
-    service = names.service
-    serviceRevId = names.serviceRevId
-    serviceProject = names.serviceProject
-    application = names.application
-    applicationRevId = names.applicationRevId
-    cluster = names.cluster
-    envProject = names.envProject
-    envName = names.envName
+        service = names.service
+        serviceRevId = names.serviceRevId
+        serviceProject = names.serviceProject
+        application = names.application
+        applicationRevId = names.applicationRevId
+        cluster = names.cluster
+        envProject = names.envProject
+        envName = names.envName
         resource = names.resource
 
 

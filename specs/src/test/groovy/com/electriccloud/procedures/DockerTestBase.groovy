@@ -1,5 +1,6 @@
 package com.electriccloud.procedures
 
+import com.electriccloud.client.api.DockerApi
 import com.electriccloud.client.api.DockerHubApi
 import com.electriccloud.client.api.JfrogArtifactoryApi
 import com.electriccloud.client.ectool.EctoolApi
@@ -9,12 +10,14 @@ import com.electriccloud.listeners.TestListener
 import io.qameta.allure.Epic
 import io.restassured.filter.log.RequestLoggingFilter
 import io.restassured.filter.log.ResponseLoggingFilter
+import io.restassured.http.ContentType
 import org.testng.annotations.BeforeClass
 import org.testng.annotations.BeforeSuite
 import org.testng.annotations.Listeners
 
 import java.util.concurrent.TimeUnit
 import static io.restassured.RestAssured.given
+import static io.restassured.http.ContentType.*
 import static org.awaitility.Awaitility.setDefaultTimeout
 
 
@@ -27,6 +30,7 @@ class DockerTestBase extends NamingTestBase {
     def getHost = { uri -> new URL(uri).host }
 
     def req = given().relaxedHTTPSValidation()
+                    .contentType(JSON)
                     .filters(new RequestLoggingFilter(), new ResponseLoggingFilter())
                     .when()
 
@@ -92,8 +96,8 @@ class DockerTestBase extends NamingTestBase {
         artifactoryClient = new ArtifactoryClient()
         dockerHub = new DockerHubApi(dockerHubId, dockerHubPass)
         ectoolApi = new EctoolApi(true)
+        dockerApi = new DockerApi(endpointCommunity, certsPath, false)
         artifactoryApi = new JfrogArtifactoryApi(artifactoryUrl, artifactoryUsername, artifactoryPassword)
-
 
         ectoolApi.ectoolLogin()
     }

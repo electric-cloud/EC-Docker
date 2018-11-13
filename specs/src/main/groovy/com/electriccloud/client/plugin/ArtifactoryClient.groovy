@@ -29,6 +29,14 @@ class ArtifactoryClient extends CommanderClient {
         return response
     }
 
+    @Step("Delete configuration: {confName}")
+    def deleteConfiguration(confName) {
+        message("removing configuration")
+        def response = client.dslFileMap(dslPath(plugin, 'deleteConfig'), [params: [configName: confName]])
+        client.waitForJobToComplete(response.json.jobId, timeout, 2, "Configuration: ${confName} is successfully deleted.")
+        return response
+    }
+
     @Step("Push artifact: {0}")
     def publishArtifact(configName,
                         artifactName,

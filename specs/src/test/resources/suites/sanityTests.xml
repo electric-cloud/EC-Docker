@@ -10,6 +10,7 @@
                     <classes>
                         <class name="com.electriccloud.procedures.configuration.CreateConfigurationTests"/>
                         <class name="com.electriccloud.procedures.configuration.ProvisionTests"/>
+                        <class name="com.electriccloud.procedures.configuration.CheckClusterTests"/>
                     </classes>
                 </include>
             </run>
@@ -21,9 +22,9 @@
             <run>
                 <include name="Positive">
                     <classes>
-                        <class name="com.electriccloud.procedures.deployment.DockerSwarmDeploymentTests"/>
-                        <class name="com.electriccloud.procedures.deployment.DockerTlsDeploymentTests"/>
-                        <class name="com.electriccloud.procedures.deployment.DockerComDeploymentTests"/>
+                        <class name="com.electriccloud.procedures.deployment.DeploymentTests"/>
+                        <class name="com.electriccloud.procedures.deployment.MicroserviceDeploymentTests"/>
+                        <class name="com.electriccloud.procedures.deployment.ApplicationDeploymentTests"/>
                     </classes>
                 </include>
             </run>

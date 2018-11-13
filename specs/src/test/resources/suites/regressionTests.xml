@@ -12,6 +12,7 @@
         <classes>
             <class name="com.electriccloud.procedures.configuration.CreateConfigurationTests"/>
             <class name="com.electriccloud.procedures.configuration.ProvisionTests"/>
+            <class name="com.electriccloud.procedures.configuration.CheckClusterTests"/>
         </classes>
     </test>
     <test name="Deployment Tests">

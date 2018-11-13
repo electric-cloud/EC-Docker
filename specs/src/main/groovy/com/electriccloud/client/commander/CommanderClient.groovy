@@ -26,29 +26,10 @@ class CommanderClient {
 
 
     @Step
-    def createConfiguration(dslFile) {
-        message("creating config")
+    def runDsl(dslFile) {
+        message("running dsl")
         def response = client.dslFile dslPath(plugin, dslFile)
-        client.waitForJobToComplete(response.json.jobId, timeout, 2, "Configuration is successfully created.")
-        return response
-    }
-
-
-
-    @Step("Delete configuration: {confName}")
-    def deleteConfiguration(confName) {
-        message("removing configuration")
-        def response = client.dslFileMap(dslPath('flow', 'deleteConfig'), [params: [configName: confName]])
-        client.waitForJobToComplete(response.json.jobId, timeout, 2, "Configuration: ${confName} is successfully deleted.")
-        return response
-    }
-
-
-    @Step
-    def createService(serviceDslFile) {
-        message("service creation")
-        def response = client.dslFile dslPath('flow', serviceDslFile)
-        client.log.info("Service for project: ${response.json.project.projectName} is created successfully.")
+        client.waitForJobToComplete(response.json.jobId, timeout, 2, "Procedure successfully finished.")
         return response
     }
 
@@ -62,7 +43,6 @@ class CommanderClient {
         client.waitForJobToComplete(response.json.jobId, timeout, 5, "Deployment is successfully completed.")
         return response
     }
-
 
     @Step("Undeploy project-level service: {serviceName}")
     def undeployService(projectName, serviceName) {
@@ -105,13 +85,7 @@ class CommanderClient {
 
 
     @Step
-    def importService(yamlfile,
-                      projectName,
-                      envProject,
-                      envName,
-                      clusterName,
-                      importApp = false,
-                      applicationName = null, resourceName = "local") {
+    def importService(yamlfile, projectName, envProject, envName, clusterName, importApp = false, applicationName = null, resourceName = "local") {
         def appScoped
         if (importApp){ appScoped = "1" } else {appScoped = null }
         message("service import")

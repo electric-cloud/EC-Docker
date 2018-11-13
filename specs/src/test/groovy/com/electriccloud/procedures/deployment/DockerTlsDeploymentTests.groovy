@@ -56,9 +56,6 @@ class DockerTlsDeploymentTests extends DockerTestBase {
                     .find { it.Names.last() == "/${serviceName}" }
                     .State == "running"
         }
-        await('Wait for success connection with service').until {
-            req.when().get("http://${getHost(endpointTls)}:81/").statusCode() == 200
-        }
         def resp = req.get("http://${getHost(endpointTls)}:81/")
         def containers = dockerApi.client.ps().content
         def container = containers.find { it.Names.last() == "/${serviceName}" }
@@ -89,9 +86,6 @@ class DockerTlsDeploymentTests extends DockerTestBase {
                     .find { it.Names.last() == "/${serviceName}" }
                     .State == "running"
         }
-        await('Wait for success connection with service').until {
-            req.when().get("http://${getHost(endpointTls)}:81/").statusCode() == 200
-        }
         def resp = req.get("http://${getHost(endpointTls)}:81/")
         def containers = dockerApi.client.ps().content
         def container = containers.find { it.Names.last() == "/${serviceName}" }
@@ -121,9 +115,6 @@ class DockerTlsDeploymentTests extends DockerTestBase {
             dockerApi.client.ps().content
                     .find { it.Names.last() == "/${serviceName}" }
                     .State == "running"
-        }
-        await('Wait for success connection with service').until {
-            req.when().get("http://${getHost(endpointTls)}:81/").statusCode() == 200
         }
         def resp = req.get("http://${getHost(endpointTls)}:81/")
         def containers = dockerApi.client.ps().content

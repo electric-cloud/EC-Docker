@@ -117,13 +117,13 @@ class ImportTests extends DockerTestBase {
                 environmentProjectName,
                 environmentName,
                 clusterName,
-                false, null, resource)
+                false, null)
         def jobId = dockerClient.importService(serviceName,
                 projectName,
                 environmentProjectName,
                 environmentName,
                 clusterName,
-                false, null, resource).json.jobId
+                false, null).json.jobId
         def services = dockerClient.client.getServices(projectName).json.service
         def service = dockerClient.client.getService(projectName, serviceName).json.service
         def container = dockerClient.client.getServiceContainer(projectName, serviceName, containerName).json.container
@@ -159,13 +159,13 @@ class ImportTests extends DockerTestBase {
                     environmentProjectName,
                     environmentName,
                     clusterName,
-                    true, applicationName, resource)
+                    true, applicationName)
             dockerClient.importService(serviceName,
                     projectName,
                     environmentProjectName,
                     environmentName,
                     clusterName,
-                    true, applicationName, resource).json.jobId
+                    true, applicationName).json.jobId
         } catch (e){
             def jobId = e.cause.message
             def errorLog = dockerClient.client.getJobLogs(jobId)
