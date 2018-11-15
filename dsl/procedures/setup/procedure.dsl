@@ -1,4 +1,3 @@
-// Version: Tue Nov  6 19:00:08 2018
 import java.io.File
 
 procedure 'Setup',
@@ -17,4 +16,4 @@ procedure 'Setup',
     	  timeLimitUnits: 'minutes'
 
 }
-
+  

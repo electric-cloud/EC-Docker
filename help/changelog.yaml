@@ -39,5 +39,3 @@
   - Previously deprecated <i>Discover</i> procedure has been removed. Use the <i>Import Microservices</i> procedure to create microservice models based on the given Docker Compose file contents.
   - Fixed the report link for unsupported tags that were not processed by the <i>Import Microservices</i>.
   - Configured the plugin to allow the ElectricFlow UI to create configs inline of procedure form.
-1.5.0:
-  - "Changed the way of storing and loading dependencies: the Repository is not required anymore. Now the depencencies and loaded through STOMP."
