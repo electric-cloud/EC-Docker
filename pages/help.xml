@@ -14,7 +14,7 @@
     <h1>@PLUGIN_KEY@</h1>
     <p>Plugin version @PLUGIN_VERSION@</p>
     
-    <p>Revised on November 06, 2018</p>
+    <p>Revised on December 07, 2018</p>
     
     <hr style="margin-left: -10px; margin-top: 10px; height: 1px; width: 100%; color: #5981BD;" noshade="noshade"/>
     <h1>Contents</h1>
@@ -22,8 +22,6 @@
     <li><a href="#overview">Overview</a></li>
     
 
-    
-    <li><a href="#Dependency Management (Setup procedure)">Dependency Management (Setup procedure)</a></li>
     
 
     
@@ -129,16 +127,6 @@ More information about how to setup TLS certificates on Docker endpoint can be f
 </p>
     
     
-
-    
-    <div id="Dependency Management (Setup procedure)">
-        <h2>Dependency Management (Setup procedure)</h2>
-        <p>Binary dependencies (Grapes) are loaded from ElectricFlow server through DSL.
-Upon procedure run a cache descriptor under plugin project (ec_dependenciesCache property) is checked.
-If the property does not exist, or the files listed there are missing on disk, or .jar files are corrupt, the depedencies will be downloaded from ElectricFlow server, and this can take some time.
-Subsequent runs will be much faster as they will be using already downloaded and cached files.</p>
-
-    </div>
 
     
     <!--TODO custom blocks-->
@@ -1066,7 +1054,7 @@ For more information on docker networking, see <a href="https://docs.docker.com/
     <h3>@PLUGIN_KEY@ 1.5.0</h3>
     <ul>
         
-        <li>Changed the way of storing and loading dependencies: the Repository is not required anymore. Now the depencencies and loaded through STOMP.</li>
+        <li>Plugin promotion time has been improved.</li>
         
     </ul>
     
