@@ -1,4 +1,3 @@
-# Version: Thu Oct 25 16:10:18 2018
 # Plugin-specific setup code
 my $setup = ECSetup->new(
     commander => $commander,
@@ -8,7 +7,7 @@ my $setup = ECSetup->new(
     promoteAction => $promoteAction,
 );
 $setup->promotePlugin([
-    {artifactName => '@PLUGIN_KEY@-Grapes', artifactVersion => '1.0.0', fromDirectory => 'lib'}
+    {artifactName => '@PLUGIN_KEY@-Grapes', artifactVersion => '1.0.3', fromDirectory => 'lib'}
 ]);
 
 
@@ -18,8 +17,6 @@ package ECSetup;
 
 use strict;
 use warnings;
-
-no warnings 'redefine';
 
 use File::Spec;
 use Archive::Zip;
@@ -48,25 +45,6 @@ sub promoteAction { shift->{promoteAction} }
 sub upgradeAction { shift->{upgradeAction} }
 sub pluginName { shift->{pluginName} }
 sub otherPluginName { shift->{otherPluginName} }
-
-sub removeArtifact {
-    my ($self, $artifactName, $artifactVersion, $fromDirectory) = @_;
-
-    $artifactName or die 'Artifact name should be provided!';
-    $artifactVersion or die 'Artifact version should be provided!';
-    $fromDirectory or die 'fromDirectory should be provided!';
-
-    # This is here because we cannot do publishArtifactVersion in dsl today
-    # delete artifact if it exists first
-    my $commander = $self->commander;
-    eval {
-        $commander->deleteArtifact("com.electriccloud:$artifactName");
-    };
-    if ($@) {
-        # It may fail to connect to the repository. No worries though.
-        warn "Warning: failed to remove old dependency artifact $artifactName: $@";
-    }
-}
 
 sub publishArtifact {
     my ($self, $artifactName, $artifactVersion, $fromDirectory) = @_;
@@ -157,72 +135,18 @@ sub publishArtifact {
 sub promotePlugin {
     my ($self, $dependencies) = @_;
 
-    my $dir = getcwd;
     my $logfile = "";
-    my $pluginDir;
 
     my $commander = $self->commander;
     my $pluginName = $self->pluginName;
-    if ( defined $ENV{QUERY_STRING} ) {    # Promotion through UI
-        $pluginDir = $ENV{COMMANDER_PLUGINS} . "/$pluginName";
-    }
-    else {
-        my $commanderPluginDir = $commander->getProperty('/server/settings/pluginsDirectory')->findvalue('//value');
-        $pluginDir = File::Spec->catfile($commanderPluginDir, $pluginName);
-    }
 
-    $logfile .= "Plugin directory is $pluginDir\n";
-
-    $commander->setProperty("/plugins/$pluginName/project/pluginDir", {value=>$pluginDir});
-    $logfile .= "Plugin Name: $pluginName\n";
-    $logfile .= "Current directory: $dir\n";
-
-
-    my $demoteDsl = q{
-    # demote.groovy placeholder
-    };
-
-    my $promoteDsl = q{
-    # promote.groovy placeholder
-    };
-
-    my $dsl;
-    if ($self->promoteAction eq 'promote') {
-      $dsl = $promoteDsl;
-    }
-    else {
-      $dsl = $demoteDsl;
-    }
-
-    my $otherPluginName = $self->otherPluginName;
-    my $upgradeAction = $self->upgradeAction;
-    my $dslReponse = $commander->evalDsl(
-        $dsl, {
-            parameters => qq(
-                         {
-                           "pluginName":"$pluginName",
-                           "upgradeAction":"$upgradeAction",
-                           "otherPluginName":"$otherPluginName"
-                         }
-                  ),
-            debug             => 'false',
-            serverLibraryPath => File::Spec->catdir( $pluginDir, 'dsl' ),
-        },
-    );
-
-    $logfile .= $dslReponse->findnodes_as_string("/");
-    my $errorMessage = $commander->getError();
-    if ( !$errorMessage ) {
-        if ($dependencies) {
-            for my $dependency (@$dependencies) {
-                $logfile .= $self->removeArtifact($dependency->{artifactName}, $dependency->{artifactVersion}, $dependency->{fromDirectory});
-            }
+    if ($dependencies) {
+        for my $dependency (@$dependencies) {
+            $logfile .= $self->publishArtifact($dependency->{artifactName}, $dependency->{artifactVersion}, $dependency->{fromDirectory});
         }
     }
 
     # Create output property for plugin setup debug logs
     my $nowString = localtime;
     $commander->setProperty( "/plugins/$pluginName/project/logs/$nowString", { value => $logfile } );
-
-    die $errorMessage unless !$errorMessage;
 }
