@@ -69,7 +69,7 @@ dependencies {
             "org.jfrog.artifactory.client:artifactory-java-client-services:2.6.2",
             "io.rest-assured:rest-assured:$restAssuredVersion",
             'org.spockframework:spock-core:1.1-groovy-2.4-SNAPSHOT',
-            'com.electriccloud:ec-specs-plugins-core:1.5.0',
+            'com.electriccloud:ec-specs-plugins-core:1.7.0',
             'com.jayway.restassured:rest-assured:2.4.0',
             "org.awaitility:awaitility:3.1.0",
             "org.awaitility:awaitility-groovy:3.1.0",
@@ -79,7 +79,7 @@ dependencies {
     testImplementation( 'com.athaydes:spock-reports:1.6.0' ) {
         transitive = false // this avoids affecting your version of Groovy/Spock
     }
-    implementation group: 'log4j', name: 'log4j', version: '1.2.17'
+    //implementation group: 'log4j', name: 'log4j', version: '1.2.17'
     implementation group: 'org.slf4j', name: 'slf4j-simple', version: '1.7.25'
     // Docker API
     compile group: 'de.gesellix', name: 'docker-client', version: '2018-01-26T21-28-05'

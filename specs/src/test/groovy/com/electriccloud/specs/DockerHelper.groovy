@@ -5,16 +5,75 @@ import com.electriccloud.spec.*
 import groovyx.net.http.RESTClient
 import groovy.json.JsonBuilder
 import static groovyx.net.http.ContentType.JSON
-import static groovyx.net.http.Method.DELETE
-import static groovyx.net.http.Method.GET
-import static groovyx.net.http.Method.PATCH
-import static groovyx.net.http.Method.POST
-import static groovyx.net.http.Method.PUT
+import static groovyx.net.http.Method.*
 
 
 class DockerHelper extends ContainerHelper {
 
-    def createCluster(projectName, envName, clusterName, configName) {
+    static String PLUGIN_NAME = 'EC-Docker'
+    static String pluginVersion = System.getenv('PLUGIN_VESION') ?: ''
+
+    @Shared
+    def certsPath = 'src/test/resources/certs',
+        configurationName = "dockerConfig",
+        configSwarm = "dockerConfigSwarm",
+        createIngressParams = [
+                 pluginConfig : configSwarm,
+                 networkName  : '',
+                 subnetList   : '',
+                 gatewayList  : '',
+                 enableIpv6   : '',
+                 mtu          : '',
+                 labels       : ''
+        ],
+        deleteNetworkParams = [
+                 pluginConfig : configSwarm,
+                 networkName  : ''
+        ]
+
+    static String getAssertedEnvVariable(String varName) {
+        String varValue = System.getenv(varName)
+        assert varValue
+        return varValue
+    }
+
+    static String getECDockerEndpoint() { getAssertedEnvVariable("EC_DOCKER_ENDPOINT") }
+
+    static String getCommanderHost() { getAssertedEnvVariable("COMMANDER_HOST") }
+
+    static String getCommanderLogin() { getAssertedEnvVariable("COMMANDER_LOGIN") }
+
+    static String getCommanderPassword() { getAssertedEnvVariable("COMMANDER_PASSWORD") }
+
+    static String getCommanderWorkspace() { getAssertedEnvVariable("COMMANDER_WORKSPACE") }
+
+    static String getESToolHome() { getAssertedEnvVariable("ECTOOL_HOME") }
+
+    static String getDockerCommunityEndpoint() { getAssertedEnvVariable("DOCKER_COMMUNITY_ENDPOINT") }
+
+    static String getDockerTLSEndpoint() { getAssertedEnvVariable("DOCKER_TLS_ENDPOINT") }
+
+    static String getDockerSwarmEndpoint() { getAssertedEnvVariable("DOCKER_SWARM_ENDPOINT") }
+
+    static String getDockerSwarmNodeEndpoint() { getAssertedEnvVariable("DOCKER_SWARM_NODE_ENDPOINT") }
+
+    static String getDockerCACert() { getAssertedEnvVariable("DOCKER_CA_CERT") }
+
+    static String getDockerCert() { getAssertedEnvVariable("DOCKER_CERT") }
+
+    static String getDockerKey() { getAssertedEnvVariable("DOCKER_KEY") }
+
+    static String getDockerHubEndpoint() { getAssertedEnvVariable("DOCKER_HUB_ENDPOINT") }
+
+    static String getDockerHubID() { getAssertedEnvVariable("DOCKER_HUB_ID") }
+
+    static String getDockerHubPassword() { getAssertedEnvVariable("DOCKER_HUB_PASSWORD") }
+
+    static String getArtifactoryAdminUsername() { getAssertedEnvVariable("ARTIFACTORY_ADMIN_USERNAME") }
+
+    static String getArtifactoryAdminPassword() { getAssertedEnvVariable("ARTIFACTORY_ADMIN_PASSWORD") }
+
+    def createCluster(projectName, envName, clusterName, String configName) {
         createConfig(configName)
         dsl """
             project '$projectName', {
@@ -32,15 +91,13 @@ class DockerHelper extends ContainerHelper {
    }
 
 
-    def deleteConfig(configName) {
-        deleteConfiguration('EC-Docker', configName)
+    def deleteConfig(String configName = configurationName) {
+        deleteConfiguration(PLUGIN_NAME, configName)
     }
 
-    def createConfig(configName) {
-        def endpoint = System.getenv('EC_DOCKER_ENDPOINT')
-        assert endpoint
+    def createConfig(String configName = configurationName) {
         def pluginConfig = [
-            endpoint  : endpoint,
+            endpoint  : getECDockerEndpoint(),
             testConnection: 'false',
             logLevel: '1'
         ]
@@ -49,7 +106,7 @@ class DockerHelper extends ContainerHelper {
             props.recreate = true
         }
         createPluginConfiguration(
-            'EC-Docker',
+                PLUGIN_NAME,
             configName,
             pluginConfig,
             null,
@@ -58,7 +115,27 @@ class DockerHelper extends ContainerHelper {
         )
     }
 
-    def cleanupCluster(configName) {
+    def createConfig(String configName, endpoint ) {
+        def pluginConfig = [
+                endpoint  : endpoint,
+                testConnection: 'false',
+                logLevel: '1'
+        ]
+        def props = [:]
+        if (System.getenv('RECREATE_CONFIG')) {
+            props.recreate = true
+        }
+        createPluginConfiguration(
+                PLUGIN_NAME,
+                configName,
+                pluginConfig,
+                null,
+                null,
+                props
+        )
+    }
+
+    def cleanupCluster( configName = configurationName) {
         assert configName
         def procName = 'Cleanup Cluster - Experimental'
         def result = dsl """
@@ -87,7 +164,7 @@ class DockerHelper extends ContainerHelper {
     static def request(requestUrl, requestUri, method, queryArgs, requestHeaders, requestBody) {
         def http = new RESTClient(requestUrl)
         http.ignoreSSLIssues()
-        logger.debug(requestBody)
+        logger.debug (requestBody)
 
         http.request(method, JSON) {
             if (requestUri) {
@@ -116,40 +193,82 @@ class DockerHelper extends ContainerHelper {
         }
     }
 
-    static def createService(endpoint, token, payload) {
+    static def createService(endpoint = getECDockerEndpoint(), token, payload) {
         def namespace = 'default'
         def uri = "/api/v1/namespaces/${namespace}/services"
-        request(getEndpoint(), uri, POST, null, ["Authorization": "Bearer ${getToken()}"], new JsonBuilder(payload).toPrettyString())
+        request(endpoint, uri, POST, null, ["Authorization": "Bearer ${getToken()}"], new JsonBuilder(payload).toPrettyString())
     }
 
 
     static def getService(name) {
         def uri = "/api/v1/namespaces/default/services/${name}"
         request(
-                getEndpoint(), uri, GET,
+                getECDockerEndpoint(), uri, GET,
                 null, ["Authorization": "Bearer ${getToken()}"], null).data
     }
 
     static def getDeployment(name) {
         def uri = "/apis/apps/v1beta1/namespaces/default/deployments/${name}"
         request(
-                getEndpoint(), uri, GET,
+                getECDockerEndpoint(), uri, GET,
                 null, ["Authorization": "Bearer ${getToken()}"], null).data
     }
 
     static def deleteService(serviceName) {
         def uri = "/api/v1/namespaces/default/services/$serviceName"
-        request(getEndpoint(), uri, DELETE, null, ["Authorization": "Bearer ${getToken()}"], null)
-    }
-
-    static def getEndpoint() {
-        def endpoint = System.getenv('EF_DOCKER_ENDPOINT')
-        assert endpoint
-        endpoint
+        request(getECDockerEndpoint(), uri, DELETE, null, ["Authorization": "Bearer ${getToken()}"], null)
     }
 
 
+    def runTestedProcedure(String projectName, String procedureName, String resourceName = 'local', Map params) {
 
+        dslFile('dsl/RunProcedure.dsl', [
+                projectName  : projectName,
+                procedureName: procedureName,
+                resourceName : resourceName,
+                params       : params
+        ])
+
+        // Stringify map
+        def params_str_arr = []
+        params.each() { k, v ->
+            params_str_arr.push(k + " : '''" + (v ?: '') + "'''")
+        }
+        logger.debug("Parameters string: " + params_str_arr.toString())
+
+        String procedureDsl = """
+            runProcedure(
+                projectName: '$projectName',
+                procedureName: '$procedureName',
+                actualParameter: $params_str_arr
+            )
+                """
+
+        def result = runProcedure( (String) procedureDsl, resourceName,
+                180, // timeout
+        )
+        return result
+    }
+
+    def getJobUpperStepSummary(def jobId) {
+        assert jobId
+        def summary = null
+        def property = "/myJob/jobSteps/RunProcedure/summary"
+        println "Trying to get the summary, property: $property, jobId: $jobId"
+        try {
+            summary = getJobProperty(property, jobId)
+        } catch (Throwable e) {
+            logger.error("Can't retrieve Upper Step Summary from the property: '$property'; check job: " + jobId)
+        }
+        return summary
+    }
+
+    def conditionallyDeleteProject(String projectName) {
+        if (System.getenv("LEAVE_TEST_PROJECTS")) {
+            return
+        }
+        dsl "deleteProject(projectName: '$projectName')"
+    }
 
     class DockerHubClient {
         def token
