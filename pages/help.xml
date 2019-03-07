@@ -14,7 +14,7 @@
     <h1>@PLUGIN_KEY@</h1>
     <p>Plugin version @PLUGIN_VERSION@</p>
     
-    <p>Revised on December 07, 2018</p>
+    <p>Revised on March 06, 2019</p>
     
     <hr style="margin-left: -10px; margin-top: 10px; height: 1px; width: 100%; color: #5981BD;" noshade="noshade"/>
     <h1>Contents</h1>
@@ -1051,11 +1051,14 @@ For more information on docker networking, see <a href="https://docs.docker.com/
 
     <h1 id="releaseNotes">Release Notes</h1>
     
+    <h3>@PLUGIN_KEY@ 1.5.1</h3>
+    <ul>
+        <li>Configurations can be created by users with "@" sign in a name.</li>
+    </ul>
+    
     <h3>@PLUGIN_KEY@ 1.5.0</h3>
     <ul>
-        
         <li>Plugin promotion time has been improved.</li>
-        
     </ul>
     
     <h3>@PLUGIN_KEY@ 1.4.0</h3>
