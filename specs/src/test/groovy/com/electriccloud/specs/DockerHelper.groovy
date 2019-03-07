@@ -11,25 +11,41 @@ import static groovyx.net.http.Method.*
 class DockerHelper extends ContainerHelper {
 
     static String PLUGIN_NAME = 'EC-Docker'
-    static String pluginVersion = System.getenv('PLUGIN_VESION') ?: ''
+    static String pluginVersion = System.getenv('PLUGIN_VERSION') ?: ''
 
     @Shared
     def certsPath = 'src/test/resources/certs',
         configurationName = "dockerConfig",
         configSwarm = "dockerConfigSwarm",
-        createIngressParams = [
-                 pluginConfig : configSwarm,
-                 networkName  : '',
-                 subnetList   : '',
-                 gatewayList  : '',
-                 enableIpv6   : '',
-                 mtu          : '',
-                 labels       : ''
-        ],
-        deleteNetworkParams = [
-                 pluginConfig : configSwarm,
-                 networkName  : ''
-        ]
+        credentialLogin = getCommanderLogin(),
+        credentialPassword = getCommanderPassword(),
+
+    createConfigParams = [
+             config         : '',
+             desc           : '',
+             endpoint       : '',
+             cacert         : '',
+             cert           : '',
+             credential     : '',
+             logLevel       : '',
+             testConnection : ''
+    ],
+    createIngressParams = [
+             pluginConfig : configSwarm,
+             networkName  : '',
+             subnetList   : '',
+             gatewayList  : '',
+             enableIpv6   : '',
+             mtu          : '',
+             labels       : ''
+    ],
+    deleteNetworkParams = [
+             pluginConfig : configSwarm,
+             networkName  : ''
+    ],
+    deleteConfigParams = [
+            config : ''
+    ]
 
     static String getAssertedEnvVariable(String varName) {
         String varValue = System.getenv(varName)
@@ -337,7 +353,5 @@ class DockerHelper extends ContainerHelper {
             }
         }
     }
-
-
 
 }
