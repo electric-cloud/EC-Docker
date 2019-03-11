@@ -17,5 +17,5 @@ if [ $DEPLOY -eq 1 ]; then
   echo "Installing plugin ..."
   ectool --server localhost login admin changeme
   ectool installPlugin ./EC-Docker.jar --force 1
-  ectool promotePlugin EC-Docker-1.2.0
+  ectool promotePlugin EC-Docker-1.5.1
 fi  

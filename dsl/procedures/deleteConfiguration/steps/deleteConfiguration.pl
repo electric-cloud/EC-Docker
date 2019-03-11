@@ -15,10 +15,17 @@
 #
 
 use ElectricCommander;
+my $ec = ElectricCommander->new();
+my $config = '$[config]';
 
-my $ec = new ElectricCommander();
-my $configName = "$[config]";
+if (!defined $config || $config eq "" ) {
+    my $errMsg = "config parameter must exist and be non-blank";
+    print $errMsg . "\n";
+    $ec->setProperty("/myJob/configError", $errMsg);
+    exit 1;
+}
 
-$ec->deleteProperty("/myProject/ec_plugin_cfgs/$[config]");
-$ec->deleteCredential("$[/myProject/projectName]", $configName);
+$ec->deleteProperty("/myProject/ec_plugin_cfgs/$config");
+$ec->deleteCredential('$[/myProject/projectName]', $config);
+
 exit 0;
