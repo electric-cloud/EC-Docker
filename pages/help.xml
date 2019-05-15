@@ -14,20 +14,25 @@
     <h1>@PLUGIN_KEY@</h1>
     <p>Plugin version @PLUGIN_VERSION@</p>
     
-    <p>Revised on March 06, 2019</p>
+    <p>Revised on May 15, 2019</p>
     
     <hr style="margin-left: -10px; margin-top: 10px; height: 1px; width: 100%; color: #5981BD;" noshade="noshade"/>
     <h1>Contents</h1>
     <ul>
+    
     <li><a href="#overview">Overview</a></li>
     
-
     
-
+    
+    
+    
+    
+    
     
     <li><a href="#CreateConfiguration">Plugin Configuration</a></li>
     
 
+    
     <li><a href="#procedures">Plugin Procedures</a></li>
     
 
@@ -72,13 +77,21 @@
     </ul>
 
     
+
+    
+    
+    
+    
     
     
     <li><a href="#knownIssues">Known Issues</a></li>
     
+    
     <li><a href="#releaseNotes">Release Notes</a></li>
 </ul>
-    <h3>Overview</h3>
+
+    
+    <h1>Overview</h1>
     <p><p>Docker is an open platform for developing, shipping, and running applications.
 Docker is designed to deliver your applications faster. With Docker, you can separate
 your applications from your infrastructure and treat your infrastructure like a
@@ -127,14 +140,17 @@ More information about how to setup TLS certificates on Docker endpoint can be f
 </p>
     
     
-
     
+    
+    
+    
+
     <!--TODO custom blocks-->
 
     
     <div id="CreateConfiguration">
         <a name='CreateConfiguration' id="CreateConfiguration"> </a>
-        <h2>Plugin Configurations</h2>
+        <h1>Plugin Configurations</h1>
 
         <p>
             Plugin configurations are sets of parameters that apply
@@ -154,7 +170,7 @@ More information about how to setup TLS certificates on Docker endpoint can be f
         <li>Find the @PLUGIN_NAME@ row.</li>
         <li>Click <b>Configure</b> to open the
              Configurations page.</li>
-        <li>Click <b>Create Configuration</b>.</li>
+        <li>Click <b>Create Configuration</b> as per the description of parameters below.</li>
         
         <li>For communicating with Docker host, you need
 <ul type="square">
@@ -175,49 +191,67 @@ More information about how to setup TLS certificates on Docker endpoint can be f
             <tbody>
             
             <tr>
-                <td class="required">Configuration</td>
-                <td>Unique name for the plugin configuration.</td>
+                
+                    <td class="required">Configuration</td>
+                    <td>Unique name for the plugin configuration.</td>
+                
             </tr>
             
             <tr>
-                <td >Description</td>
-                <td>Description for the plugin configuration.</td>
+                
+                    <td >Description</td>
+                    <td>Description for the plugin configuration.</td>
+                
             </tr>
             
             <tr>
-                <td class="required">Docker Endpoint</td>
-                <td>The endpoint at which Docker REST API will be reachable. Must be a IP address or a resolvable DNS name.</td>
+                
+                    <td class="required">Docker Endpoint</td>
+                    <td>The endpoint at which Docker REST API will be reachable. Must be a IP address or a resolvable DNS name.</td>
+                
             </tr>
             
             <tr>
-                <td >CA Certificate</td>
-                <td>CA Certificate used for authentication when communicating with a secure Docker end-point. Required if the plugin configuration is used for deploying services on a TLS-enabled Docker engine.</td>
+                
+                    <td >CA Certificate</td>
+                    <td>CA Certificate used for authentication when communicating with a secure Docker end-point. Required if the plugin configuration is used for deploying services on a TLS-enabled Docker engine.</td>
+                
             </tr>
             
             <tr>
-                <td >Client Certificate</td>
-                <td>Client certificate used for authentication when communicating with a secure Docker end-point. Required if the plugin configuration is used for deploying services on a TLS-enabled Docker engine.</td>
+                
+                    <td >Client Certificate</td>
+                    <td>Client certificate used for authentication when communicating with a secure Docker end-point. Required if the plugin configuration is used for deploying services on a TLS-enabled Docker engine.</td>
+                
             </tr>
             
             <tr>
-                <td >Client Private Key</td>
-                <td>Private key used by a Docker client for authentication when communicating with a secure Docker end-point. Required if the plugin configuration is used for deploying services on Docker.</td>
+                
+                    <td >Client Private Key</td>
+                    <td>Private key used by a Docker client for authentication when communicating with a secure Docker end-point. Required if the plugin configuration is used for deploying services on Docker.</td>
+                
             </tr>
             
             <tr>
-                <td >Test Connection</td>
-                <td>Check this checkbox to verify connectivity to the Docker endpoint.</td>
+                
+                    <td >Test Connection</td>
+                    <td>Check this checkbox to verify connectivity to the Docker endpoint.</td>
+                
             </tr>
             
             <tr>
-                <td >Log Level</td>
-                <td>Log level to use for logging output. Error=4, Warning=3, Info=2, Debug=1.</td>
+                
+                    <td >Log Level</td>
+                    <td>Log level to use for logging output. Error=4, Warning=3, Info=2, Debug=1.</td>
+                
             </tr>
             
             </tbody>
         </table>
         
     </div>
+    
+
     
 
     <h1 id="procedures">Plugin Procedures</h1>
@@ -243,8 +277,10 @@ More information about how to setup TLS certificates on Docker endpoint can be f
             <tbody>
             
             <tr>
+                
                 <td class="required">Configuration</td>
                 <td>The name of an existing configuration which holds all the connection information for a stand-alone Docker host or Docker Swarm manager.</td>
+                
             </tr>
             
             </tbody>
@@ -271,38 +307,52 @@ More information about how to setup TLS certificates on Docker endpoint can be f
             <tbody>
             
             <tr>
+                
                 <td class="required">Configuration</td>
                 <td>Name of plugin configuration to use.</td>
+                
             </tr>
             
             <tr>
+                
                 <td class="required">Name</td>
                 <td>Name of ingress network to create.</td>
+                
             </tr>
             
             <tr>
+                
                 <td >Subnets</td>
                 <td>Comma separated (CSV) list of subnets to create in ingress network. </td>
+                
             </tr>
             
             <tr>
+                
                 <td >Gateways</td>
                 <td>Comma separated (CSV) list of gateways for subnets mentioned in "Subnets" field.</td>
+                
             </tr>
             
             <tr>
+                
                 <td >Enable IPv6</td>
                 <td>Enable IPv6 on the network</td>
+                
             </tr>
             
             <tr>
+                
                 <td >MTU</td>
                 <td>MTU to set to ingress network</td>
+                
             </tr>
             
             <tr>
+                
                 <td >Labels</td>
                 <td>Comma separated list of key=value pairs to assign to ingress network.</td>
+                
             </tr>
             
             </tbody>
@@ -329,13 +379,17 @@ More information about how to setup TLS certificates on Docker endpoint can be f
             <tbody>
             
             <tr>
+                
                 <td class="required">Configuration</td>
                 <td>Name of plugin configuration to use.</td>
+                
             </tr>
             
             <tr>
+                
                 <td class="required">Network Name</td>
                 <td>Name of the network to delete.</td>
+                
             </tr>
             
             </tbody>
@@ -386,38 +440,52 @@ More information about how to setup TLS certificates on Docker endpoint can be f
             <tbody>
             
             <tr>
+                
                 <td class="required">Docker Compose File Content</td>
                 <td>Content of the Docker Compose File</td>
+                
             </tr>
             
             <tr>
+                
                 <td class="required">Project Name</td>
                 <td>The name of project in which the application or microservices will be created.</td>
+                
             </tr>
             
             <tr>
+                
                 <td >Create Microservices within an Application</td>
                 <td>(Optional) Select to create all services defined in the Docker Compose file within one application in ElectricFlow. If selected, then the application name must be provided. If unselected, microservices will be created at the top-level in the project.</td>
+                
             </tr>
             
             <tr>
+                
                 <td >Application Name</td>
                 <td>(Optional) The name of the new application that will contain the microservices. Required only if 'Create Microservices within an Application' is selected.</td>
+                
             </tr>
             
             <tr>
+                
                 <td >Environment Project Name</td>
                 <td>(Optional) The project containing the Environment where the services will be deployed.</td>
+                
             </tr>
             
             <tr>
+                
                 <td >Environment Name</td>
                 <td>(Optional) The name of an existing environment that contains a cluster where the newly created microservice(s) will be deployed.</td>
+                
             </tr>
             
             <tr>
+                
                 <td >Cluster Name</td>
                 <td>(Optional) The name of the existing EC-Docker backed cluster in the environment above where the newly created microservice(s) will be deployed.</td>
+                
             </tr>
             
             </tbody>
@@ -444,8 +512,10 @@ More information about how to setup TLS certificates on Docker endpoint can be f
             <tbody>
             
             <tr>
+                
                 <td >Plugin Configuration</td>
                 <td>Plugin Configuration Name.</td>
+                
             </tr>
             
             </tbody>
@@ -472,13 +542,17 @@ More information about how to setup TLS certificates on Docker endpoint can be f
             <tbody>
             
             <tr>
+                
                 <td class="required">Configuration</td>
                 <td>The name of an existing configuration which holds all the connection information for communicating with a stand-alone Docker host or a Docker Swarm cluster.</td>
+                
             </tr>
             
             <tr>
+                
                 <td class="required">Service name in Docker</td>
                 <td>The name of the Docker service that needs to be undeployed.</td>
+                
             </tr>
             
             </tbody>
@@ -508,20 +582,24 @@ More information about how to setup TLS certificates on Docker endpoint can be f
             <tbody>
             
             <tr>
+                
                 <td >Use sudo</td>
                 <td>Use sudo for running docker build</td>
+                
             </tr>
             
             <tr>
+                
                 <td class="required">Build path</td>
                 <td>Path to source code</td>
+                
             </tr>
             
             </tbody>
         </table>
         
         <p>
-            <img src="../../plugins/@PLUGIN_NAME@/htdocs/images/runDockerBuild1.png" />
+            <img src="../../plugins/@PLUGIN_NAME@/images/runDockerBuild1.png" />
 <br />
 <h3>Output</h3>
 <p>After the job runs, you can view the results on the Job Details page in ElectricFlow.
@@ -555,25 +633,31 @@ More information about how to setup TLS certificates on Docker endpoint can be f
             <tbody>
             
             <tr>
+                
                 <td >Use sudo</td>
                 <td>Use sudo for running docker pull</td>
+                
             </tr>
             
             <tr>
+                
                 <td class="required">Image name</td>
                 <td>Image to pull from Docker Hub</td>
+                
             </tr>
             
             <tr>
+                
                 <td >Image tag</td>
                 <td>Tag of image</td>
+                
             </tr>
             
             </tbody>
         </table>
         
         <p>
-            <img src="../../plugins/@PLUGIN_KEY@/htdocs/images/runDockerPull1.png" />
+            <img src="../../plugins/@PLUGIN_KEY@/images/runDockerPull1.png" />
 <h3>Output</h3>
 <p>After the job runs, you can view the results on the Job Details page in ElectricFlow.</p>
 <p>In the <b>runDockerPull</b> step, click the Log button to see the diagnostic information. </p>
@@ -604,65 +688,87 @@ More information about how to setup TLS certificates on Docker endpoint can be f
             <tbody>
             
             <tr>
+                
                 <td >Use sudo</td>
                 <td>Use sudo for running docker run</td>
+                
             </tr>
             
             <tr>
+                
                 <td class="required">Image name</td>
                 <td>Image to run a container from</td>
+                
             </tr>
             
             <tr>
+                
                 <td >Container name</td>
                 <td>Assign a name to the container</td>
+                
             </tr>
             
             <tr>
+                
                 <td >Detached mode (-d)</td>
                 <td>Detached mode: run the container in the background and print the new container ID</td>
+                
             </tr>
             
             <tr>
+                
                 <td >Entrypoint</td>
                 <td>Overwrite the default ENTRYPOINT of the image</td>
+                
             </tr>
             
             <tr>
+                
                 <td >Container working directory</td>
                 <td>Working directory inside the container</td>
+                
             </tr>
             
             <tr>
+                
                 <td >Publish ports</td>
                 <td>Publish a container's port to the host (format: ip:hostPort:containerPort | ip::containerPort | hostPort:containerPort | containerPort). Note: use spaces to delimit port mappings, for example "2666:1666 8088:8080"</td>
+                
             </tr>
             
             <tr>
+                
                 <td >Publish all ports</td>
                 <td>Publish all exposed ports to the host interfaces</td>
+                
             </tr>
             
             <tr>
+                
                 <td >Privileged</td>
                 <td>Give extended privileges to this container</td>
+                
             </tr>
             
             <tr>
+                
                 <td >Link</td>
                 <td>Add link to another container in the form of name:alias</td>
+                
             </tr>
             
             <tr>
+                
                 <td >Command with args</td>
                 <td>Command to run within container</td>
+                
             </tr>
             
             </tbody>
         </table>
         
         <p>
-            <img src="../../plugins/@PLUGIN_KEY@/htdocs/images/runDockerRun1.png" />
+            <img src="../../plugins/@PLUGIN_KEY@/images/runDockerRun1.png" />
 <h3>Output</h3>
 <p>After the job runs, you can view the results on the Job Details page in ElectricFlow.
 </p>
@@ -692,43 +798,59 @@ More information about how to setup TLS certificates on Docker endpoint can be f
             <tbody>
             
             <tr>
+                
                 <td class="required">Service Name</td>
                 <td>The name of the service in ElectricFlow that encapsulates the service that was previously deployed on a stand-alone Docker host or a Docker Swarm cluster. Please note that this name will be modified to comply with the naming conventions of Docker. Specifically characters such as "space , _ " will be converted to "-".</td>
+                
             </tr>
             
             <tr>
+                
                 <td >Service Revision ID</td>
                 <td>Revision Id of the service in ElectricFlow.</td>
+                
             </tr>
             
             <tr>
+                
                 <td class="required">Project Name</td>
                 <td>The name of the project that the service belongs to. In case of an application-level service it also owns the application.</td>
+                
             </tr>
             
             <tr>
+                
                 <td >Application Name</td>
                 <td>The name of the application that the service belongs to. Not applicable for a top-level service.</td>
+                
             </tr>
             
             <tr>
+                
                 <td >Application Revision ID</td>
                 <td>Revision Id of the application version that the service belongs to.</td>
+                
             </tr>
             
             <tr>
+                
                 <td class="required">Environment Name</td>
                 <td>The name of the environment that the cluster belongs to.</td>
+                
             </tr>
             
             <tr>
+                
                 <td >Environment Project Name</td>
                 <td>The name of the project that the environment belongs to. If not specified, the environment is assumed to be in the same project as the service.</td>
+                
             </tr>
             
             <tr>
+                
                 <td >Cluster Name</td>
                 <td>The name of the cluster in the environment on which the service was previously deployed. If not specified, the application tier mapping will be used to find the cluster name.</td>
+                
             </tr>
             
             </tbody>
@@ -836,102 +958,140 @@ CMD [${COMMAND}]
             <tbody>
             
             <tr>
+                
                 <td class="required">EC-Docker Configuration</td>
                 <td>Name of the existing EC-Docker plugin configuration</td>
+                
             </tr>
             
             <tr>
+                
                 <td >EC-Artifact Name</td>
                 <td>If reading artifact from the ElectricFlow Artifact repository: provide the name in the format 'group:artifact'</td>
+                
             </tr>
             
             <tr>
+                
                 <td >EC-Artifact Version</td>
                 <td>Provide the artifact version that will be retrieved from EC-Artifact repository (e.g. 0.0.1).  If left empty, the latest artifact version will be retrieved.</td>
+                
             </tr>
             
             <tr>
+                
                 <td >Artifact Filesystem Location</td>
                 <td>If reading the artifact directly from a filesystem location, provide the path to the folder containing the artifact or to the artifact itself (e.g. /myArtifactStorage/artifact.war or /my-storage/artifact1/)</td>
+                
             </tr>
             
             <tr>
+                
                 <td >Artifactory - Configuration Name</td>
                 <td>If reading artifact from Artifactory: Name of an existing configuration for the EC-Artifactory plugin. Please note: the EC-Artifactory plugin must be installed and promoted.</td>
+                
             </tr>
             
             <tr>
+                
                 <td >Artifactory Repository Type</td>
                 <td>Required if retrieving from Artifactory</td>
+                
             </tr>
             
             <tr>
+                
                 <td >Artifactory Repository Key</td>
                 <td>Repository key for the repository in Artifactory, e.g. myrepo, libs-release-local. Required if Artifactory is used.</td>
+                
             </tr>
             
             <tr>
+                
                 <td >Artifactory Organization Path</td>
                 <td>Organization path for the artifact in Artifactory, e.g. com/mycompany. Required if Artifactory is used.</td>
+                
             </tr>
             
             <tr>
+                
                 <td >Artifactory Artifact Name</td>
                 <td>Name of the artifact (module name) in the artifactory. E.g. my-artifact. Required if Artifactory is used.</td>
+                
             </tr>
             
             <tr>
+                
                 <td >Artifactory Artifact Version</td>
                 <td>Artifact version in Artifactory, e.g. 1.0.0. If left blank, the latest version will be retrieved (Artifactory Pro is required for non-Maven repositories to retrieve the latest version). Required if retrieving from Artifactory.</td>
+                
             </tr>
             
             <tr>
+                
                 <td >Artifactory Artifact Extension</td>
                 <td>Artifact extension, e.g. jar or war. Required if retrieving from Artifactory.</td>
+                
             </tr>
             
             <tr>
+                
                 <td class="required">Image Name</td>
                 <td>Name and version of the new container image, provided in format: myrepo/image:v1.0.</td>
+                
             </tr>
             
             <tr>
+                
                 <td >Registry URL</td>
                 <td>Registry URL (if not specified, Dockerhub will be used).</td>
+                
             </tr>
             
             <tr>
+                
                 <td >Docker Connection Credential</td>
                 <td>Select an existing credential to use to connect to the Docker Registry</td>
+                
             </tr>
             
             <tr>
+                
                 <td >Base Image</td>
                 <td>Base Image for the DockerFile. If not specified, the default base image for the artifact will be used.
         </td>
+                
             </tr>
             
             <tr>
+                
                 <td >Ports</td>
                 <td>The ports to list in the EXPOSE instruction in the DockerFile. If not specified, the default port defined in the template DockerFile for the artifact will be used.
         </td>
+                
             </tr>
             
             <tr>
+                
                 <td >Command</td>
                 <td>Command instruction for the DockerFile. E.g., "executable","param1","param2". If not specified, the default command defined in the template DockerFile for the artifact will be used.
         </td>
+                
             </tr>
             
             <tr>
+                
                 <td >Environment Variables</td>
                 <td>Multi-line name=value pairs. If specified, merge with any existing environment variables defined in the template DockerFile for the artifact.
         </td>
+                
             </tr>
             
             <tr>
+                
                 <td >Remove Image After Push?</td>
                 <td>If checked, the built image will be removed from the machine after it is pushed to the registry.</td>
+                
             </tr>
             
             </tbody>
@@ -988,48 +1148,66 @@ For more information on docker networking, see <a href="https://docs.docker.com/
             <tbody>
             
             <tr>
+                
                 <td class="required">Service Name</td>
                 <td>The name of the service in ElectricFlow that encapsulates the service to be deployed on a stand-alone Docker host or a Docker Swarm cluster. Please note that this name will be modified to comply with the naming conventions of Docker. Specifically characters such as "space , _ " will be converted to "-".</td>
+                
             </tr>
             
             <tr>
+                
                 <td >Service Revision ID</td>
                 <td>Revision Id of the service in ElectricFlow.</td>
+                
             </tr>
             
             <tr>
+                
                 <td class="required">Project Name</td>
                 <td>The name of the project that the service belongs to. In case of an application-level service it also owns the application.</td>
+                
             </tr>
             
             <tr>
+                
                 <td >Application Name</td>
                 <td>The name of the application that the service belongs to. Not applicable for a top-level service.</td>
+                
             </tr>
             
             <tr>
+                
                 <td >Application Revision ID</td>
                 <td>Revision Id of the application version that the service belongs to.</td>
+                
             </tr>
             
             <tr>
+                
                 <td class="required">Cluster Name</td>
                 <td>The name of the cluster in ElectricFlow that encapsulates the stand-alone Docker host or a Docker Swarm cluster on which the service is to be deployed.</td>
+                
             </tr>
             
             <tr>
+                
                 <td >Cluster Or Environment Project Name</td>
                 <td>The name of the project that the cluster belongs to if it is a top-level project cluster. Or the name of the project that the environment belongs to if it is an environment-scoped cluster.</td>
+                
             </tr>
             
             <tr>
+                
                 <td >Environment Name</td>
                 <td>The name of the environment that the cluster belongs to. Not applicable for a top-level project cluster.</td>
+                
             </tr>
             
             <tr>
+                
                 <td >Results Property Sheet</td>
                 <td>Name of the property sheet where the output properties for the deployed service will be saved. If not specified, will default to '/myParent/parent'.</td>
+                
             </tr>
             
             </tbody>
@@ -1042,23 +1220,41 @@ For more information on docker networking, see <a href="https://docs.docker.com/
     
 
     
+
+    
+
+    
+    
+    
     <h1 id="knownIssues">Known Issues</h1>
     <div>
         <p>Backslashes (\) are not supported in .dockerignore for Artifact2Image procedure. Use forward slashes.</p>
 
     </div>
     
+    
 
     <h1 id="releaseNotes">Release Notes</h1>
     
+    <h3>@PLUGIN_KEY@ 1.5.2</h3>
+    <ul>
+        
+        <li>Images in the help file have been fixed.</li>
+        
+    </ul>
+    
     <h3>@PLUGIN_KEY@ 1.5.1</h3>
     <ul>
+        
         <li>Configurations can be created by users with "@" sign in a name.</li>
+        
     </ul>
     
     <h3>@PLUGIN_KEY@ 1.5.0</h3>
     <ul>
+        
         <li>Plugin promotion time has been improved.</li>
+        
     </ul>
     
     <h3>@PLUGIN_KEY@ 1.4.0</h3>

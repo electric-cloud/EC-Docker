@@ -1,6 +1,5 @@
 
-
-<img src="../../plugins/@PLUGIN_KEY@/htdocs/images/runDockerPull1.png" />
+<img src="../../plugins/@PLUGIN_KEY@/images/runDockerPull1.png" />
 
 <h3>Output</h3>
 
