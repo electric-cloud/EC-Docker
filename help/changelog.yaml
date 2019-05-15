@@ -41,3 +41,7 @@
   - Configured the plugin to allow the ElectricFlow UI to create configs inline of procedure form.
 1.5.0:
   - Plugin promotion time has been improved.
+1.5.1:
+  - Configurations can be created by users with "@" sign in a name.
+1.5.2:
+  - Images in the help file have been fixed.
