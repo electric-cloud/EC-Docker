@@ -1,6 +1,6 @@
 <!--
 
-     Copyright 2016 Electric Cloud, Inc.
+     Copyright 2016 CloudBees, Inc.
 
      Licensed under the Apache License, Version 2.0 (the "License");
      you may not use this file except in compliance with the License.
@@ -31,7 +31,7 @@
         <label>EC-Artifact Name:</label>
         <property>ecp_docker_artifactName</property>
         <required>0</required>
-        <documentation>If reading artifact from the ElectricFlow Artifact repository: provide the name in the format 'group:artifact'</documentation>
+        <documentation>If reading artifact from the CloudBees Flow Artifact repository: provide the name in the format 'group:artifact'</documentation>
     </formElement>
     <formElement>
         <type>entry</type>
