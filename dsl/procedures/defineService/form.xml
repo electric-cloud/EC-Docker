@@ -1,6 +1,6 @@
 <!--
 
-     Copyright 2016 Electric Cloud, Inc.
+     Copyright 2016 CloudBees, Inc.
 
      Licensed under the Apache License, Version 2.0 (the "License");
      you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@
         <label>Service Name:</label>
         <property>serviceName</property>
         <required>0</required>
-        <documentation>The name of the service in ElectricFlow that encapsulates the service to be deployed on a stand-alone Docker host or a Docker Swarm cluster.</documentation>
+        <documentation>The name of the service in CloudBees Flow that encapsulates the service to be deployed on a stand-alone Docker host or a Docker Swarm cluster.</documentation>
     </formElement>
     <formElement>
         <type>entry</type>
@@ -49,7 +49,7 @@
         <label>Cluster Name:</label>
         <property>clusterName</property>
         <required>0</required>
-        <documentation>The name of the cluster in ElectricFlow that encapsulates the stand-alone Docker host or a Docker Swarm cluster on which the service is to be deployed.</documentation>
+        <documentation>The name of the cluster in CloudBees Flow that encapsulates the stand-alone Docker host or a Docker Swarm cluster on which the service is to be deployed.</documentation>
     </formElement>
     <formElement>
         <type>entry</type>
@@ -70,7 +70,7 @@
         <label>Service Name Override:</label>
         <property>serviceNameOverride</property>
         <required>0</required>
-        <documentation>Name to use for the service being deployed instead of the name of the service in ElectricFlow.</documentation>
+        <documentation>Name to use for the service being deployed instead of the name of the service in CloudBees Flow.</documentation>
     </formElement>
      <formElement>
         <type>entry</type>
