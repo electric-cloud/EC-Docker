@@ -13,10 +13,10 @@ EC-Docker plugin uses the Docker Engine API to deploy containers and services on
 
 ## Usage ##
 
-1. Install the plugin jar in your local ElectricFlow server
+1. Install the plugin jar in your local CloudBees Flow server
    `./dev/build.sh --deploy`
 
-2. Login to the ElectricFlow server. Navigate to *Administration->Plugins* and create a configuration for newly installed and promoted EC-Docker plugin.
+2. Login to the CloudBees Flow server. Navigate to *Administration->Plugins* and create a configuration for newly installed and promoted EC-Docker plugin.
 
 ## Prerequisites:
    + Docker engine must be accessible on TCP port.
