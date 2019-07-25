@@ -1,3 +1,11 @@
+# use ElectricCommander;
+# my $commander = ElectricCommander->new;
+# my $pluginName = 'EC-Docker-1.5.0.0';
+# my $promoteAction = 'promote';
+# my $upgradeAction = '';
+# my $otherPluginName = '';
+
+
 # Plugin-specific setup code
 my $setup = ECSetup->new(
     commander => $commander,
@@ -25,6 +33,8 @@ use Digest::MD5 qw(md5_hex);
 use File::Temp qw(tempfile tempdir);
 use Cwd;
 use POSIX;
+use JSON;
+use Data::Dumper;
 
 
 sub new {
@@ -58,52 +68,94 @@ sub publishArtifact {
     my $commander = $self->commander;
     $commander->deleteArtifactVersion("com.electriccloud:$artifactName:$artifactVersion");
 
-    my $dependenciesProperty = '/projects/@PLUGIN_NAME@/ec_groovyDependencies';
-    my $base64 = '';
-    my $xpath;
-    eval {
-      $xpath = $commander->getProperties({path => $dependenciesProperty});
-      1;
-    };
-    unless($@) {
-      my $blocks = {};
-      my $checksum = '';
-      for my $prop ($xpath->findnodes('//property')) {
-        my $name = $prop->findvalue('propertyName')->string_value;
-        my $value = $prop->findvalue('value')->string_value;
-        if ($name eq 'checksum') {
-          $checksum = $value;
-        }
-        else {
-          my ($number) = $name =~ /ec_dependencyChunk_(\d+)$/;
-          $blocks->{$number} = $value;
-        }
-      }
-      for my $key (sort {$a <=> $b} keys %$blocks) {
-        $base64 .= $blocks->{$key};
-      }
 
-      my $resultChecksum = md5_hex($base64);
-      unless($checksum) {
-        die "No checksum found in dependendencies property, please reinstall the plugin";
-      }
-      if ($resultChecksum ne $checksum) {
-        die "Wrong dependency checksum: original checksum is $checksum";
-      }
-    }
-
-    return unless $base64;
-
-    my $binary = decode_base64($base64);
     my ($tempFh, $tempFilename) = tempfile(CLEANUP => 1);
-    binmode($tempFh);
-    print $tempFh $binary;
+    my $dsl = q{
+import java.util.zip.ZipEntry
+import java.util.zip.ZipOutputStream
+
+
+int length = args.length
+int chunkNumber = args.chunkNumber
+
+// take this from the server
+def pluginsFolder = getProperty(propertyName: '/server/settings/pluginsDirectory')?.value
+File root = new File(pluginsFolder.toString(), '@PLUGIN_NAME@')
+File zipArchive = new File(root, 'dependencies.zip')
+if (!zipArchive.exists()) {
+    ZipOutputStream zipFile = new ZipOutputStream(new FileOutputStream(zipArchive))
+    new File(root, 'lib').eachFileRecurse { file ->
+        //check if file
+        if (file.isFile()) {
+            def relPath = root.toPath().relativize(file.toPath()).toString()
+            zipFile.putNextEntry(new ZipEntry(relPath))
+            def buffer = new byte[file.size()]
+            file.withInputStream {
+                zipFile.write(buffer, 0, it.read(buffer))
+            }
+            zipFile.closeEntry()
+        }
+    }
+    zipFile.close()
+}
+
+FileInputStream is = new FileInputStream(zipArchive);
+byte[] chunk = new byte[length];
+int bytesRead = 0
+int counter = 0
+def response
+while(bytesRead != -1 && counter <= chunkNumber) {
+    bytesRead = is.read(chunk)
+    response = [
+        hasMore: (bytesRead != -1),
+        read: bytesRead,
+    ]
+    if (bytesRead > 0) {
+        chunk = chunk[0 .. bytesRead-1]
+        response.chunk = chunk.encodeBase64().toString()
+    }
+    counter ++
+}
+
+return response
+
+    };
+
+
+    my $length = 1024 * 1024 * 5;
+    my $chunkNumber = 0;
+
+    my $hasMore = 1;
+    while($hasMore) {
+        my $result = $commander->evalDsl($dsl,
+            {
+                parameters => qq(
+                    {
+                        "length": $length,
+                        "chunkNumber": $chunkNumber
+                    }
+                )
+            }
+        );
+        my $json = $result->findvalue('//value')->string_value;
+        my $object = decode_json($json);
+        my $chunk = $object->{chunk};
+        if ($chunk) {
+            my $decoded = decode_base64($chunk);
+            print $tempFh $decoded;
+            warn "Got chunk\n";
+        }
+        $hasMore = $object->{hasMore};
+        $chunkNumber ++;
+        delete $object->{chunk};
+        warn Dumper $object;
+    }
     close $tempFh;
 
     my ($tempDir) = tempdir(CLEANUP => 1);
     my $zip = Archive::Zip->new();
     unless($zip->read($tempFilename) == Archive::Zip::AZ_OK()) {
-      die "Cannot read .zip dependencies: $!";
+      die "Cannot read .zip dependencies from $tempFilename: $!";
     }
     $zip->extractTree("", $tempDir . '/');
 
