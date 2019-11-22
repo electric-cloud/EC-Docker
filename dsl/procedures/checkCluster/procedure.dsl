@@ -1,20 +1,17 @@
 import java.io.File
 
-procedure 'Check Cluster', 
+procedure 'Check Cluster',
 	description: 'Checks that the Docker endpoint specified in the plugin configuration is reachable', {
 
 	step 'setup',
       subproject: '',
-      subprocedure: 'Setup',
+      subprocedure: 'flowpdk-setup',
       command: null,
       errorHandling: 'failProcedure',
       exclusiveMode: 'none',
       postProcessor: 'postp',
       releaseMode: 'none',
-      timeLimitUnits: 'minutes', {
-
-    	  actualParameter 'additionalArtifactVersion', ''
-    }
+      timeLimitUnits: 'minutes'
 
 	step 'checkCluster',
 	  command: new File(pluginDir, 'dsl/procedures/checkCluster/steps/checkCluster.groovy').text,
@@ -25,6 +22,6 @@ procedure 'Check Cluster',
 	  shell: 'ec-groovy',
 	  resourceName: '$[grabbedResource]',
 	  timeLimitUnits: 'minutes'
-	  
+
 }
-  
+

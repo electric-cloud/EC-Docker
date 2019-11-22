@@ -2,20 +2,17 @@ import java.io.File
 
 procedure 'Delete Network',
     description: 'Deletes a network', {
-    
+
     step 'setup',
       subproject: '',
-      subprocedure: 'Setup',
+      subprocedure: 'flowpdk-setup',
       command: null,
       errorHandling: 'failProcedure',
       exclusiveMode: 'none',
       postProcessor: 'postp',
       releaseMode: 'none',
-      timeLimitUnits: 'minutes', {
+      timeLimitUnits: 'minutes'
 
-    	  actualParameter 'additionalArtifactVersion', ''
-    }
-    
     step 'deleteNetwork',
       command: new File(pluginDir, 'dsl/procedures/deleteNetwork/steps/deleteNetwork.groovy').text,
       errorHandling: 'abortProcedure',
