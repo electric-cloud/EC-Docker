@@ -33,6 +33,19 @@ sub logInfo {
     }
 }
 
+sub logError {
+    my @messages = @_;
+
+    for my $m (@messages) {
+        if (ref $m) {
+            print "[ERROR] " . Dumper $m;
+        }
+        else {
+            print "[ERROR] $m\n";
+        }
+    }
+}
+
 sub new {
     my ($class) = @_;
     return bless {}, $class;
@@ -65,9 +78,17 @@ sub fetchFromServer {
     my $server = $ENV{COMMANDER_SERVER} || 'localhost';
     my $pluginName = '@PLUGIN_NAME@';
     my $url = "$protocol://$server:$port/rest/v1.0/plugins/$pluginName/agent-dependencies";
-
     my $dependencies = File::Spec->catfile($dest, ".cbDependenciesTarget.zip");
-    my $response = $ua->get($url, cookie => "sessionId=$session", ':content_file' => $dependencies);
+    my $response = $ua->get($url,
+        cookie => "sessionId=$session",
+        ':content_file' => $dependencies
+    );
+
+    unless($response->is_success) {
+        logError "Failed to retrieve dependencies from the server: code " . $response->code . ", status: " . $response->status_line . ", message: " . $response->content;
+        die "Failed to retrieve dependencies from the server: " . $response->code;
+    }
+
     logInfo "Saved response to $dependencies";
     return $dependencies;
 }
@@ -114,6 +135,7 @@ sub fetchFromDsl {
             $hasMore = 0;
         }
     }
+
     close $fh;
     return $dependencies;
 }
@@ -150,15 +172,24 @@ sub deliverDependencies {
     }
 
     my $zip = Archive::Zip->new();
+    logInfo "Reading .zip file $dependencies";
     unless($zip->read($dependencies) == Archive::Zip::AZ_OK()) {
       die "Cannot read .zip dependencies: $!";
     }
     $zip->extractTree("", $dest . '/');
 
+    # Check if not empty
+    # Just in case
+    opendir my $dh, $dest or die "Cannot open directory $dest: $!";
+    my @files = grep { $_ !~ /^\./ } readdir $dh;
+    unless(scalar @files) {
+        logError "No files found in the $dest directory, it is probably corrupted", "Please check the folder $source/@PLUGIN_NAME@/agent on the Flow Server filesystem. If it is empty, please reinstall the plugin.";
+        die "No files found in the $dest directory. It is probably corrupted";
+    }
+
     unlink $dependencies;
     print "Extracted dependencies archive\n";
     $self->writeMeta();
-
 
     $self->copyGrapes();
     $self->copySharedDeps();

@@ -14,6 +14,6 @@ procedure 'flowpdk-setup', description: 'Delivers binary dependencies from the F
           shell: 'ec-perl',
           timeLimitUnits: 'minutes'
 
-    property 'ec_compressAndDeliver', value: new File(pluginDir, 'dsl/procedures/flowpdkSetup/compressAndDeliver.dsl')
+    property 'ec_compressAndDeliver', value: new File(pluginDir, 'dsl/procedures/flowpdkSetup/compressAndDeliver.dsl').text
 }
 
