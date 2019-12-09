@@ -164,7 +164,7 @@ sub deliverDependencies {
     mkpath($dest);
     my $dependencies;
     # TODO add check version when there is one
-    if (1) {
+    if (0) {
         $dependencies = $self->fetchFromServer($dest);
     }
     else {
@@ -303,4 +303,36 @@ sub getSharedDepsFolder {
 
 my $o = Setup->new;
 $o->deliverDependencies();
+
+my $generateClasspathFromFolders = $ec->getPropertyValue('generateClasspathFromFolders');
+
+if ($generateClasspathFromFolders) {
+    logInfo "generateClasspathFromFolders: $generateClasspathFromFolders";
+    # Folders are relative to agent/ folder
+    my @jars = ();
+
+    for my $folder (split /\,\s*/ => $generateClasspathFromFolders) {
+        my $path = File::Spec->catfile($ENV{COMMANDER_PLUGINS}, '@PLUGIN_NAME@/agent/' . $folder);
+        if (-d $path) {
+            if ($path !~ /\/$/) {
+                $path .= '/';
+            }
+            $path .= '*';
+            logInfo "Adding folder $path to classpath";
+            push @jars, $path;
+        }
+    }
+
+    my $os = $^O;
+    my $separator = ':';
+    if ($os =~ /win/i) {
+        $separator = ";";
+    }
+    my $classpath = join($separator, @jars);
+    unless($classpath) {
+        die "Failed to generate classpath: classpath is empty.";
+    }
+    $ec->setProperty({propertyName => '/myJob/flowpdk_classpath', value => $classpath});
+    logInfo "Classpath: $classpath\n";
+}
 

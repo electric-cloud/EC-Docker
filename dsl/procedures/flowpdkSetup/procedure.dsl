@@ -15,5 +15,12 @@ procedure 'flowpdk-setup', description: 'Delivers binary dependencies from the F
           timeLimitUnits: 'minutes'
 
     property 'ec_compressAndDeliver', value: new File(pluginDir, 'dsl/procedures/flowpdkSetup/compressAndDeliver.dsl').text
+
+
+    formalParameter 'generateClasspathFromFolders', {
+        required = '0'
+        defaultValue = ''
+        type = 'entry'
+    }
 }
 
