@@ -5,17 +5,14 @@ procedure 'CreateConfiguration',
 
     step 'setup',
       subproject: '',
-      subprocedure: 'Setup',
+      subprocedure: 'flowpdk-setup',
       command: null,
       errorHandling: 'failProcedure',
       exclusiveMode: 'none',
       postProcessor: 'postp',
       releaseMode: 'none',
-      timeLimitUnits: 'minutes', {
+      timeLimitUnits: 'minutes'
 
-          actualParameter 'additionalArtifactVersion', ''
-    }
-    
     step 'testConnection',
             command: new File(pluginDir, 'dsl/procedures/createConfiguration/steps/testConnection.groovy').text,
             errorHandling: 'abortProcedure',
@@ -42,5 +39,5 @@ procedure 'CreateConfiguration',
 	        releaseMode: 'none',
 	        shell: 'ec-perl',
 	        timeLimitUnits: 'minutes'
-   
+
 }

@@ -5,17 +5,14 @@ procedure 'Deploy Service',
 
 	step 'setup',
       subproject: '',
-      subprocedure: 'Setup',
+      subprocedure: 'flowpdk-setup',
       command: null,
       errorHandling: 'failProcedure',
       exclusiveMode: 'none',
       postProcessor: 'postp',
       releaseMode: 'none',
-      timeLimitUnits: 'minutes', {
+      timeLimitUnits: 'minutes'
 
-    	  actualParameter 'additionalArtifactVersion', ''
-    }
- 
 	step 'createOrUpdateDeployment',
 	  command: new File(pluginDir, 'dsl/procedures/deployService/steps/createOrUpdateDeployment.groovy').text,
 	  errorHandling: 'failProcedure',
@@ -25,5 +22,5 @@ procedure 'Deploy Service',
 	  resourceName: '$[grabbedResource]',
 	  shell: 'ec-groovy',
 	  timeLimitUnits: 'minutes'
-	
+
 }

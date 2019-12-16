@@ -5,7 +5,7 @@ procedure 'Remove Docker Service',
 
 	step 'setup',
       subproject: '',
-      subprocedure: 'Setup',
+      subprocedure: 'flowpdk-setup',
       command: null,
       errorHandling: 'failProcedure',
       exclusiveMode: 'none',
@@ -27,4 +27,4 @@ procedure 'Remove Docker Service',
 	  timeLimitUnits: 'minutes'
 
 }
-  
+
