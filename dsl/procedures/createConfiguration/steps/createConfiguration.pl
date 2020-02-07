@@ -66,8 +66,8 @@ foreach my $key (keys %{$opts}) {
         next;
     }
     $cfg->setCol("$opts->{config}", "$key", "$opts->{$key}");
-    
-  
 }
+
+print "Configuration '$opts->{config}' successfully created.\n";
 
 exit SUCCESS;
