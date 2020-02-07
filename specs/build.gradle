@@ -1,0 +1,58 @@
+
+apply plugin: "groovy"
+apply plugin: 'idea'
+
+version = "1.0"
+description = "EC-Docker Specs"
+
+sourceCompatibility = 1.8
+
+defaultTasks 'test'
+
+repositories {
+    jcenter()
+    mavenCentral()
+    maven {
+        url 'https://oss.sonatype.org/content/repositories/snapshots'
+    }
+    maven {
+        url  "https://dl.bintray.com/ecpluginsdev/maven"
+    }
+}
+
+dependencies {
+    compile 'org.codehaus.groovy:groovy-all:2.4.5:indy'
+    compile 'org.spockframework:spock-core:1.1-groovy-2.4-SNAPSHOT'
+    compile 'com.jayway.restassured:rest-assured:2.4.0'
+
+    compile 'com.electriccloud:ec-specs-plugins-core:1.9.1'
+    compile group: 'org.codehaus.groovy.modules.http-builder', name: 'http-builder', version: '0.7.1'
+    testCompile( 'com.athaydes:spock-reports:1.6.0' ) {
+        transitive = false // this avoids affecting your version of Groovy/Spock
+    }
+}
+
+test {
+    systemProperty 'com.athaydes.spockframework.report.showCodeBlocks', true
+
+    def server = findProperty('server') ?: findProperty('COMMANDER_SERVER') ?: findProperty('commanderServer') ?: 'localhost'
+    systemProperties['COMMANDER_SERVER'] = server
+    def secure = findProperty('secure') ?: findProperty('COMMANDER_SECURE') ?: findProperty('commanderSecure') ?: 1
+    systemProperties["COMMANDER_SECURE"] = secure
+
+    testLogging {
+        showStandardStreams = true
+//        exceptionFormat = 'full'
+    }
+    outputs.upToDateWhen { false }
+    systemProperties['EC_SPECS_CLI'] = true
+
+    def destination = findProperty('reportDestination') ?: "spec-report"
+    if (destination) {
+        reports {
+            // html.destination = "$destination/spock-report"
+            html.setDestination(new File("$destination/spock-report"))
+        }
+        systemProperty 'com.athaydes.spockframework.report.outputDir', destination
+    }
+}

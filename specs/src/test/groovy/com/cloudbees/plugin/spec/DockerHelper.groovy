@@ -1,3 +1,5 @@
+package com.cloudbees.plugin.spec
+
 import spock.lang.*
 import com.electriccloud.spec.*
 import groovyx.net.http.RESTClient
