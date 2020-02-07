@@ -3,6 +3,10 @@ package com.cloudbees.plugin.spec
 import spock.lang.*
 import com.electriccloud.spec.*
 
+// > там тесты емнип на процедуру
+// > которая нахуй никому не всралась
+// > я к тому что если ты их скипнешь на билде, никто горевать не будет
+@Ignore
 class Artifact2Image extends DockerHelper {
     static def projectName = 'EC-Docker Specs Artifact2Image'
     static def configName = 'EC-Docker Specs'
