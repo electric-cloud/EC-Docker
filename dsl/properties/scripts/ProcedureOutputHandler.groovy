@@ -1,7 +1,5 @@
 @Grab('log4j:log4j:1.2.17')
 import org.apache.log4j.Logger
-@Grab('log4j:log4j:1.2.17')
-import org.apache.log4j.Logger
 
 abstract class ProcedureOutputHandler {
     private static final Logger logger = PluginLogger.getLogger()
