@@ -1,3 +1,5 @@
+package com.cloudbees.plugin.spec
+
 import spock.lang.*
 import com.electriccloud.spec.*
 
@@ -48,7 +50,7 @@ version: '3\'
 services:
   electric-flow:
     image: "ecdocker/eflow-ce-server"
-    
+
     ports:
       - "8000:8000"
       - "8443:8443"
@@ -104,7 +106,7 @@ version: '3\'
 services:
   electric-flow:
     image: "ecdocker/eflow-ce-server"
-    
+
     ports:
       - "8000:8000"
       - "8443:8443"
@@ -214,7 +216,7 @@ volumes:
             getProcessDependencies(
                 projectName: '$projectName',
                 applicationName: '$appName',
-                processName: 'Deploy', 
+                processName: 'Deploy',
             )
         """
         logger.debug(objectToJson(dependencies))
@@ -271,7 +273,7 @@ services:
             getProcessDependencies(
                 projectName: '$projectName',
                 applicationName: '$appName',
-                processName: 'Deploy', 
+                processName: 'Deploy',
             )
         """
         logger.debug(objectToJson(dependencies))
@@ -322,7 +324,7 @@ services:
             getProcessDependencies(
                 projectName: '$projectName',
                 applicationName: '$appName',
-                processName: 'Deploy', 
+                processName: 'Deploy',
             )
         """
         logger.debug(objectToJson(dependencies))
@@ -342,7 +344,7 @@ services:
      restart: always
      depends_on:
       - backend
-   backend: 
+   backend:
      image: backend
      depends_on:
        - redis

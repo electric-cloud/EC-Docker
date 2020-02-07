@@ -1,3 +1,5 @@
+package com.cloudbees.plugin.spec
+
 import spock.lang.*
 import com.electriccloud.spec.*
 
@@ -266,7 +268,8 @@ runProcedure(
     }
 
     def publishArtifact(String artifactName, String version, String resName) {
-        File resource = new File(this.getClass().getResource("/resources/${resName}").toURI())
+        // logger.debug('#001: '+this.getClass().getResource("/${resName}"))
+        File resource = new File(this.getClass().getResource("/${resName}").toURI())
 
         String commanderServer = System.getProperty("COMMANDER_SERVER") ?: 'localhost'
         String username = System.getProperty('COMMANDER_USER') ?: 'admin'
