@@ -26,7 +26,7 @@ if (efClient.toBoolean(actualParams.get('testConnection'))) {
 1. Is your 'Docker Endpoint' correct?
 2. Are your 'CA Certificate' and 'Client Certificate' correct?
 3. Are your credentials correct?
-   Are you able to use these credentials to work with BigIp using 'curl', 'wget', etc.?
+   Are you able to use these credentials to work with docker using 'curl', 'wget', etc.?
 '''
         procedureOutputHandler.addErrorOutcome()
         procedureOutputHandler.addErrorSummary(suggestions + "\n\n" + errMsg)
