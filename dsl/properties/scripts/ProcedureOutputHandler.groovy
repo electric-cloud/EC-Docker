@@ -1,13 +1,10 @@
-@Grab('log4j:log4j:1.2.17')
-import org.apache.log4j.Logger
-
 abstract class ProcedureOutputHandler {
-    private static final Logger logger = PluginLogger.getLogger()
     List summaries = []
     ProcedureOutcome procedureOutcome = ProcedureOutcome.success
 
     abstract void setSummary(String summary)
     abstract void setOutcome(ProcedureOutcome procedureOutcome)
+    abstract void setConfigError(String error)
     abstract void bailOut()
     abstract void setOutputProperty(String name, String value)
 
