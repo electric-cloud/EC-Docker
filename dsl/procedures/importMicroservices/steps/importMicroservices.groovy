@@ -31,12 +31,12 @@ if (environmentProjectName && environmentName && clusterName) {
     }
     if (cluster.pluginKey != 'EC-Docker') {
         println "Wrong cluster type: ${cluster.pluginKey}"
-        println "ElectricFlow cluster '${clusterName}' in '${environmentName}' environment is not backed by a Docker-based cluster."
+        println "CloudBees Flow cluster '${clusterName}' in '${environmentName}' environment is not backed by a Docker-based cluster."
         System.exit(-1)
     }
 } else if (environmentProjectName || environmentName || clusterName) {
     // If any of the environment parameters are specified then *all* of them must be specified.
-    println "Either specify all the parameters required to identify the Docker-backed ElectricFlow cluster (environment project name, environment name, and cluster name) where the newly created microservice(s) will be deployed. Or do not specify any of the cluster related parameters in which case the service mapping to a cluster will not be created for the microservice(s)."
+    println "Either specify all the parameters required to identify the Docker-backed CloudBees Flow cluster (environment project name, environment name, and cluster name) where the newly created microservice(s) will be deployed. Or do not specify any of the cluster related parameters in which case the service mapping to a cluster will not be created for the microservice(s)."
     System.exit(-1)
 }
 
