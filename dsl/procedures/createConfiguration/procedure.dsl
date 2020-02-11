@@ -16,7 +16,7 @@ procedure 'CreateConfiguration',
     step 'testConnection',
         command: new File(pluginDir, 'dsl/procedures/createConfiguration/steps/testConnection.groovy').text,
         errorHandling: 'abortProcedure',
-        condition: '$[testConnection]',
+        condition: '$[/javascript myJob.testConnection == "true" || myJob.testConnection == "1"]',
         exclusiveMode: 'none',
         releaseMode: 'none',
         shell: 'ec-groovy',
@@ -34,11 +34,11 @@ procedure 'CreateConfiguration',
         timeLimitUnits: 'minutes'
 
     step 'createAndAttachCredential',
-	    command: new File(pluginDir, 'dsl/procedures/createConfiguration/steps/createAndAttachCredential.pl').text,
-	    errorHandling: 'failProcedure',
-	    exclusiveMode: 'none',
-	    releaseMode: 'none',
-	    shell: 'ec-perl',
-	    timeLimitUnits: 'minutes'
+        command: new File(pluginDir, 'dsl/procedures/createConfiguration/steps/createAndAttachCredential.pl').text,
+        errorHandling: 'failProcedure',
+        exclusiveMode: 'none',
+        releaseMode: 'none',
+        shell: 'ec-perl',
+        timeLimitUnits: 'minutes'
 
 }

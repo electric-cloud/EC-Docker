@@ -14,7 +14,7 @@
     <h1>@PLUGIN_KEY@</h1>
     <p>Plugin version @PLUGIN_VERSION@</p>
     
-    <p>Revised on May 27, 2019</p>
+    <p>Revised on February 11, 2020</p>
     
     <hr style="margin-left: -10px; margin-top: 10px; height: 1px; width: 100%; color: #5981BD;" noshade="noshade"/>
     <h1>Contents</h1>
@@ -285,6 +285,9 @@ More information about how to setup TLS certificates on Docker endpoint can be f
             
             </tbody>
         </table>
+
+        
+
         
     </div>
 
@@ -357,6 +360,9 @@ More information about how to setup TLS certificates on Docker endpoint can be f
             
             </tbody>
         </table>
+
+        
+
         
     </div>
 
@@ -394,6 +400,9 @@ More information about how to setup TLS certificates on Docker endpoint can be f
             
             </tbody>
         </table>
+
+        
+
         
     </div>
 
@@ -490,6 +499,9 @@ More information about how to setup TLS certificates on Docker endpoint can be f
             
             </tbody>
         </table>
+
+        
+
         
     </div>
 
@@ -520,6 +532,9 @@ More information about how to setup TLS certificates on Docker endpoint can be f
             
             </tbody>
         </table>
+
+        
+
         
     </div>
 
@@ -557,6 +572,9 @@ More information about how to setup TLS certificates on Docker endpoint can be f
             
             </tbody>
         </table>
+
+        
+
         
     </div>
 
@@ -597,6 +615,9 @@ More information about how to setup TLS certificates on Docker endpoint can be f
             
             </tbody>
         </table>
+
+        
+
         
         <p>
             <img src="../../plugins/@PLUGIN_NAME@/images/runDockerBuild1.png" />
@@ -655,6 +676,9 @@ More information about how to setup TLS certificates on Docker endpoint can be f
             
             </tbody>
         </table>
+
+        
+
         
         <p>
             <img src="../../plugins/@PLUGIN_KEY@/images/runDockerPull1.png" />
@@ -766,6 +790,9 @@ More information about how to setup TLS certificates on Docker endpoint can be f
             
             </tbody>
         </table>
+
+        
+
         
         <p>
             <img src="../../plugins/@PLUGIN_KEY@/images/runDockerRun1.png" />
@@ -855,6 +882,9 @@ More information about how to setup TLS certificates on Docker endpoint can be f
             
             </tbody>
         </table>
+
+        
+
         
     </div>
 
@@ -1096,6 +1126,9 @@ CMD [${COMMAND}]
             
             </tbody>
         </table>
+
+        
+
         
     </div>
 
@@ -1212,6 +1245,9 @@ For more information on docker networking, see <a href="https://docs.docker.com/
             
             </tbody>
         </table>
+
+        
+
         
     </div>
 
@@ -1235,10 +1271,22 @@ For more information on docker networking, see <a href="https://docs.docker.com/
     
 
     <h1 id="releaseNotes">Release Notes</h1>
-
-    <h3 id="1.5.3">@PLUGIN_KEY@ 1.5.3</h3>
-    <p>Renaming from "Electric Cloud" to "CloudBees"</p>
-
+    
+    <h3>@PLUGIN_KEY@ 1.6.0</h3>
+    <ul>
+        
+        <li>Provisioning of Binary Dependencies (for example Grape jars) in the agent resource, required by this plugin, is now delivered through a newly introduced mechanism called Plugin Dependency Management. Binary dependencies will now be seamlessly delivered to the agent resource from the Flow Server, any time a new version of a plugin is invoked the first time. Flow Repository set up is no longer required for this plugin.</li>
+        
+        <li>Add checking connection while creating/editing a configuration.</li>
+        
+    </ul>
+    
+    <h3>@PLUGIN_KEY@ 1.5.3</h3>
+    <ul>
+        
+        <li>Renaming from "Electric Cloud" to "CloudBees".</li>
+        
+    </ul>
     
     <h3>@PLUGIN_KEY@ 1.5.2</h3>
     <ul>
