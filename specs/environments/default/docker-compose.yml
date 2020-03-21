@@ -19,7 +19,7 @@ services:
   docker:
     image: "docker:stable-dind"
     ports:
-      - "2375:2375"
+      - "2376:2376"
     networks:
       - internal
     container_name: docker
