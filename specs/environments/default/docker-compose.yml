@@ -16,16 +16,16 @@ services:
       - repo1.maven.org:127.0.0.1
       - jcenter.bintray.com:127.0.0.1
 
-#Not today
-#  docker:
-#    image: "docker:stable-dind"
-#    ports:
-#      - "2375:2375"
-#    networks:
-#      - internal
-#    container_name: docker
-#    tty: true
-#    privileged: true
+  docker:
+    image: "docker:stable-dind"
+    ports:
+      - "2375:2375"
+    networks:
+      - internal
+    entrypoint: dockerd --host=tcp://0.0.0.0:2375
+    container_name: docker
+    tty: true
+    privileged: true
 
 networks:
   internal:
