@@ -31,7 +31,7 @@
         <label>EC-Artifact Name:</label>
         <property>ecp_docker_artifactName</property>
         <required>0</required>
-        <documentation>If reading artifact from the CloudBees Flow Artifact repository: provide the name in the format 'group:artifact'</documentation>
+        <documentation>If reading artifact from the CloudBees CD Artifact repository: provide the name in the format 'group:artifact'</documentation>
     </formElement>
     <formElement>
         <type>entry</type>

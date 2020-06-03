@@ -17,23 +17,23 @@ on which it is running.</p>
 <p>More information about Docker Swarm can be found at <a href="https://docs.docker.com/engine/swarm/key-concepts/">Docker Swarm key concepts</a>.</p>
 
 
-<h2>CloudBees Flow Integration to Docker</h2>
+<h2>CloudBees CD Integration to Docker</h2>
 
-<p>Plugin deploys CloudBees Flow service as a single container or as a Docker Swarm service based on whether given Docker endpoint is a stand-alone Docker engine or Docker Swarm cluster manager. Plugin checks type of Docker endpoint at runtime and takes decision to deploy correct type of workload (container or Docker Swarm service) accordingly.</p>
+<p>Plugin deploys CloudBees CD service as a single container or as a Docker Swarm service based on whether given Docker endpoint is a stand-alone Docker engine or Docker Swarm cluster manager. Plugin checks type of Docker endpoint at runtime and takes decision to deploy correct type of workload (container or Docker Swarm service) accordingly.</p>
 
-<p>The TLS mutual authentication and encryption is supported between Docker endpoint and the CloudBees Flow agent.</p>
+<p>The TLS mutual authentication and encryption is supported between Docker endpoint and the CloudBees CD agent.</p>
 
 <h2>Integrated Version</h2>
 
 <p>This plugin was tested against Docker Engine 17.06.</p>
-<h2>Prerequisite for deploying CloudBees Flow service on stand-alone Docker engine</h2>
+<h2>Prerequisite for deploying CloudBees CD service on stand-alone Docker engine</h2>
 <p>Docker engine daemon must listen on TCP socket. By default, daemon listens on Unix socket on linux/unix based OSs and on named pipe (npipe://) on windows. </p>
 <p>To make above changes, </p>
 <ol>
     <li>Add '{"hosts": ["tcp://IP:PORT"]}' entry in '/etc/docker/daemon.json' (on linux) and in 'C:\ProgramData\Docker\config\daemon.json' (on Windows) file .</li>
     <li>Restart Docker daemon</li>
 </ol>
-<h2>Prerequisite for deploying CloudBees Flow service on Docker Swarm cluster</h2>
+<h2>Prerequisite for deploying CloudBees CD service on Docker Swarm cluster</h2>
 <p>Docker Swarm cluster must be already setup and Docker Swarm manager must be accessible over network.</p>
 
 <h2>Prerequisite for supporting TLS based authentication</h2>

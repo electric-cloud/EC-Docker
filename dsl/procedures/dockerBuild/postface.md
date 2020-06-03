@@ -4,7 +4,7 @@
 
 <h3>Output</h3>
 
-<p>After the job runs, you can view the results on the Job Details page in CloudBees Flow.
+<p>After the job runs, you can view the results on the Job Details page in CloudBees CD.
 </p>
 
 <p>In the <b>runDockerBuild</b> step, click the Log button to see the diagnostic information.
