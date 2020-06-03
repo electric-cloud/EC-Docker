@@ -39,7 +39,7 @@
 		<checkedValue>1</checkedValue>
         <uncheckedValue>0</uncheckedValue>
         <initiallyChecked>0</initiallyChecked>
-        <documentation>(Optional) Select to create all services defined in the Docker Compose file within one application in CloudBees Flow. If selected, then the application name must be provided. If unselected, microservices will be created at the top-level in the project.</documentation>
+        <documentation>(Optional) Select to create all services defined in the Docker Compose file within one application in CloudBees CD. If selected, then the application name must be provided. If unselected, microservices will be created at the top-level in the project.</documentation>
     </formElement>
     <formElement>
         <type>entry</type>
