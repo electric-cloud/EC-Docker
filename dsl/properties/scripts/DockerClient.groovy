@@ -3,11 +3,12 @@
  */
 
 @Grab(group='ch.qos.logback', module='logback-classic', version='1.2.0')
+@Grab(group='org.apache.commons', module='commons-compress', version='1.20')
 @Grab(group='com.squareup.okhttp3', module='okhttp', version='3.10.0')
 @Grab("de.gesellix:docker-client:2018-01-26T21-28-05")
 // @Grab(group='ch.qos.logback', module='logback-classic', version='1.0.13')
 // @GrabExclude(group='org.codehaus.groovy', module='groovy', version='2.4.11')
-@GrabExclude('org.apache.commons:commons-compress')
+// @GrabExclude('org.apache.commons:commons-compress')
 @GrabExclude('net.sf.json-lib:json-lib')
 @GrabExclude('commons-beanutils:commons-beanutils')
 @GrabExclude('commons-collections:commons-collections')
