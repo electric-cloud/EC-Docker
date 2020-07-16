@@ -3,8 +3,15 @@
  */
 
 @Grab("de.gesellix:docker-client:2018-01-26T21-28-05")
-@Grab(group='ch.qos.logback', module='logback-classic', version='1.0.13')
-@GrabExclude(group='org.codehaus.groovy', module='groovy', version='2.4.11')
+// @Grab(group='ch.qos.logback', module='logback-classic', version='1.0.13')
+// @GrabExclude(group='org.codehaus.groovy', module='groovy', version='2.4.11')
+@GrabExclude('net.sf.json-lib:json-lib')
+@GrabExclude('commons-beanutils:commons-beanutils')
+@GrabExclude('commons-collections:commons-collections')
+@GrabExclude('org.codehaus.groovy.modules.http-builder:http-builder')
+@GrabExclude(group='org.codehaus.groovy', module='groovy')
+@GrabExclude(group='org.codehaus.groovy', module='groovy-json')
+@GrabExclude(group='org.slf4j', module='slf4j-api')
 
 import de.gesellix.docker.client.DockerClientImpl
 import de.gesellix.docker.client.DockerClientException
@@ -58,7 +65,7 @@ public class DockerClient extends BaseClient {
         }else{
             System.setProperty("docker.tls.verify", "")
         }
-        
+
         dockerClient = new DockerClientImpl(pluginConfig.endpoint)
     }
 
@@ -152,13 +159,13 @@ public class DockerClient extends BaseClient {
         }else{
             createOrUpdateService(clusterEndpoint, serviceDetails)
         }
-        
+
         def uri = new URI(clusterEndpoint)
         def serviceEndpoint = "${uri.host}"
-        
+
         if (serviceEndpoint) {
             serviceDetails.port?.each { port ->
- 
+
                 def portName = port.subport?:port.listenerPort
                 String url = "${serviceEndpoint}:${port.listenerPort}"
                 efClient.createProperty("${resultsPropertySheet}/${formatName(serviceName)}/${portName}/url", url)
@@ -232,7 +239,7 @@ public class DockerClient extends BaseClient {
 
         def networkList = getNetworkList(serviceDetails)
         def subnetList = getServiceParameter(serviceDetails, "subnetList", "").split(",")
-        def gatewayList = getServiceParameter(serviceDetails, "gatewayList", "").split(",")     
+        def gatewayList = getServiceParameter(serviceDetails, "gatewayList", "").split(",")
 
         // For each network in list
         for(int i=0; i<networkList.size(); i++){
@@ -245,11 +252,11 @@ public class DockerClient extends BaseClient {
                 logger INFO, "Creating $networkName network."
 
                 def config = []
-                def payload 
+                def payload
                 try{
                     def subnets = subnetList[i].split("\\|")
                     def gateways = gatewayList[i].split("\\|")
-        
+
                     for(int j=0;j<subnets.size();j++){
 
                         def networkConfig = [:]
@@ -259,7 +266,7 @@ public class DockerClient extends BaseClient {
 
                             if(subnet != ""){
                                 networkConfig["Subnet"] = subnet
-                            } 
+                            }
 
                             if(gateway != ""){
                                 networkConfig["Gateway"] = gateway
@@ -278,17 +285,17 @@ public class DockerClient extends BaseClient {
                             config << [
                                 "Subnet":subnets[j].trim()
                             ]
-                        }   
+                        }
                     }
 
                     }catch(ArrayIndexOutOfBoundsException e){
 
                         // if no subnet and gateway provided for last network in list
-                        // no action required. 
+                        // no action required.
                     }
 
                 if (standAloneDockerHost()){
-                   
+
                     // Create user defined bridge network
                     payload = [
                             Driver: "bridge",
@@ -296,7 +303,7 @@ public class DockerClient extends BaseClient {
                                     "Driver": "default"
                             ],
                             "Scope": "local"
-                    ] 
+                    ]
 
                     // Add config parameter only if it is defined
                     if(config.size()!=0){
@@ -311,7 +318,7 @@ public class DockerClient extends BaseClient {
                                     "Driver": "default"
                             ],
                             "Scope": "swarm"
-                    ]   
+                    ]
 
                     // Add config parameter only if it is defined
                     if(config.size()!=0){
@@ -331,9 +338,9 @@ public class DockerClient extends BaseClient {
     def createOrUpdateService(String clusterEndPoint,  def serviceDetails) {
 
         if (OFFLINE) return null
-        
+
         String serviceName = getServiceNameToUseForDeployment(serviceDetails)
-       
+
         // Create network if does not exists
         createNetwork(serviceDetails)
 
@@ -342,23 +349,23 @@ public class DockerClient extends BaseClient {
             def deployedContainer = getContainer(serviceName)
 
             if(deployedContainer){
-               // Remove the container if it is already deployed, in order to update it. 
+               // Remove the container if it is already deployed, in order to update it.
                 undeployDockerService(serviceName)
-            } 
+            }
 
             def (containerDefinition,encodedAuthConfig) = buildContainerPayload(serviceDetails)
             def (imageName,tag) = getContainerImage(serviceDetails)
             logger INFO, "Payload to create container $serviceName:\n $containerDefinition \n with image: $imageName, tag: $tag"
             def response = dockerClient.run(imageName, containerDefinition, tag, serviceName, encodedAuthConfig)
             logger INFO, "Created Container $serviceName. Response: $response"
-            attachAdditionalNetworks(serviceName, serviceDetails)   
-                  
+            attachAdditionalNetworks(serviceName, serviceDetails)
+
         }else{
             // Given endpoint is a Swarm manager. Deploy Flow service as a swarm service.
             def deployedService = getService(serviceName)
             def deployedServiceSpec = deployedService?.Spec
             def deployedServiceVersion = deployedService?.Version?.Index
-            
+
             def (serviceDefinition,encodedAuthConfig) = buildServicePayload(serviceDetails, deployedServiceSpec)
 
             if(deployedService){
@@ -366,7 +373,7 @@ public class DockerClient extends BaseClient {
 
                 def response
                 if(encodedAuthConfig){
-                    // For private docker registries 
+                    // For private docker registries
                     // encodedAuthConfig will be passed as "X-Registry-Auth" header
                     response = dockerClient.updateService(serviceName, [version: deployedServiceVersion], serviceDefinition, [EncodedRegistryAuth: encodedAuthConfig])
                 } else {
@@ -380,15 +387,15 @@ public class DockerClient extends BaseClient {
                 }else{
                     logger ERROR, "Service start timed out."
                 }
-                
+
 
             } else {
 
                 logger INFO, "Creating service $serviceName"
-                
+
                 def response
                 if(encodedAuthConfig){
-                    // For private docker registries 
+                    // For private docker registries
                     // encodedAuthConfig will be passed as "X-Registry-Auth" header
                     response = dockerClient.createService(serviceDefinition, [EncodedRegistryAuth: encodedAuthConfig])
                 } else {
@@ -408,7 +415,7 @@ public class DockerClient extends BaseClient {
 
     def awaitServiceStarted(def name,def timeout) {
         def service = null
-        def timespent = 0 
+        def timespent = 0
         while (service == null && timespent<timeout) {
             service = findService(name)
             if (service) {
@@ -418,7 +425,7 @@ public class DockerClient extends BaseClient {
                 sleep(1000)
                 timespent += 1000
             }
-        }  
+        }
         return service
     }
 
@@ -438,7 +445,7 @@ public class DockerClient extends BaseClient {
     def getService(String serviceName) {
 
         if (OFFLINE) return null
-        
+
         try{
             def serviceSpec = dockerClient.inspectService(serviceName).content
             if (serviceSpec) {
@@ -459,7 +466,7 @@ public class DockerClient extends BaseClient {
     def getContainer(String serviceName) {
 
         if (OFFLINE) return null
-        
+
         try{
             def containerSpec = dockerClient.inspectContainer(serviceName)?.content
             if (containerSpec) {
@@ -546,14 +553,14 @@ public class DockerClient extends BaseClient {
                                         Target: mount.mountPath,
                                         Type: "volume"
                                   ]
-                    }                 
+                    }
                 }
             }
         }
 
         def env = [:]
         env = container.environmentVariable?.collect { envVar ->
-                   
+
                    "${envVar.environmentVariableName}=${envVar.value}"
 
                 }
@@ -564,7 +571,7 @@ public class DockerClient extends BaseClient {
         if (container.memoryLimit) {
            limits.MemoryBytes= convertMBsToBytes(container.memoryLimit.toFloat())
         }
-           
+
         def reservation = [:]
         if (container.cpuCount) {
            reservation.NanoCPUs= convertCpuToNanoCpu(container.cpuCount.toFloat())
@@ -572,11 +579,11 @@ public class DockerClient extends BaseClient {
         if (container.memorySize) {
            reservation.MemoryBytes= convertMBsToBytes(container.memorySize.toFloat())
         }
- 
-        
+
+
         int replicas = args.defaultCapacity?args.defaultCapacity.toInteger():1
         int updateParallelism = args.minCapacity? replicas - args.minCapacity.toInteger() : replicas - 1
-        
+
         def networkList = getNetworkList(args)
 
         def hash=[
@@ -592,15 +599,15 @@ public class DockerClient extends BaseClient {
 
                         ],
                         "Resources":[
-           
+
                             "Limits":limits,
                             "Reservation":reservation
                         ]
                     ],
-                   
+
                     "EndpointSpec": [
                         "ports" : args.port.collect { servicePort ->
-                                    
+
                                     def targetPort
 
                                     for (containerPort in container.port) {
@@ -609,13 +616,13 @@ public class DockerClient extends BaseClient {
                                             targetPort = containerPort.containerPort
                                             break
                                         }
-                                    }      
-                                    
+                                    }
+
                                     def portMapping = [:]
                                     portMapping.PublishedPort=servicePort.listenerPort.toInteger()
                                     portMapping.TargetPort=targetPort.toInteger()
                                     portMapping
-                            }          
+                            }
                     ],
                     "UpdateConfig": [
                         "Parallelism" : updateParallelism
@@ -626,13 +633,13 @@ public class DockerClient extends BaseClient {
                         ]
                     ]
                 ]
-            
+
             if(networkList.size()>0){
                 def networks = []
                 for(network in networkList){
                     networks << [
                                     "Target": network
-                                ] 
+                                ]
                 }
                 hash["TaskTemplate"]["Networks"] = networks
             }
@@ -666,8 +673,8 @@ public class DockerClient extends BaseClient {
             exit 1
         }
     }
-    
-    
+
+
     def buildImage(String tag, InputStream tar) {
         def response = dockerClient.build(tar, new BuildConfig(query: [t: tag]))
         logger INFO, "Created image $tag.\n"
@@ -688,7 +695,7 @@ public class DockerClient extends BaseClient {
 
     def awaitServiceRemoved(def name,def timeout) {
         def service = findService(name)
-        def timespent = 0 
+        def timespent = 0
         while (service != null && timespent<timeout) {
             service = findService(name)
             if (service == null) {
@@ -698,7 +705,7 @@ public class DockerClient extends BaseClient {
                 sleep(1000)
                 timespent += 1000
             }
-        }  
+        }
         return service
     }
 
@@ -734,7 +741,7 @@ public class DockerClient extends BaseClient {
                         binds << "${svcMount.hostPath}:${mount.mountPath}"
                     }else{
                         binds << "${formatName(mount.name)}:${mount.mountPath}"
-                    }                 
+                    }
                 }
             }
             volumes[mount.mountPath] = [:]
@@ -742,7 +749,7 @@ public class DockerClient extends BaseClient {
 
         def env = [:]
         env = container.environmentVariable?.collect { envVar ->
-               
+
                "${envVar.environmentVariableName}=${envVar.value}"
 
             }
@@ -757,16 +764,16 @@ public class DockerClient extends BaseClient {
         def portBindings = [:]
         def targetPort
         for (sPort in args.port ){
-            for (cPort in container.port){      
+            for (cPort in container.port){
 
                 if (cPort.portName == sPort.subport) {
                     targetPort = "${cPort.containerPort}/tcp"
                     portBindings[targetPort] = [
                             ["HostPort": "${sPort.listenerPort}"]
-                    ]      
+                    ]
                 }
             }
-        }      
+        }
 
         def nanoCPUs
         if (container.cpuLimit) {
@@ -777,7 +784,7 @@ public class DockerClient extends BaseClient {
         if (container.memoryLimit) {
            memoryLimit = convertMBsToBytes(container.memoryLimit.toFloat())
         }
-           
+
         def cpuCount
         if (container.cpuCount) {
            cpuCount = convertCpuToNanoCpu(container.cpuCount.toFloat())
@@ -807,7 +814,7 @@ public class DockerClient extends BaseClient {
                         "cpuCount": cpuCount
                     ]
             ]
-        
+
         // Deploy the container in first network in the list
         // Later connect it to rest of the networks.
         // Refer: https://github.com/moby/moby/issues/29265
@@ -817,10 +824,10 @@ public class DockerClient extends BaseClient {
                 "EndpointsConfig": [
                     (networkList[0]): [:]
                 ]
-            ]           
+            ]
         }
 
-        return [hash,encodedAuthConfig]    
+        return [hash,encodedAuthConfig]
     }
 
     def getServiceParameter(Map args, String parameterName, def defaultValue = null) {
@@ -860,7 +867,7 @@ public class DockerClient extends BaseClient {
         }
         formattedNetworkList
     }
-    
+
     def attachAdditionalNetworks(def container, def serviceDetails){
         def networkList = getNetworkList(serviceDetails)
 
@@ -873,9 +880,9 @@ public class DockerClient extends BaseClient {
                         logger INFO, "${container} already attached to ${networkList[i]}"
                     }else{
                         throw e
-                    } 
+                    }
                 }
-        }  
+        }
     }
 
     def createIngress(def networkName,
@@ -898,7 +905,7 @@ public class DockerClient extends BaseClient {
             }else{
                 logger ERROR, "${networkName} network already exists"
             }
-            
+
         }else{
             logger ERROR, "Can not create ingress network on stand-alone Docker engine."
         }
@@ -911,7 +918,7 @@ public class DockerClient extends BaseClient {
                              def labels){
 
         def config = []
-       
+
         for(int i=0;i<subnetList.size();i++){
 
             def networkConfig = [:]
@@ -919,7 +926,7 @@ public class DockerClient extends BaseClient {
 
                 if(subnetList[i] != ""){
                     networkConfig["Subnet"] = subnetList[i]
-                } 
+                }
 
                 if(gatewayList[i] != ""){
                     networkConfig["Gateway"] = gatewayList[i]
@@ -938,7 +945,7 @@ public class DockerClient extends BaseClient {
                 config << [
                     "Subnet":subnetList[i]
                 ]
-            }   
+            }
         }
 
         // Parse labels string to map
@@ -966,12 +973,12 @@ public class DockerClient extends BaseClient {
                         "com.docker.network.mtu": mtu
                     ],
                     "Labels":labelsMap
-                ]  
+                ]
 
         // Add config parameter only if it is defined
         if(config.size()!=0){
             payload["IPAM"]["Config"] = config
-        } 
+        }
 
         payload
     }
@@ -979,4 +986,4 @@ public class DockerClient extends BaseClient {
     def deleteNetwork(def networkName){
         dockerClient.rmNetwork(networkName)
     }
-}   
+}
