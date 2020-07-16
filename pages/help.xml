@@ -14,7 +14,7 @@
     <h1>@PLUGIN_KEY@</h1>
     <p>Plugin version @PLUGIN_VERSION@</p>
     
-    <p>Revised on June 03, 2020</p>
+    <p>Revised on July 16, 2020</p>
     
     <hr style="margin-left: -10px; margin-top: 10px; height: 1px; width: 100%; color: #5981BD;" noshade="noshade"/>
     <h1>Contents</h1>
@@ -1272,6 +1272,13 @@ For more information on docker networking, see <a href="https://docs.docker.com/
     
 
     <h1 id="releaseNotes">Release Notes</h1>
+    
+    <h3>@PLUGIN_KEY@ 1.6.2</h3>
+    <ul>
+        
+        <li>Upgrading dependecies to address security issues.</li>
+        
+    </ul>
     
     <h3>@PLUGIN_KEY@ 1.6.1</h3>
     <ul>
