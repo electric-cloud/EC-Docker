@@ -52,3 +52,5 @@
   - Add checking connection while creating/editing a configuration.
 1.6.1:
   - Renaming from "CloudBees Flow" to "CloudBees CD"
+1.6.2:
+  - Upgrading dependecies to address security issues.

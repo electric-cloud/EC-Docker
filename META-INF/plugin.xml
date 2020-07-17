@@ -9,5 +9,5 @@
   <key>EC-Docker</key>
   <configure>ec_config</configure>
   <label>EC-Docker</label>
-  <version>1.6.1.0</version>
+  <version>1.6.2.0</version>
 </plugin>

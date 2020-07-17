@@ -1,6 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ivy-module version="2.0" xmlns:m="http://ant.apache.org/ivy/maven">
-	<info organisation="org.scijava" module="native-lib-loader" revision="2.0.2" status="release" publication="20140821173800">
+	<info organisation="org.scijava"
+		module="native-lib-loader"
+		revision="2.0.2"
+		status="release"
+		publication="20140821173800"
+	>
+		<license name="CC0 1.0 Universal License" url="http://creativecommons.org/publicdomain/zero/1.0/" />
 		<description homepage="http://github.com/scijava/native-lib-loader">
 		A library for loading native libraries.
 		</description>
@@ -92,7 +98,7 @@
 		<conf name="compile" visibility="public" description="this is the default scope, used if none is specified. Compile dependencies are available in all classpaths."/>
 		<conf name="provided" visibility="public" description="this is much like compile, but indicates you expect the JDK or a container to provide it. It is only available on the compilation classpath, and is not transitive."/>
 		<conf name="runtime" visibility="public" description="this scope indicates that the dependency is not required for compilation, but is for execution. It is in the runtime and test classpaths, but not the compile classpath." extends="compile"/>
-		<conf name="test" visibility="private" description="this scope indicates that the dependency is not required for normal use of the application, and is only available for the test compilation and execution phases." extends="runtime"/>
+		<conf name="test" visibility="public" description="this scope indicates that the dependency is not required for normal use of the application, and is only available for the test compilation and execution phases." extends="runtime"/>
 		<conf name="system" visibility="public" description="this scope is similar to provided except that you have to provide the JAR which contains it explicitly. The artifact is always available and is not looked up in a repository."/>
 		<conf name="sources" visibility="public" description="this configuration contains the source artifact of this module, if any."/>
 		<conf name="javadoc" visibility="public" description="this configuration contains the javadoc artifact of this module, if any."/>
@@ -105,46 +111,46 @@
 	</publications>
 	<dependencies>
 		<dependency org="junit" name="junit" rev="4.11" force="true" conf="test->runtime(*),master(*)"/>
-		<override org="org.scijava" module="scijava-plugins-text-plain" matcher="exact" rev="0.1.1"/>
-		<override org="net.imglib2" module="imglib2" matcher="exact" rev="2.0.0-beta-26"/>
-		<override org="net.imglib2" module="imglib2-algorithms-gpl" matcher="exact" rev="2.0.0-beta-26"/>
-		<override org="ome" module="formats-api" matcher="exact" rev="5.0.2"/>
-		<override org="org.scijava" module="scripting-groovy" matcher="exact" rev="0.1.1"/>
-		<override org="net.imglib2" module="imglib2-ui" matcher="exact" rev="2.0.0-beta-26"/>
-		<override org="net.imglib2" module="imglib2-algorithms-legacy" matcher="exact" rev="2.0.0-beta-26"/>
-		<override org="org.scijava" module="scijava-plugins-commands" matcher="exact" rev="0.1.6"/>
-		<override org="junit" module="junit" matcher="exact" rev="4.11"/>
-		<override org="org.scijava" module="scijava-plugins-platforms" matcher="exact" rev="0.1.2"/>
-		<override org="org.scijava" module="junit-benchmarks" matcher="exact" rev="0.7.3-scijava"/>
-		<override org="org.scijava" module="scripting-javascript" matcher="exact" rev="0.2.2"/>
-		<override org="org.scijava" module="scripting-jython" matcher="exact" rev="0.1.2"/>
-		<override org="org.scijava" module="scripting-scala" matcher="exact" rev="0.1.0"/>
-		<override org="org.scijava" module="scripting-matlab" matcher="exact" rev="0.2.0"/>
-		<override org="net.imglib2" module="imglib2-ops" matcher="exact" rev="2.0.0-beta-26"/>
-		<override org="org.scijava" module="swing-checkbox-tree" matcher="exact" rev="1.0.0"/>
-		<override org="org.scijava" module="scijava-log-slf4j" matcher="exact" rev="1.0.1"/>
-		<override org="org.scijava" module="scripting-jruby" matcher="exact" rev="0.1.3"/>
-		<override org="org.scijava" module="scijava-ui-awt" matcher="exact" rev="0.1.2"/>
-		<override org="org.scijava" module="minimaven" matcher="exact" rev="2.1.3"/>
-		<override org="org.jfree" module="jfreechart" matcher="exact" rev="1.0.14"/>
-		<override org="net.imglib2" module="imglib2-meta" matcher="exact" rev="2.0.0-beta-26"/>
-		<override org="org.scijava" module="scijava-ui-swing" matcher="exact" rev="0.3.0"/>
-		<override org="org.scijava" module="scripting-clojure" matcher="exact" rev="0.1.1"/>
-		<override org="net.imglib2" module="imglib2-scripting" matcher="exact" rev="2.0.0-beta-24"/>
 		<override org="org.scijava" module="scijava-common" matcher="exact" rev="2.30.0"/>
-		<override org="org.scijava" module="scripting-beanshell" matcher="exact" rev="0.1.3"/>
-		<override org="net.imglib2" module="imglib2-algorithms" matcher="exact" rev="2.0.0-beta-26"/>
-		<override org="com.miglayout" module="miglayout" matcher="exact" rev="3.7.3.1"/>
+		<override org="org.scijava" module="scijava-log-slf4j" matcher="exact" rev="1.0.1"/>
+		<override org="org.scijava" module="scijava-plugins-commands" matcher="exact" rev="0.1.6"/>
+		<override org="org.scijava" module="scijava-plugins-platforms" matcher="exact" rev="0.1.2"/>
 		<override org="org.scijava" module="scijava-plugins-text-markdown" matcher="exact" rev="0.1.1"/>
-		<override org="ome" module="formats-bsd" matcher="exact" rev="5.0.2"/>
-		<override org="ome" module="bio-formats_plugins" matcher="exact" rev="5.0.2"/>
-		<override org="ome" module="ome-xml" matcher="exact" rev="5.0.2"/>
-		<override org="net.imglib2" module="imglib2-realtransform" matcher="exact" rev="2.0.0-beta-26"/>
+		<override org="org.scijava" module="scijava-plugins-text-plain" matcher="exact" rev="0.1.1"/>
+		<override org="org.scijava" module="scijava-ui-awt" matcher="exact" rev="0.1.2"/>
+		<override org="org.scijava" module="scijava-ui-swing" matcher="exact" rev="0.3.0"/>
+		<override org="org.scijava" module="scripting-beanshell" matcher="exact" rev="0.1.3"/>
+		<override org="org.scijava" module="scripting-clojure" matcher="exact" rev="0.1.1"/>
+		<override org="org.scijava" module="scripting-groovy" matcher="exact" rev="0.1.1"/>
 		<override org="org.scijava" module="scripting-java" matcher="exact" rev="0.2.4"/>
-		<override org="org.scijava" module="native-lib-loader" matcher="exact" rev="2.0.1"/>
-		<override org="ome" module="formats-common" matcher="exact" rev="5.0.2"/>
-		<override org="net.imglib2" module="imglib2-ij" matcher="exact" rev="2.0.0-beta-26"/>
-		<override org="ome" module="formats-gpl" matcher="exact" rev="5.0.2"/>
+		<override org="org.scijava" module="scripting-javascript" matcher="exact" rev="0.2.2"/>
+		<override org="org.scijava" module="scripting-jruby" matcher="exact" rev="0.1.3"/>
+		<override org="org.scijava" module="scripting-jython" matcher="exact" rev="0.1.2"/>
+		<override org="org.scijava" module="scripting-matlab" matcher="exact" rev="0.2.0"/>
 		<override org="org.scijava" module="scripting-r" matcher="exact" rev="0.1.0"/>
+		<override org="org.scijava" module="scripting-scala" matcher="exact" rev="0.1.0"/>
+		<override org="org.scijava" module="swing-checkbox-tree" matcher="exact" rev="1.0.0"/>
+		<override org="net.imglib2" module="imglib2" matcher="exact" rev="2.0.0-beta-26"/>
+		<override org="net.imglib2" module="imglib2-meta" matcher="exact" rev="2.0.0-beta-26"/>
+		<override org="net.imglib2" module="imglib2-ops" matcher="exact" rev="2.0.0-beta-26"/>
+		<override org="net.imglib2" module="imglib2-realtransform" matcher="exact" rev="2.0.0-beta-26"/>
+		<override org="net.imglib2" module="imglib2-ui" matcher="exact" rev="2.0.0-beta-26"/>
+		<override org="net.imglib2" module="imglib2-algorithms" matcher="exact" rev="2.0.0-beta-26"/>
+		<override org="net.imglib2" module="imglib2-algorithms-gpl" matcher="exact" rev="2.0.0-beta-26"/>
+		<override org="net.imglib2" module="imglib2-algorithms-legacy" matcher="exact" rev="2.0.0-beta-26"/>
+		<override org="net.imglib2" module="imglib2-ij" matcher="exact" rev="2.0.0-beta-26"/>
+		<override org="net.imglib2" module="imglib2-scripting" matcher="exact" rev="2.0.0-beta-24"/>
+		<override org="org.scijava" module="minimaven" matcher="exact" rev="2.1.3"/>
+		<override org="org.scijava" module="native-lib-loader" matcher="exact" rev="2.0.1"/>
+		<override org="ome" module="bio-formats_plugins" matcher="exact" rev="5.0.2"/>
+		<override org="ome" module="formats-api" matcher="exact" rev="5.0.2"/>
+		<override org="ome" module="formats-bsd" matcher="exact" rev="5.0.2"/>
+		<override org="ome" module="formats-common" matcher="exact" rev="5.0.2"/>
+		<override org="ome" module="formats-gpl" matcher="exact" rev="5.0.2"/>
+		<override org="ome" module="ome-xml" matcher="exact" rev="5.0.2"/>
+		<override org="org.jfree" module="jfreechart" matcher="exact" rev="1.0.14"/>
+		<override org="com.miglayout" module="miglayout" matcher="exact" rev="3.7.3.1"/>
+		<override org="junit" module="junit" matcher="exact" rev="4.11"/>
+		<override org="org.scijava" module="junit-benchmarks" matcher="exact" rev="0.7.3-scijava"/>
 	</dependencies>
 </ivy-module>
