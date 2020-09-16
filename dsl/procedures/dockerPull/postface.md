@@ -1,9 +1,9 @@
 
-<img src="../../plugins/@PLUGIN_KEY@/images/runDockerPull1.png" />
+![image](images/runDockerPull1.png)
 
-<h3>Output</h3>
+### Output
 
-<p>After the job runs, you can view the results on the Job Details page in CloudBees CD.</p>
+After the job runs, you can view the results on the Job Details page in CloudBees CD.
 
-<p>In the <b>runDockerPull</b> step, click the Log button to see the diagnostic information. </p>
+In the *runDockerPull* step, click the Log button to see the diagnostic information.
 

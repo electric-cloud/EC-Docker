@@ -6,7 +6,7 @@ The following artifacts are supported:
 
 For .csproj artifact one needs to specify Command field.
 
-## Jetty
+#### Jetty
 
 If .war file is found in the artifact folder, the artifact will be treated as web application.
 Dockerfile will look like below:
@@ -23,7 +23,7 @@ Dockerfile will look like below:
     CMD [${COMMAND}]
     <% } %>
 
-## Springboot
+#### Springboot
 
 If .jar file is found in the artifact folder, the artifact wil be treated as Springboot application.
 Dockerfile will look like below:
@@ -38,7 +38,7 @@ Dockerfile will look like below:
 
     CMD [${COMMAND:'"java", "-jar", "/app.jar"'}]
 
-## ASP.NET
+#### ASP.NET
 
 If web.config is found in the artifact folder, the artifact will be treated as .NET application.
 Dockerfile will look like below:
@@ -59,7 +59,7 @@ Dockerfile will look like below:
     %>
     ENTRYPOINT [${COMMAND:DEFAULT_COMMAND}]
 
-## CSPROJ
+#### CSPROJ
 
 If .csproj file is found in the artifact folder, the artifact will be treated as raw .NET application.
 *NB*: In this case Command field will be needed in order to build a correct Dockerfile.

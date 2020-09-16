@@ -54,3 +54,5 @@
   - Renaming from "CloudBees Flow" to "CloudBees CD"
 1.6.2:
   - Upgrading dependecies to address security issues.
+1.6.3:
+  - The documentation has been migrated to the main site.
