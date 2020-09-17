@@ -1,11 +1,68 @@
 Plugin version @PLUGIN_VERSION@
 
-Revised on September 16, 2020
+Revised on September 17, 2020
 
 
 
 
 == Overview
+
+Docker is an open platform for developing, shipping, and running applications. Docker is designed to deliver your applications faster. With Docker, you can separate your applications from your infrastructure and treat your infrastructure like a managed application. Docker helps you ship code faster, test faster, deploy faster, and shorten the cycle between writing code and deploying it.
+
+With Docker, you can package an application will all its dependencies into a standardized unit for software development. Containers wrap your application in a complete file system that has everything it needs to run (code, runtime, system tools, libraries, and other components installed on a server. The result is an application that will run the same, regardless of the environment on which it is running.
+
+For more information about Docker, go to the http://www.docker.com/[Docker home page].
+
+Plugin also supports Docker engines in Swarm mode. The cluster management and orchestration features embedded in the Docker Engine are built using SwarmKit. Docker Swarm is a cluster of Docker engines, or nodes, where you deploy services. When you create a service, you specify which container image to use and which commands to execute inside running containers.
+
+More information about Docker Swarm can be found at https://docs.docker.com/engine/swarm/key-concepts/[Docker Swarm key concepts].
+
+== {CD} Integration to Docker
+
+Plugin deploys {CD} service as a single container or as a Docker Swarm service based on whether given Docker endpoint is a stand-alone Docker engine or Docker Swarm cluster manager. Plugin checks type of Docker endpoint at runtime and takes decision to deploy correct type of workload (container or Docker Swarm service) accordingly.
+
+The TLS mutual authentication and encryption is supported between Docker endpoint and the {CD} agent.
+
+== Integrated Version
+
+This plugin was tested against Docker Engine 17.06.
+
+== Prerequisite for deploying {CD} service on stand-alone Docker engine
+
+Docker engine daemon must listen on TCP socket. By default, daemon listens on Unix socket on linux/unix based OSs and on named pipe (npipe://) on windows.
+
+To make above changes,
+
+. Add `{&quot;hosts&quot;: [&quot;tcp://IP:PORT&quot;]}` entry in &#39;/etc/docker/daemon.json&#39; (on linux) and in &#39;C:\ProgramData\Docker\config\daemon.json&#39; (on Windows) file .
+. Restart Docker daemon
+
+== Prerequisite for deploying {CD} service on Docker Swarm cluster
+
+Docker Swarm cluster must be already setup and Docker Swarm manager must be accessible over network.
+
+== Prerequisite for supporting TLS based authentication
+
+In case of Docker endpoint supporting TLS based authentication, CA certificate (CA&#39;s public key), client&#39;s public and private keys are required. All three keys can be stored in plugin configuration. More information about how to setup TLS certificates on Docker endpoint can be found https://github.com/docker/docker.github.io/blob/master/swarm/configure-tls.md[here].
+
+If the Docker Swarm cluster is on Docker EE then client certificates can be obtained from UCP (Universal Control Plane) from &quot;User Profile&quot; page by clicking on &quot;Create a Client Bundle&quot;. Bundle contains all the required certificates.
+
+In case of stand-alone Docker engine and for Docker Swarm cluster on Docker CE, perform below steps to generate client side certificates using openssl utility:
+
+*Note:*If you already have access to a CA and certificates, you should skip this step 1.
+
+Step 1: Setup CA server
+
+. openssl genrsa -out ca-priv-key.pem 2048
+. openssl req -config /usr/lib/ssl/openssl.cnf -new -key ca-priv-key.pem -x509 -days 1825 -out ca.pem
+
+Step 2: Generete client side certificates
+
+. openssl genrsa -out key.pem 2048
+. openssl req -subj &quot;/CN=client&quot; -new -key key.pem -out client.csr
+. openssl x509 -req -days 1825 -in client.csr -CA ca.pem -CAkey ca-priv-key.pem -CAcreateserial -out cert.pem -extensions v3_req -extfile /usr/lib/ssl/openssl.cnf
+
+If TLS support is not enabled on Docker endpoint then leave &quot;CA Certificate&quot;, &quot;Client Certificate&quot; and &quot;Client Private Key&quot; input parameters on plugin configuration page empty. Plugin will establish simple HTTP connection with such Docker endpoint.
+
 
 
 
@@ -696,7 +753,10 @@ Deploys or updates a service on a stand-alone Docker host or a Docker Swarm clus
 Backslashes (\) are not supported in .dockerignore for Artifact2Image procedure. Use forward slashes.
 
 
-[[releasenotes]]
+
+[[rns]]
+== Release notes
+
 
 === EC-Docker 1.6.3
 
