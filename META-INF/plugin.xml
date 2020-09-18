@@ -11,4 +11,5 @@
   <label>EC-Docker</label>
   <version>1.6.3</version>
 <hasAdoc>true</hasAdoc>
+  <catalogLabel>Docker</catalogLabel>
 </plugin>
