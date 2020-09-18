@@ -1,11 +1,9 @@
+![image](images/runDockerBuild1.png)
 
-<img src="../../plugins/@PLUGIN_NAME@/images/runDockerBuild1.png" />
-<br />
+### Output
 
-<h3>Output</h3>
+After the job runs, you can view the results on the Job Details page in CloudBees CD.
 
-<p>After the job runs, you can view the results on the Job Details page in CloudBees CD.
-</p>
 
-<p>In the <b>runDockerBuild</b> step, click the Log button to see the diagnostic information.
-</p>
+In the **runDockerBuild** step, click the Log button to see the diagnostic information.
+
