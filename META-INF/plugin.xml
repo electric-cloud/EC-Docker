@@ -12,6 +12,8 @@
   <version>1.6.3</version>
 <hasAdoc>true</hasAdoc>
   
+
+
 <detailedDescription>Docker is an open platform for developing, shipping, and running applications. Docker is designed to deliver your applications faster: you can separate your applications from your infrastructure and treat your infrastructure like a managed application. Docker helps you ship code faster, test faster, deploy faster, and shorten the cycle between writing code and deploying it.
 
 The EC-Docker plugin deploys the CloudBees CD service as a single container or as a Docker Swarm service based on whether the given Docker endpoint is a stand-alone Docker engine or Docker Swarm cluster manager. It checks the type of Docker endpoint at runtime and takes action to deploy the correct type of workload (container or Docker Swarm service) accordingly.</detailedDescription>
