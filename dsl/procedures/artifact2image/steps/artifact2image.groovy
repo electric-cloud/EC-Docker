@@ -21,6 +21,8 @@ String env = '''$[ecp_docker_env]'''.trim()
 String artifactFileLocation = '''$[ecp_docker_artifactLocation]'''.trim()
 boolean removeAfterPush = '$[ecp_docker_removeAfterPush]'.trim() == "true"
 
+
+
 ElectricFlow ef = new ElectricFlow()
 EFClient efClient = new EFClient()
 

@@ -110,6 +110,22 @@
     </formElement>
     <formElement>
         <type>entry</type>
+        <label>Artifactory Classifier:</label>
+        <property>ecp_docker_artifactoryClassifier</property>
+        <documentation>Classifier to use with Artifactory, e.g. sources.</documentation>
+        <required>0</required>
+    </formElement>
+    <formElement>
+        <type>checkbox</type>
+        <label>Artifactory Extract Archive:</label>
+        <property>ecp_docker_artifactoryExtract</property>
+        <documentation>Check to extract archive downloaded from Artifactory.</documentation>
+        <required>0</required>
+        <checkedValue>1</checkedValue>
+        <uncheckedValue>0</uncheckedValue>
+    </formElement>
+    <formElement>
+        <type>entry</type>
         <required>1</required>
         <property>ecp_docker_imageName</property>
         <label>Image Name:</label>

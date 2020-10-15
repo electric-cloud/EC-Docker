@@ -14,6 +14,8 @@ my $ec = ElectricCommander->new();
 my $artifactName = getParam('artifactName');
 my $location = getParam('artifactLocation');
 my $artifactoryConfig = getParam('artifactoryConfigName');
+my $classifier = getParam('artifactoryClassifier');
+my $extract = getParam('artifactoryExtract');
 
 if ($artifactName) {
     my $versionRange = getParam('versionRange');
@@ -54,7 +56,7 @@ sub retrieveArtifactFromArtifactory {
     my $actualParameters = [];
     for my $artifactoryParamName (keys %$parameters) {
         my $value = getParam($parameters->{$artifactoryParamName});
-        if (!$value && $artifactoryParamName != 'version') {
+        if (!$value && $artifactoryParamName ne 'version') {
             print qq{Parameter "$parameters->{$artifactoryParamName}" is required\n};
             exit -1;
         }
@@ -73,13 +75,19 @@ sub retrieveArtifactFromArtifactory {
         actualParameterName => 'destination',
         value => $destination,
     };
+    push @$actualParameters, {
+        actualParameterName => 'classifier',
+        value => $classifier,
+    };
 
     my $repoType = getParam("artifactoryRepoType");
-    if ($repoType eq 'NuGet' || $repoType eq 'Generic') {
+    if ($repoType eq 'NuGet' || $repoType eq 'Generic' || $extract eq '1') {
+
         push @$actualParameters, {
             value               => '1',
             actualParameterName => 'extract'
         };
+
     }
 
     my $version = getParam('artifactoryVersion');
@@ -103,6 +111,9 @@ sub retrieveArtifactFromArtifactory {
         actualParameterName => 'resultPropertySheet',
         value               => $destinationProperty,
     };
+
+    print "Running Retrieve with\n";
+    print Dumper $actualParameters;
     my $xpath = $ec->createJobStep({
         subprocedure    => 'Retrieve Artifact from Artifactory',
         subproject      => '/plugins/EC-Artifactory/project',

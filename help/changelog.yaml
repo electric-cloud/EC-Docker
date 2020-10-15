@@ -56,3 +56,5 @@
   - Upgrading dependecies to address security issues.
 1.6.3:
   - The documentation has been migrated to the main site.
+1.6.4:
+  - Support for "Artifactory Classifier" and "Artifactory Extract" fields was added to the Artifact2Image procedure
