@@ -18,7 +18,7 @@ Docker engine daemon must listen on TCP socket. By default, daemon listens on Un
 
 To make above changes,
 
-. Add `{`hosts`: [`tcp://IP:PORT`]}` entry in `/etc/docker/daemon.json` (on linux) and in `C:\ProgramData\Docker\config\daemon.json` (on Windows) file .
+. Add `{&quot;hosts&quot;: [&quot;tcp://IP:PORT&quot;]}` entry in `/etc/docker/daemon.json` (on linux) and in `C:\ProgramData\Docker\config\daemon.json` (on Windows) file .
 . Restart Docker daemon
 
 == Prerequisite for deploying {CD} service on Docker Swarm cluster
@@ -802,29 +802,29 @@ Backslashes () are not supported in `.dockerignore` for Artifact2Image procedure
 
 === EC-Docker 1.4.0
 
-- Previously deprecated <i>Discover</i> procedure has been removed. Use the <i>Import Microservices</i> procedure to create microservice models based on the given Docker Compose file contents.
+- Previously deprecated _Discover_ procedure has been removed. Use the _Import Microservices_ procedure to create microservice models based on the given Docker Compose file contents.
 
-- Fixed the report link for unsupported tags that were not processed by the <i>Import Microservices</i>.
+- Fixed the report link for unsupported tags that were not processed by the _Import Microservices_.
 
 - Configured the plugin to allow the ElectricFlow UI to create configs inline of procedure form.
 
 
 === EC-Docker 1.3.0
 
-- Added <i>Import Microservices</i> procedure which can be used through the <i>Import Docker Compose file</i> catalog item in the <i>Containers</i> service catalog for creating microservice models in ElectricFlow.
+- Added _Import Microservices_ procedure which can be used through the _Import Docker Compose file_ catalog item in the _Containers_ service catalog for creating microservice models in ElectricFlow.
 
-- Added <i>Artifact2Image</i> procedure.
+- Added _Artifact2Image_ procedure.
 
-- Discover procedure is <i>Deprecated</i>. Use the <i>Import Microservices</i> procedure to create microservice models based on the given Docker Compose file contents
+- Discover procedure is _Deprecated_. Use the _Import Microservices_ procedure to create microservice models based on the given Docker Compose file contents
 
-- Added support for retrieving and creating the plugin configurations through the <i>Configurations</i> option on the application process step and the pipeline stage task editors.
+- Added support for retrieving and creating the plugin configurations through the _Configurations_ option on the application process step and the pipeline stage task editors.
 
 
 === EC-Docker 1.2.2
 
-- Registered the <i>Undeploy Service</i> procedure as an <i>Undeploy Service</i> operation to enable undeploying micro-services modeled in ElectricFlow from Docker using the service process.
+- Registered the _Undeploy Service_ procedure as an _Undeploy Service_ operation to enable undeploying micro-services modeled in ElectricFlow from Docker using the service process.
 
-- Added <i>Create Ingress</i> and <i>Delete Network</i> procedures.
+- Added _Create Ingress_ and _Delete Network_ procedures.
 
 - Added support for container update on standalone docker engine.
 
@@ -834,30 +834,28 @@ Backslashes () are not supported in `.dockerignore` for Artifact2Image procedure
 === EC-Docker 1.2.1
 
 - Added support for Docker network creation.
-<ul>
-  <li>For Stand-alone Docker instances, <i>Deploy Service</i> procedure creates a user defined bridge network if network name given in service mapping page. Procedure uses this network to deploy containers.</li>
-  <li>For Docker Swarm instances, <i>Deploy Service</i> procedure creates a user defined overlay network if network name given in service mapping page. Procedure uses this network to deploy Docker Swarm services.</li>
-</ul>
+
+  * For Stand-alone Docker instances, _Deploy Service_ procedure creates a user defined bridge network if network name given in service mapping page. Procedure uses this network to deploy containers.
+  * For Docker Swarm instances, _Deploy Service_ procedure creates a user defined overlay network if network name given in service mapping page. Procedure uses this network to deploy Docker Swarm services.
 
 
 
 === EC-Docker 1.2.0
 
 - Added support for deploying micro-services modeled in ElectricFlow to Docker. Deploying micro-services to the following Docker environments are supported:
-<ul>
-  <li>Stand-alone Docker instances</li>
-  <li>Docker Swarm</li>
-  <li>Docker Enterprise Edition</li>
-  <li>Windows Docker containers on Windows 2016</li>
-  <li>Docker Swarm</li>
-  <li>Docker Enterprise Edition</li>
-  <li>Windows Docker containers on Windows 2016</li>
-</ul>
+
+  * Stand-alone Docker instances
+  * Docker Swarm
+  * Docker Enterprise Edition
+  * Windows Docker containers on Windows 2016
+  * Docker Swarm
+  * Docker Enterprise Edition
+  * Windows Docker containers on Windows 2016
 
 
-- Added procedure <i>Undeploy Service</i> to undeploy a previously deployed service.
+- Added procedure _Undeploy Service_ to undeploy a previously deployed service.
 
-- Added procedure <i>Remove Docker Service</i> to remove a service running on a stand-alone Docker host or a Docker Swarm cluster.
+- Added procedure _Remove Docker Service_ to remove a service running on a stand-alone Docker host or a Docker Swarm cluster.
 
 - Removed support for using EC-Docker as a 'component' plugin. Micro-services based applications should be modeled as applications with services. The services can then be deployed using the native ElectricFlow services deployment capability.
 

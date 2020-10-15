@@ -10,7 +10,7 @@ Docker engine daemon must listen on TCP socket. By default, daemon listens on Un
 
 To make above changes,
 
-1.  Add `{`hosts`: [`tcp://IP:PORT`]}` entry in `/etc/docker/daemon.json` (on linux) and in `C:\ProgramData\Docker\config\daemon.json` (on Windows) file .
+1.  Add `{"hosts": ["tcp://IP:PORT"]}` entry in `/etc/docker/daemon.json` (on linux) and in `C:\ProgramData\Docker\config\daemon.json` (on Windows) file .
 2.  Restart Docker daemon
 
 Prerequisite for deploying CloudBees CD service on Docker Swarm cluster
