@@ -17,4 +17,4 @@ proceduresOrder:
   - runDockerRun
   - Undeploy Service
 knownIssues: |
-  Backslashes (\\) are not supported in .dockerignore for Artifact2Image procedure. Use forward slashes.
+  Backslashes (\) are not supported in `.dockerignore` for Artifact2Image procedure. Use forward slashes.

@@ -1,5 +1,12 @@
 Plugin version @PLUGIN_VERSION@
-Revised on September 17, 2020
+
+Revised on October 15, 2020
+
+
+
+
+
+== Overview
 
 == Integrated Version
 
@@ -10,9 +17,8 @@ This plugin was tested against Docker Engine 17.06.
 Docker engine daemon must listen on TCP socket. By default, daemon listens on Unix socket on linux/unix based OSs and on named pipe (npipe://) on windows.
 
 To make above changes,
-
-. Add `{`hosts`: [`tcp://IP:PORT`]}` entry in `/etc/docker/daemon.json` (on linux) and in `C:\ProgramData\Docker\config\daemon.json` (on Windows) file .
-. Restart Docker daemon
+1. Add `{`hosts`: [`tcp://IP:PORT`]}` entry in `/etc/docker/daemon.json` (on linux) and in `C:\ProgramData\Docker\config\daemon.json` (on Windows) file .
+2. Restart Docker daemon
 
 == Prerequisite for deploying {CD} service on Docker Swarm cluster
 
@@ -20,7 +26,9 @@ Docker Swarm cluster must be already setup and Docker Swarm manager must be acce
 
 == Prerequisite for supporting TLS based authentication
 
-In case of Docker endpoint supporting TLS based authentication, CA certificate (CA's public key), client's public and private keys are required. All three keys can be stored in plugin configuration. More information about how to setup TLS certificates on Docker endpoint can be found \https://github.com/docker/docker.github.io/blob/master/swarm/configure-tls.md.
+In case of Docker endpoint supporting TLS based authentication, CA certificate (CA's public key), client's public and private keys are required.
+All three keys can be stored in plugin configuration. More information about how to setup TLS certificates on Docker endpoint can be found
+https://github.com/docker/docker.github.io/blob/master/swarm/configure-tls.md[here].
 
 If the Docker Swarm cluster is on Docker EE then client certificates can be obtained from UCP (Universal Control Plane) from `User Profile` page by clicking on `Create a Client Bundle`. Bundle contains all the required certificates.
 
@@ -41,6 +49,16 @@ Step 2: Generete client side certificates
 
 If TLS support is not enabled on Docker endpoint then leave `CA Certificate`, `Client Certificate` and `Client Private Key` input parameters on plugin configuration page empty. Plugin will establish simple HTTP connection with such Docker endpoint.
 
+
+
+
+
+
+
+
+
+
+
 == Plugin Configurations
 Plugin configurations are sets of parameters that apply
 across some or all of the plugin procedures. They
@@ -55,7 +73,7 @@ parameters on procedures that use them.
 To create plugin configurations in {CD}, do these steps:
 
 * Go to **Administration** &gt;**Plugins** to open the Plugin Manager.
-* Find the EC-Docker-@PLUGIN_VERSION@ row.
+* Find the @PLUGIN_NAME@ row.
 * Click *Configure* to open the
      Configurations page.
 * Click *Create Configuration* as per the description of parameters below.
@@ -67,13 +85,13 @@ To create plugin configurations in {CD}, do these steps:
 |===
 |Parameter |Description
 
-|Configuration | Unique name for the plugin configuration.
+|__**Configuration**__ | Unique name for the plugin configuration.
 
 
 |Description | Description for the plugin configuration.
 
 
-|Docker Endpoint | The endpoint at which Docker REST API will be reachable. Must be a IP address or a resolvable DNS name.
+|__**Docker Endpoint**__ | The endpoint at which Docker REST API will be reachable. Must be a IP address or a resolvable DNS name.
 
 
 |CA Certificate | CA Certificate used for authentication when communicating with a secure Docker end-point. Required if the plugin configuration is used for deploying services on a TLS-enabled Docker engine.
@@ -115,7 +133,7 @@ Checks that the Docker endpoint specified in the plugin configuration is reachab
 |===
 | Parameter | Description
 
-| Configuration | The name of an existing configuration which holds all the connection information for a stand-alone Docker host or Docker Swarm manager.
+| __**Configuration**__ | The name of an existing configuration which holds all the connection information for a stand-alone Docker host or Docker Swarm manager.
 
 
 |===
@@ -138,13 +156,13 @@ Configures default ingress network in Docker Swarm cluster
 |===
 | Parameter | Description
 
-| Configuration | Name of plugin configuration to use.
+| __**Configuration**__ | Name of plugin configuration to use.
 
 
-| Name | Name of ingress network to create.
+| __**Name**__ | Name of ingress network to create.
 
 
-| Subnets | Comma separated (CSV) list of subnets to create in ingress network.
+| Subnets | Comma separated (CSV) list of subnets to create in ingress network. 
 
 
 | Gateways | Comma separated (CSV) list of gateways for subnets mentioned in "Subnets" field.
@@ -179,10 +197,10 @@ Deletes a network
 |===
 | Parameter | Description
 
-| Configuration | Name of plugin configuration to use.
+| __**Configuration**__ | Name of plugin configuration to use.
 
 
-| Network Name | Name of the network to delete.
+| __**Network Name**__ | Name of the network to delete.
 
 
 |===
@@ -199,15 +217,15 @@ Deletes a network
 Create microservices in {CD} by importing a Docker Compose file.
 
 
- .  *Copy and enter the content of your Docker Compose File (version 3 or greater).*
- .  *Determine how the new microservices will be created in {CD}*
+ .  *Copy and enter the content of your Docker Compose File (version 3 or greater).* 
+ .  *Determine how the new microservices will be created in {CD}* 
  **  *Create the microservices individually at the top-level within the project.*  All microservices will be created at the top-level. Enter the following parameters:
-
+                    
 
  *** Project Name: Enter the name of the project where the microservices will be created
 
  **  *Create the Microservices within an application in {CD}.*  All microservices will be created as services within a new application. Enter the following parameters:
-
+                    
 
  *** Project Name: Enter the name of the project where the new application will be created
 
@@ -216,7 +234,7 @@ Create microservices in {CD} by importing a Docker Compose file.
  *** Application Name:  The name of a new application which will be created in {CD} containing the new services.
 
  *  *Optionally map the services to an existing Environment Cluster*  Select an existing Environment that contains a cluster with EC-Docker configuration details where the new microservices can be deployed. Enter the following parameters:
-
+            
 
  ** Environment Project Name: The project containing the {CD} environment where the services will be deployed.
 
@@ -232,10 +250,10 @@ Create microservices in {CD} by importing a Docker Compose file.
 |===
 | Parameter | Description
 
-| Docker Compose File Content | Content of the Docker Compose File
+| __**Docker Compose File Content**__ | Content of the Docker Compose File
 
 
-| Project Name | The name of project in which the application or microservices will be created.
+| __**Project Name**__ | The name of project in which the application or microservices will be created.
 
 
 | Create Microservices within an Application | (Optional) Select to create all services defined in the Docker Compose file within one application in {CD}. If selected, then the application name must be provided. If unselected, microservices will be created at the top-level in the project.
@@ -296,10 +314,10 @@ Removes service deployed on a stand-alone Docker host or a Docker Swarm cluster.
 |===
 | Parameter | Description
 
-| Configuration | The name of an existing configuration which holds all the connection information for communicating with a stand-alone Docker host or a Docker Swarm cluster.
+| __**Configuration**__ | The name of an existing configuration which holds all the connection information for communicating with a stand-alone Docker host or a Docker Swarm cluster.
 
 
-| Service name in Docker | The name of the Docker service that needs to be undeployed.
+| __**Service name in Docker**__ | The name of the Docker service that needs to be undeployed.
 
 
 |===
@@ -313,7 +331,7 @@ Removes service deployed on a stand-alone Docker host or a Docker Swarm cluster.
 === runDockerBuild
 
 
-Performs aDockerbuild
+Performs a docker build
 
 
 
@@ -322,10 +340,10 @@ Performs aDockerbuild
 |===
 | Parameter | Description
 
-| Use sudo | Use sudo for running Dockerbuild
+| Use sudo | Use sudo for running docker build
 
 
-| Build path | Path to source code
+| __**Build path**__ | Path to source code
 
 
 |===
@@ -347,7 +365,7 @@ In the *runDockerBuild* step, click the Log button to see the diagnostic informa
 === runDockerPull
 
 
-Performs a Dockerpull on the requested image
+Performs a docker pull on the requested image
 
 
 
@@ -356,10 +374,10 @@ Performs a Dockerpull on the requested image
 |===
 | Parameter | Description
 
-| Use sudo | Use sudo for running Dockerpull
+| Use sudo | Use sudo for running docker pull
 
 
-| Image name | Image to pull from Docker Hub
+| __**Image name**__ | Image to pull from Docker Hub
 
 
 | Image tag | Tag of image
@@ -384,7 +402,7 @@ In the _runDockerPull_ step, click the Log button to see the diagnostic informat
 === runDockerRun
 
 
-Performs a Docker run
+Performs a docker run
 
 
 
@@ -393,10 +411,10 @@ Performs a Docker run
 |===
 | Parameter | Description
 
-| Use sudo | Use sudo for running Docker run
+| Use sudo | Use sudo for running docker run
 
 
-| Image name | Image to run a container from
+| __**Image name**__ | Image to run a container from
 
 
 | Container name | Assign a name to the container
@@ -454,13 +472,13 @@ Undeploys a previously deployed service on a stand-alone Docker host or a Docker
 |===
 | Parameter | Description
 
-| Service Name | The name of the service in {CD} that encapsulates the service that was previously deployed on a stand-alone Docker host or a Docker Swarm cluster. Please note that this name will be modified to comply with the naming conventions of Docker. Specifically characters such as "space , _ " will be converted to "-".
+| __**Service Name**__ | The name of the service in {CD} that encapsulates the service that was previously deployed on a stand-alone Docker host or a Docker Swarm cluster. Please note that this name will be modified to comply with the naming conventions of Docker. Specifically characters such as "space , _ " will be converted to "-".
 
 
 | Service Revision ID | Revision Id of the service in {CD}.
 
 
-| Project Name | The name of the project that the service belongs to. In case of an application-level service it also owns the application.
+| __**Project Name**__ | The name of the project that the service belongs to. In case of an application-level service it also owns the application.
 
 
 | Application Name | The name of the application that the service belongs to. Not applicable for a top-level service.
@@ -469,7 +487,7 @@ Undeploys a previously deployed service on a stand-alone Docker host or a Docker
 | Application Revision ID | Revision Id of the application version that the service belongs to.
 
 
-| Environment Name | The name of the environment that the cluster belongs to.
+| __**Environment Name**__ | The name of the environment that the cluster belongs to.
 
 
 | Environment Project Name | The name of the project that the environment belongs to. If not specified, the environment is assumed to be in the same project as the service.
@@ -489,7 +507,7 @@ Undeploys a previously deployed service on a stand-alone Docker host or a Docker
 === Artifact2Image
 
 
-Creates and pushes a new Docker image from the existing artifact
+Creates and pushes a new docker image from the existing artifact
 
 
 The following artifacts are supported:
@@ -593,7 +611,7 @@ CMD [${COMMAND}]
 |===
 | Parameter | Description
 
-| EC-Docker Configuration | Name of the existing EC-Docker plugin configuration
+| __**EC-Docker Configuration**__ | Name of the existing EC-Docker plugin configuration
 
 
 | EC-Artifact Name | If reading artifact from the {CD} Artifact repository: provide the name in the format 'group:artifact'
@@ -626,7 +644,13 @@ CMD [${COMMAND}]
 | Artifactory Artifact Extension | Artifact extension, e.g. jar or war. Required if retrieving from Artifactory.
 
 
-| Image Name | Name and version of the new container image, provided in format: myrepo/image:v1.0.
+| Artifactory Classifier | Classifier to use with Artifactory, e.g. sources.
+
+
+| Artifactory Extract Archive | Check to extract archive downloaded from Artifactory.
+
+
+| __**Image Name**__ | Name and version of the new container image, provided in format: myrepo/image:v1.0.
 
 
 | Registry URL | Registry URL (if not specified, Dockerhub will be used).
@@ -636,19 +660,19 @@ CMD [${COMMAND}]
 
 
 | Base Image | Base Image for the DockerFile. If not specified, the default base image for the artifact will be used.
-
+        
 
 
 | Ports | The ports to list in the EXPOSE instruction in the DockerFile. If not specified, the default port defined in the template DockerFile for the artifact will be used.
-
+        
 
 
 | Command | Command instruction for the DockerFile. E.g., "executable","param1","param2". If not specified, the default command defined in the template DockerFile for the artifact will be used.
-
+        
 
 
 | Environment Variables | Multi-line name=value pairs. If specified, merge with any existing environment variables defined in the template DockerFile for the artifact.
-
+        
 
 
 | Remove Image After Push? | If checked, the built image will be removed from the machine after it is pushed to the registry.
@@ -674,13 +698,13 @@ Deploys or updates a service on a stand-alone Docker host or a Docker Swarm clus
 |===
 | Parameter | Description
 
-| Service Name | The name of the service in {CD} that encapsulates the service to be deployed on a stand-alone Docker host or a Docker Swarm cluster. Please note that this name will be modified to comply with the naming conventions of Docker. Specifically characters such as "space , _ " will be converted to "-".
+| __**Service Name**__ | The name of the service in {CD} that encapsulates the service to be deployed on a stand-alone Docker host or a Docker Swarm cluster. Please note that this name will be modified to comply with the naming conventions of Docker. Specifically characters such as "space , _ " will be converted to "-".
 
 
 | Service Revision ID | Revision Id of the service in {CD}.
 
 
-| Project Name | The name of the project that the service belongs to. In case of an application-level service it also owns the application.
+| __**Project Name**__ | The name of the project that the service belongs to. In case of an application-level service it also owns the application.
 
 
 | Application Name | The name of the application that the service belongs to. Not applicable for a top-level service.
@@ -689,7 +713,7 @@ Deploys or updates a service on a stand-alone Docker host or a Docker Swarm clus
 | Application Revision ID | Revision Id of the application version that the service belongs to.
 
 
-| Cluster Name | The name of the cluster in {CD} that encapsulates the stand-alone Docker host or a Docker Swarm cluster on which the service is to be deployed.
+| __**Cluster Name**__ | The name of the cluster in {CD} that encapsulates the stand-alone Docker host or a Docker Swarm cluster on which the service is to be deployed.
 
 
 | Cluster Or Environment Project Name | The name of the project that the cluster belongs to if it is a top-level project cluster. Or the name of the project that the environment belongs to if it is an environment-scoped cluster.
@@ -720,7 +744,7 @@ Deploys or updates a service on a stand-alone Docker host or a Docker Swarm clus
 
 
 == Known Issues
-Backslashes (\) are not supported in `.dockerignore` for Artifact2Image procedure. Use forward slashes.
+Backslashes () are not supported in `.dockerignore` for Artifact2Image procedure. Use forward slashes.
 
 
 
@@ -728,10 +752,14 @@ Backslashes (\) are not supported in `.dockerignore` for Artifact2Image procedur
 == Release notes
 
 
+=== EC-Docker 1.6.4
+
+- Support for "Artifactory Classifier" and "Artifactory Extract" fields was added to the Artifact2Image procedure
+
+
 === EC-Docker 1.6.3
 
 - The documentation has been migrated to the main site.
-
 
 
 === EC-Docker 1.6.2
@@ -739,20 +767,16 @@ Backslashes (\) are not supported in `.dockerignore` for Artifact2Image procedur
 - Upgrading dependecies to address security issues.
 
 
-
 === EC-Docker 1.6.1
 
 - Renaming to "{CD}"
-
 
 
 === EC-Docker 1.6.0
 
 - Provisioning of Binary Dependencies (for example Grape jars) in the agent resource, required by this plugin, is now delivered through a newly introduced mechanism called Plugin Dependency Management. Binary dependencies will now be seamlessly delivered to the agent resource from the Flow Server, any time a new version of a plugin is invoked the first time. Flow Repository set up is no longer required for this plugin.
 
-
 - Add checking connection while creating/editing a configuration.
-
 
 
 === EC-Docker 1.5.3
@@ -760,11 +784,9 @@ Backslashes (\) are not supported in `.dockerignore` for Artifact2Image procedur
 - Renaming to "CloudBees".
 
 
-
 === EC-Docker 1.5.2
 
 - Images in the help file have been fixed.
-
 
 
 === EC-Docker 1.5.1
@@ -772,79 +794,48 @@ Backslashes (\) are not supported in `.dockerignore` for Artifact2Image procedur
 - Configurations can be created by users with "@" sign in a name.
 
 
-
 === EC-Docker 1.5.0
 
 - Plugin promotion time has been improved.
 
 
-
 === EC-Docker 1.4.0
 
-- Previously deprecated
-_Discover_ procedure has been removed. Use the
-_Import Microservices_ procedure to create microservice models based on the given Docker Compose file contents.
+- Previously deprecated _Discover_ procedure has been removed. Use the _Import Microservices_ procedure to create microservice models based on the given Docker Compose file contents.
 
-
-- Fixed the report link for unsupported tags that were not processed by the
-_Import Microservices_.
-
+- Fixed the report link for unsupported tags that were not processed by the _Import Microservices_.
 
 - Configured the plugin to allow the ElectricFlow UI to create configs inline of procedure form.
 
 
-
 === EC-Docker 1.3.0
 
-- Added
-_Import Microservices_ procedure which can be used through the
-_Import Docker Compose file_ catalog item in the
-_Containers_ service catalog for creating microservice models in ElectricFlow.
+- Added _Import Microservices_ procedure which can be used through the _Import Docker Compose file_ catalog item in the _Containers_ service catalog for creating microservice models in ElectricFlow.
 
+- Added _Artifact2Image_ procedure.
 
-- Added
-_Artifact2Image_ procedure.
+- Discover procedure is _Deprecated_. Use the _Import Microservices_ procedure to create microservice models based on the given Docker Compose file contents
 
-
-- Discover procedure is
-_Deprecated_. Use the
-_Import Microservices_ procedure to create microservice models based on the given Docker Compose file contents
-
-
-- Added support for retrieving and creating the plugin configurations through the
-_Configurations_ option on the application process step and the pipeline stage task editors.
-
+- Added support for retrieving and creating the plugin configurations through the _Configurations_ option on the application process step and the pipeline stage task editors.
 
 
 === EC-Docker 1.2.2
 
-- Registered the
-_Undeploy Service_ procedure as an
-_Undeploy Service_ operation to enable undeploying micro-services modeled in ElectricFlow from Docker using the service process.
+- Registered the _Undeploy Service_ procedure as an _Undeploy Service_ operation to enable undeploying micro-services modeled in ElectricFlow from Docker using the service process.
 
+- Added _Create Ingress_ and _Delete Network_ procedures.
 
-- Added
-_Create Ingress_ and
-_Delete Network_ procedures.
-
-
-- Added support for container update on standalone Docker engine.
-
+- Added support for container update on standalone docker engine.
 
 - Added support for attaching additional networks during container update.
-
 
 
 === EC-Docker 1.2.1
 
 - Added support for Docker network creation.
 
-
- * For Stand-alone Docker instances,
-_Deploy Service_ procedure creates a user defined bridge network if network name given in service mapping page. Procedure uses this network to deploy containers.
-
- * For Docker Swarm instances,
-_Deploy Service_ procedure creates a user defined overlay network if network name given in service mapping page. Procedure uses this network to deploy Docker Swarm services.
+  * For Stand-alone Docker instances, _Deploy Service_ procedure creates a user defined bridge network if network name given in service mapping page. Procedure uses this network to deploy containers.
+  * For Docker Swarm instances, _Deploy Service_ procedure creates a user defined overlay network if network name given in service mapping page. Procedure uses this network to deploy Docker Swarm services.
 
 
 
@@ -852,32 +843,20 @@ _Deploy Service_ procedure creates a user defined overlay network if network nam
 
 - Added support for deploying micro-services modeled in ElectricFlow to Docker. Deploying micro-services to the following Docker environments are supported:
 
-
- * Stand-alone Docker instances
-
- * Docker Swarm
-
- * Docker Enterprise Edition
-
- * Windows Docker containers on Windows 2016
-
- * Docker Swarm
-
- * Docker Enterprise Edition
-
- * Windows Docker containers on Windows 2016
+  * Stand-alone Docker instances
+  * Docker Swarm
+  * Docker Enterprise Edition
+  * Windows Docker containers on Windows 2016
+  * Docker Swarm
+  * Docker Enterprise Edition
+  * Windows Docker containers on Windows 2016
 
 
-- Added procedure
-_Undeploy Service_ to undeploy a previously deployed service.
+- Added procedure _Undeploy Service_ to undeploy a previously deployed service.
 
-
-- Added procedure
-_Remove Docker Service_ to remove a service running on a stand-alone Docker host or a Docker Swarm cluster.
-
+- Added procedure _Remove Docker Service_ to remove a service running on a stand-alone Docker host or a Docker Swarm cluster.
 
 - Removed support for using EC-Docker as a 'component' plugin. Micro-services based applications should be modeled as applications with services. The services can then be deployed using the native ElectricFlow services deployment capability.
-
 
 
 === EC-Docker 1.0.1
@@ -885,7 +864,8 @@ _Remove Docker Service_ to remove a service running on a stand-alone Docker host
 - Discover procedure has been added.
 
 
-
 === EC-Docker 1.0.0
 
 - Introduced the EC-Docker plugin.
+
+
