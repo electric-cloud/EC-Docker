@@ -17,9 +17,8 @@ This plugin was tested against Docker Engine 17.06.
 Docker engine daemon must listen on TCP socket. By default, daemon listens on Unix socket on linux/unix based OSs and on named pipe (npipe://) on windows.
 
 To make above changes,
-
-. Add `{&quot;hosts&quot;: [&quot;tcp://IP:PORT&quot;]}` entry in `/etc/docker/daemon.json` (on linux) and in `C:\ProgramData\Docker\config\daemon.json` (on Windows) file .
-. Restart Docker daemon
+1. Add `{`hosts`: [`tcp://IP:PORT`]}` entry in `/etc/docker/daemon.json` (on linux) and in `C:\ProgramData\Docker\config\daemon.json` (on Windows) file .
+2. Restart Docker daemon
 
 == Prerequisite for deploying {CD} service on Docker Swarm cluster
 
@@ -770,7 +769,7 @@ Backslashes () are not supported in `.dockerignore` for Artifact2Image procedure
 
 === EC-Docker 1.6.1
 
-- Renaming from "CloudBees Flow" to "{CD}"
+- Renaming to "{CD}"
 
 
 === EC-Docker 1.6.0
@@ -782,7 +781,7 @@ Backslashes () are not supported in `.dockerignore` for Artifact2Image procedure
 
 === EC-Docker 1.5.3
 
-- Renaming from "Electric Cloud" to "CloudBees".
+- Renaming to "CloudBees".
 
 
 === EC-Docker 1.5.2
