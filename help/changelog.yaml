@@ -5,7 +5,7 @@
 1.2.0:
   - |
     Added support for deploying micro-services modeled in ElectricFlow to Docker. Deploying micro-services to the following Docker environments are supported:
-    
+
       * Stand-alone Docker instances
       * Docker Swarm
       * Docker Enterprise Edition
@@ -13,7 +13,7 @@
       * Docker Swarm
       * Docker Enterprise Edition
       * Windows Docker containers on Windows 2016
-    
+
 
   - Added procedure _Undeploy Service_ to undeploy a previously deployed service.
   - Added procedure _Remove Docker Service_ to remove a service running on a stand-alone Docker host or a Docker Swarm cluster.
@@ -21,10 +21,10 @@
 1.2.1:
   - |
     Added support for Docker network creation.
-    
+
       * For Stand-alone Docker instances, _Deploy Service_ procedure creates a user defined bridge network if network name given in service mapping page. Procedure uses this network to deploy containers.
       * For Docker Swarm instances, _Deploy Service_ procedure creates a user defined overlay network if network name given in service mapping page. Procedure uses this network to deploy Docker Swarm services.
-    
+
 1.2.2:
   - Registered the _Undeploy Service_ procedure as an _Undeploy Service_ operation to enable undeploying micro-services modeled in ElectricFlow from Docker using the service process.
   - Added _Create Ingress_ and _Delete Network_ procedures.
@@ -58,3 +58,5 @@
   - The documentation has been migrated to the main site.
 1.6.4:
   - Support for "Artifactory Classifier" and "Artifactory Extract" fields was added to the Artifact2Image procedure
+1.6.5:
+  - Upgraded third-party dependencies to address security issues.
