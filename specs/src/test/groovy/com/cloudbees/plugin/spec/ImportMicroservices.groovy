@@ -203,7 +203,7 @@ volumes:
             """
         then:
         logger.debug(result.logs)
-        assert result.outcome == 'success'
+        assert result.outcome in ['success', 'warning']
         def processSteps = dsl """
             getProcessSteps(
                 applicationName: '$appName',
@@ -319,7 +319,7 @@ services:
             """
         then:
         logger.debug(result.logs)
-        assert result.outcome == 'success'
+        assert result.outcome in ['success', 'warning']
         def dependencies = dsl """
             getProcessDependencies(
                 projectName: '$projectName',
