@@ -4,7 +4,7 @@
 		module="bcpkix-jdk15on"
 		revision="1.58"
 		status="release"
-		publication="20200115163430"
+		publication="20170823070821"
 	>
 		<license name="Bouncy Castle Licence" url="http://www.bouncycastle.org/licence.html" />
 		<description homepage="http://www.bouncycastle.org/java.html">

@@ -1,12 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ivy-module version="2.0" xmlns:m="http://ant.apache.org/ivy/maven">
-	<info organisation="org.apache.commons"
-		module="commons-parent"
-		revision="48"
-		status="release"
-		publication="20200109172552"
-	>
-		<license name="Apache License, Version 2.0" url="https://www.apache.org/licenses/LICENSE-2.0.txt" />
+	<info organisation="org.apache.commons" module="commons-parent" revision="48" status="release" publication="20200109172552">
+		<license name="Apache License, Version 2.0" url="https://www.apache.org/licenses/LICENSE-2.0.txt"/>
 		<description homepage="http://commons.apache.org/commons-parent-pom.html">
 		The Apache Commons Parent POM provides common settings for all Apache Commons components.
 		</description>
