@@ -1,53 +1,6 @@
 Plugin version @PLUGIN_VERSION@
 
-Revised on October 15, 2020
-
-
-
-
-
-== Overview
-
-== Integrated Version
-
-This plugin was tested against Docker Engine 17.06.
-
-== Prerequisite for deploying {CD} service on stand-alone Docker engine
-
-Docker engine daemon must listen on TCP socket. By default, daemon listens on Unix socket on linux/unix based OSs and on named pipe (npipe://) on windows.
-
-To make above changes,
-1. Add `{`hosts`: [`tcp://IP:PORT`]}` entry in `/etc/docker/daemon.json` (on linux) and in `C:\ProgramData\Docker\config\daemon.json` (on Windows) file .
-2. Restart Docker daemon
-
-== Prerequisite for deploying {CD} service on Docker Swarm cluster
-
-Docker Swarm cluster must be already setup and Docker Swarm manager must be accessible over network.
-
-== Prerequisite for supporting TLS based authentication
-
-In case of Docker endpoint supporting TLS based authentication, CA certificate (CA's public key), client's public and private keys are required.
-All three keys can be stored in plugin configuration. More information about how to setup TLS certificates on Docker endpoint can be found
-https://github.com/docker/docker.github.io/blob/master/swarm/configure-tls.md[here].
-
-If the Docker Swarm cluster is on Docker EE then client certificates can be obtained from UCP (Universal Control Plane) from `User Profile` page by clicking on `Create a Client Bundle`. Bundle contains all the required certificates.
-
-In case of stand-alone Docker engine and for Docker Swarm cluster on Docker CE, perform below steps to generate client side certificates using openssl utility:
-
-*Note:*If you already have access to a CA and certificates, you should skip this step 1.
-
-Step 1: Setup CA server
-
-. openssl genrsa -out ca-priv-key.pem 2048
-. openssl req -config /usr/lib/ssl/openssl.cnf -new -key ca-priv-key.pem -x509 -days 1825 -out ca.pem
-
-Step 2: Generete client side certificates
-
-. openssl genrsa -out key.pem 2048
-. openssl req -subj `/CN=client` -new -key key.pem -out client.csr
-. openssl x509 -req -days 1825 -in client.csr -CA ca.pem -CAkey ca-priv-key.pem -CAcreateserial -out cert.pem -extensions v3_req -extfile /usr/lib/ssl/openssl.cnf
-
-If TLS support is not enabled on Docker endpoint then leave `CA Certificate`, `Client Certificate` and `Client Private Key` input parameters on plugin configuration page empty. Plugin will establish simple HTTP connection with such Docker endpoint.
+Revised on February 12, 2021
 
 
 
@@ -59,7 +12,11 @@ If TLS support is not enabled on Docker endpoint then leave `CA Certificate`, `C
 
 
 
-== Plugin Configurations
+
+
+
+== Plugin configurations
+
 Plugin configurations are sets of parameters that apply
 across some or all of the plugin procedures. They
 reduce repetition of common values, create
@@ -69,18 +26,26 @@ is given a unique name that is entered in designated
 parameters on procedures that use them.
 
 
-=== Creating Plugin Configurations
+=== Creating plugin configurations
+
 To create plugin configurations in {CD}, do these steps:
 
-* Go to **Administration** &gt;**Plugins** to open the Plugin Manager.
+* Go to menu:Admistration[Plugins] to open the Plugin Manager.
 * Find the @PLUGIN_NAME@ row.
 * Click *Configure* to open the
      Configurations page.
 * Click *Create Configuration* as per the description of parameters below.
 
 
+For communicating with Docker host, you need
 
-=== Configuration Procedure Parameters
+. Docker endpoint (For example, tcp://swarmmanager.example.com:2376)
+. TLS certificates in case of cert based authentication with Docker endpoint.
+
+
+
+=== Configuration procedure parameters
+
 [cols=",",options="header",]
 |===
 |Parameter |Description
@@ -116,7 +81,8 @@ To create plugin configurations in {CD}, do these steps:
 
 
 [[procedures]]
-== Plugin Procedures
+== Plugin procedures
+
 
 
 
@@ -128,10 +94,10 @@ Checks that the Docker endpoint specified in the plugin configuration is reachab
 
 
 
-==== Check Cluster Parameters
+==== Check Cluster parameters
 [cols=",",options="header",]
 |===
-| Parameter | Description
+|Parameter |Description
 
 | __**Configuration**__ | The name of an existing configuration which holds all the connection information for a stand-alone Docker host or Docker Swarm manager.
 
@@ -151,10 +117,10 @@ Configures default ingress network in Docker Swarm cluster
 
 
 
-==== Create Ingress Parameters
+==== Create Ingress parameters
 [cols=",",options="header",]
 |===
-| Parameter | Description
+|Parameter |Description
 
 | __**Configuration**__ | Name of plugin configuration to use.
 
@@ -192,10 +158,10 @@ Deletes a network
 
 
 
-==== Delete Network Parameters
+==== Delete Network parameters
 [cols=",",options="header",]
 |===
-| Parameter | Description
+|Parameter |Description
 
 | __**Configuration**__ | Name of plugin configuration to use.
 
@@ -245,10 +211,10 @@ Create microservices in {CD} by importing a Docker Compose file.
 
 
 
-==== Import Microservices Parameters
+==== Import Microservices parameters
 [cols=",",options="header",]
 |===
-| Parameter | Description
+|Parameter |Description
 
 | __**Docker Compose File Content**__ | Content of the Docker Compose File
 
@@ -286,10 +252,10 @@ Dump TLS certificates (ca-cert, client cert and client key) on agent machine in 
 
 
 
-==== Populate Certs Parameters
+==== Populate Certs parameters
 [cols=",",options="header",]
 |===
-| Parameter | Description
+|Parameter |Description
 
 | Plugin Configuration | Plugin Configuration Name.
 
@@ -309,10 +275,10 @@ Removes service deployed on a stand-alone Docker host or a Docker Swarm cluster.
 
 
 
-==== Remove Docker Service Parameters
+==== Remove Docker Service parameters
 [cols=",",options="header",]
 |===
-| Parameter | Description
+|Parameter |Description
 
 | __**Configuration**__ | The name of an existing configuration which holds all the connection information for communicating with a stand-alone Docker host or a Docker Swarm cluster.
 
@@ -334,11 +300,14 @@ Removes service deployed on a stand-alone Docker host or a Docker Swarm cluster.
 Performs a docker build
 
 
+NOTE: This procedure does not use the plugin configuration to connect to a Docker host. It uses the Docker command line _docker_ on the resource that the procedure step is running on to interact with the Docker engine. The procedure expects any required Docker client config files to be available in the default location at `$HOME/.docker` on the resource.
 
-==== runDockerBuild Parameters
+
+
+==== runDockerBuild parameters
 [cols=",",options="header",]
 |===
-| Parameter | Description
+|Parameter |Description
 
 | Use sudo | Use sudo for running docker build
 
@@ -351,14 +320,6 @@ Performs a docker build
 
 
 
-image::cloudbees-common::cd-plugins/ec-docker/rundockerbuild1.png[image]
-
-=== Output
-
-After the job runs, you can view the results on the Job Details page in {CD}.
-
-In the *runDockerBuild* step, click the Log button to see the diagnostic information.
-
 
 
 [[runDockerPull]]
@@ -369,10 +330,10 @@ Performs a docker pull on the requested image
 
 
 
-==== runDockerPull Parameters
+==== runDockerPull parameters
 [cols=",",options="header",]
 |===
-| Parameter | Description
+|Parameter |Description
 
 | Use sudo | Use sudo for running docker pull
 
@@ -388,14 +349,6 @@ Performs a docker pull on the requested image
 
 
 
-image::cloudbees-common::cd-plugins/ec-docker/rundockerpull1.png[image]
-
-=== Output
-
-After the job runs, you can view the results on the Job Details page in {CD}.
-
-In the _runDockerPull_ step, click the Log button to see the diagnostic information.
-
 
 
 [[runDockerRun]]
@@ -406,10 +359,10 @@ Performs a docker run
 
 
 
-==== runDockerRun Parameters
+==== runDockerRun parameters
 [cols=",",options="header",]
 |===
-| Parameter | Description
+|Parameter |Description
 
 | Use sudo | Use sudo for running docker run
 
@@ -449,14 +402,6 @@ Performs a docker run
 
 
 
-image::cloudbees-common::cd-plugins/ec-docker/images/rundockerrun1.png[image]
-
-=== Output
-
-After the job runs, you can view the results on the Job Details page in {CD}.
-
-In the *runDockerRun* step, click the Log button to see the diagnostic information.
-
 
 
 [[UndeployService]]
@@ -467,10 +412,10 @@ Undeploys a previously deployed service on a stand-alone Docker host or a Docker
 
 
 
-==== Undeploy Service Parameters
+==== Undeploy Service parameters
 [cols=",",options="header",]
 |===
-| Parameter | Description
+|Parameter |Description
 
 | __**Service Name**__ | The name of the service in {CD} that encapsulates the service that was previously deployed on a stand-alone Docker host or a Docker Swarm cluster. Please note that this name will be modified to comply with the naming conventions of Docker. Specifically characters such as "space , _ " will be converted to "-".
 
@@ -520,9 +465,9 @@ For .csproj artifact one needs to specify Command field.
 
 ==== Jetty
 
-If .war file is found in the artifact folder, the artifact will be treated as web application.
-Dockerfile will look like below:
+If .war file is found in the artifact folder, the artifact will be treated as web application. The Dockerfile will look like below:
 
+[source,text]
 ----
 FROM ${BASE_IMAGE:'jetty:9.4.7-jre8-alpine'} # Will use Base Image parameter or jetty:9.4.7-jre8-alpine by default
 
@@ -539,9 +484,9 @@ CMD [${COMMAND}]
 
 ==== Springboot
 
-If .jar file is found in the artifact folder, the artifact wil be treated as Springboot application.
-Dockerfile will look like below:
+If `.jar` file is found in the artifact folder, the artifact will be treated as Springboot application. The Dockerfile will look like below:
 
+[source,text]
 ----
 FROM ${BASE_IMAGE:'openjdk:8-jdk-alpine'}
 
@@ -556,9 +501,9 @@ CMD [${COMMAND:'"java", "-jar", "/app.jar"'}]
 
 ==== ASP.NET
 
-If web.config is found in the artifact folder, the artifact will be treated as .NET application.
-Dockerfile will look like below:
+If web.config is found in the artifact folder, the artifact will be treated as .NET application. Dockerfile will look like below:
 
+[source,text]
 ----
 FROM ${BASE_IMAGE:'microsoft/aspnetcore:2.0'}
 
@@ -580,8 +525,9 @@ ENTRYPOINT [${COMMAND:DEFAULT_COMMAND}]
 ==== CSPROJ
 
 If .csproj file is found in the artifact folder, the artifact will be treated as raw .NET application.
-_NB_: In this case Command field will be needed in order to build a correct Dockerfile.
+NOTE: In this case Command field will be needed in order to build a correct Dockerfile.
 
+[source,text]
 ----
 FROM microsoft/aspnetcore-build:2.0 AS build-env
 WORKDIR /app
@@ -606,10 +552,12 @@ CMD [${COMMAND}]
 ----
 
 
-==== Artifact2Image Parameters
+
+
+==== Artifact2Image parameters
 [cols=",",options="header",]
 |===
-| Parameter | Description
+|Parameter |Description
 
 | __**EC-Docker Configuration**__ | Name of the existing EC-Docker plugin configuration
 
@@ -693,10 +641,40 @@ Deploys or updates a service on a stand-alone Docker host or a Docker Swarm clus
 
 
 
-==== Deploy Service Parameters
+User can provide a comma-separated list of networks on which to deploy the container or the swarm service in the service mapping page when mapping the service to a cluster in {CD}. If the network does not already exist then the procedure will create one with the provided subnet and gateway. If no subnet and gateway is specified, Docker uses default values. Each of the user-defined networks can have multiple subnets and gateways. In that case, multiple subnets/gateways must be separated by '|'(pipe). If deploying to a stand-alone Docker engine then the user-defined **"bridge"** network is created.  If deploying to a Docker swarm cluster then the user-defined **"overlay"** network is created.
+
+
+For example,
+<table class="grid">
+<thead>
+    <tr>
+        <td>Networks:</td>
+        <td>bridge, net1, net2</td>
+    </tr>
+</thead>
+<tbody>
+    <tr>
+        <td>Subnets:</td>
+        <td>,10.200.1.10/24|10.200.2.10/24,198.168.10.10/24</td>
+    </tr>
+    <tr>
+        <td>Gateways:</td>
+        <td>,10.200.1.1|10.200.2.1,198.168.10.1</td>
+    </tr>
+</tbody>
+</table>
+In this example, container gets attached to bridge, net1 and net2 networks. "bridge" network is already created by Docker and no need to specify subnet/gateway for it. "net1" and "net2" are user defined networks. "net1" have two subnet IP ranges i.e. 10.200.1.10/24(Gateway:10.200.1.1) and 10.200.2.10/24(Gateway:10.200.2.1) while "net2" have single subnet IP range i.e. 198.168.10.10/24(Gateway:198.168.10.1).
+</p>
+<p>
+For more information on docker networking, see <a href="https://docs.docker.com/engine/userguide/networking/">here</a>
+</p>
+
+
+
+==== Deploy Service parameters
 [cols=",",options="header",]
 |===
-| Parameter | Description
+|Parameter |Description
 
 | __**Service Name**__ | The name of the service in {CD} that encapsulates the service to be deployed on a stand-alone Docker host or a Docker Swarm cluster. Please note that this name will be modified to comply with the naming conventions of Docker. Specifically characters such as "space , _ " will be converted to "-".
 
@@ -743,13 +721,19 @@ Deploys or updates a service on a stand-alone Docker host or a Docker Swarm clus
 
 
 
-== Known Issues
-Backslashes () are not supported in `.dockerignore` for Artifact2Image procedure. Use forward slashes.
+== Known issues
+Backslashes (\) are not supported in `.dockerignore` for Artifact2Image procedure. Use forward slashes.
+
 
 
 
 [[rns]]
 == Release notes
+
+
+=== EC-Docker 1.6.5
+
+- Upgraded third-party dependencies to address security issues.
 
 
 === EC-Docker 1.6.4
