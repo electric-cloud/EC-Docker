@@ -9,7 +9,7 @@
   <key>EC-Docker</key>
   <configure>ec_config</configure>
   <label>EC-Docker</label>
-  <version>1.6.5</version>
+  <version>1.7.0</version>
 <hasAdoc>true</hasAdoc>
 
 <detailedDescription>Docker is an open platform for developing, shipping, and running applications. Docker is designed to deliver your applications faster: you can separate your applications from your infrastructure and treat your infrastructure like a managed application. Docker helps you ship code faster, test faster, deploy faster, and shorten the cycle between writing code and deploying it.
