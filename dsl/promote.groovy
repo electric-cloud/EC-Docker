@@ -59,13 +59,6 @@ project pluginName, {
 			}
 		}
 	}
-
-	procedure 'Define Container', {
-		containerMappingsForm = new File(pluginDir, 'dsl/procedures/defineContainer/containerMappingsForm.xml').text
-	}
-	procedure 'Define Service', {
-		serviceMappingsForm = new File(pluginDir, 'dsl/procedures/defineService/serviceMappingsForm.xml').text
-	}
 	// End-of container service plugin metadata
 }
 
