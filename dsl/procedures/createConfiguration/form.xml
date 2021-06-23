@@ -60,7 +60,7 @@
         <passwordLabel>Private Key:</passwordLabel>
         <credentialType>key</credentialType>
         <documentation>Private key used by a Docker client for authentication when communicating with a secure Docker end-point. Required if the plugin configuration is used for deploying services on Docker.</documentation>
-        <attachedAsParameterToStep>createAndAttachCredential,testConnection</attachedAsParameterToStep>
+        <attachedAsParameterToStep>createAndAttachCredential</attachedAsParameterToStep>
     </formElement>
     <formElement>
         <type>select</type>
