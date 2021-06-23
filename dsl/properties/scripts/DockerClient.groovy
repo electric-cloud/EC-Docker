@@ -811,9 +811,4 @@ public class DockerClient extends BaseClient {
                 }
         }
     }
-
-
-    def deleteNetwork(def networkName){
-        dockerClient.rmNetwork(networkName)
-    }
 }
