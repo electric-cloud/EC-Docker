@@ -21,11 +21,7 @@ def stepsWithAttachedCredentials = [
 		], [
 				procedureName: 'Populate Certs',
 				stepName: 'populateDockerClientCerts'
-		], [
-				procedureName: 'Delete Network',
-				stepName: 'deleteNetwork'
 		]
-
 ]
 project pluginName, {
 
