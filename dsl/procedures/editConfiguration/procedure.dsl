@@ -12,15 +12,4 @@ procedure 'EditConfiguration',
         postProcessor: '$[/myProject/postpLoader]',
         releaseMode: 'none',
         timeLimitUnits: 'minutes'
-
-    step 'testConnection',
-        command: new File(pluginDir, 'dsl/procedures/createConfiguration/steps/testConnection.groovy').text,
-        errorHandling: 'abortProcedure',
-        condition: '$[/javascript myJob.testConnection == "true" || myJob.testConnection == "1"]',
-        exclusiveMode: 'none',
-        releaseMode: 'none',
-        resourceName: '$[grabbedResource]',
-        shell: 'ec-groovy',
-        timeLimitUnits: 'minutes',
-        postProcessor: '$[/myProject/postpLoader]'
 }
