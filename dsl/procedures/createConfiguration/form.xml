@@ -62,17 +62,6 @@
         <documentation>Private key used by a Docker client for authentication when communicating with a secure Docker end-point. Required if the plugin configuration is used for deploying services on Docker.</documentation>
         <attachedAsParameterToStep>createAndAttachCredential,testConnection</attachedAsParameterToStep>
     </formElement>
-    <formElement> 
-        <label>Test Connection:</label>    
-        <property>testConnection</property> 
-        <documentation>Check this checkbox to verify connectivity to the Docker endpoint.</documentation>
-        <type>checkbox</type>   
-        <checkedValue>true</checkedValue> 
-        <uncheckedValue>false</uncheckedValue> 
-        <initiallyChecked>0</initiallyChecked> 
-        <value>true</value> 
-        <required>0</required>
-    </formElement> 
     <formElement>
         <type>select</type>
         <label>Log Level:</label>

@@ -16,14 +16,8 @@ def pluginCategory = 'Container Management'
 //List of procedure steps to which the plugin configuration credentials need to be attached
 def stepsWithAttachedCredentials = [
 		[
-				procedureName: 'Check Cluster',
-				stepName: 'checkCluster'
-		], [
 				procedureName: 'Remove Docker Service',
 				stepName: 'cleanup'
-		],[
-				procedureName: 'CreateConfiguration',
-				stepName: 'testConnection'
 		], [
 				procedureName: 'Populate Certs',
 				stepName: 'populateDockerClientCerts'
