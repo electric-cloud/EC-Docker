@@ -133,30 +133,6 @@ public class DockerClient extends BaseClient {
         efClient.getConfigValues('ec_plugin_cfgs', configName, pluginProjectName)
     }
 
-    def undeployDockerService(def deployedServiceName) {
-        if (standAloneDockerHost()) {
-            logger INFO, "Removing container '$deployedServiceName' from standalone Docker host"
-            //check if container exists, if found, stop and remove it
-            def deployedContainerId = getContainerId(deployedServiceName)
-            if (deployedContainerId) {
-                dockerClient.stop(deployedContainerId)
-                dockerClient.wait(deployedContainerId)
-                dockerClient.rm(deployedContainerId)
-            } else {
-                logger INFO, "Nothing to do as no container named '$deployedServiceName' found on the standalone Docker host."
-            }
-        } else {
-            //It is a Docker swarm cluster end-point.
-            //Check if service exists
-            logger INFO, "Undeploying service '$deployedServiceName' from Docker Swarm cluster"
-            def deployedService = getService(deployedServiceName)
-            if (deployedService) {
-                deleteService(deployedServiceName)
-            } else {
-                logger INFO, "Nothing to do as no service named '$deployedServiceName' found on the Docker Swarm cluster."
-            }
-        }
-    }
 
     boolean standAloneDockerHost() {
         dockerClient.info().content.Swarm.LocalNodeState == "inactive"
@@ -407,18 +383,6 @@ public class DockerClient extends BaseClient {
 
     }
 
-    /**
-     * Retrieves the container id from docker engine.
-     * Returns null if no container instance by the given name is found.
-     */
-    def getContainerId(String serviceName) {
-
-        // do not rely on docker ps name:<name> as it does not do an exact match
-        // so all containers with names containing the <name> will be retrieved
-        //def containers = dockerClient.ps([name:serviceName]).content
-        def containerInfo = getContainer(serviceName)
-        containerInfo?.Id
-    }
 
      Object doHttpGet(String requestUrl, String requestUri, String accessToken, boolean failOnErrorCode = true) {
 
@@ -588,19 +552,6 @@ public class DockerClient extends BaseClient {
         return mbs * 1048576 as int
     }
 
-    def deleteService(def serviceName) {
-
-        def response = dockerClient.rmService(serviceName)
-        logger INFO, "Deleted Service $serviceName. Response: $response\nWaiting for service cleanup..."
-        def service = awaitServiceRemoved(serviceName, 5000)
-        if(service == null ){
-            logger INFO, "Service $serviceName cleaned up successfully."
-        }else{
-            logger ERROR, "Service clean up timed out."
-            exit 1
-        }
-    }
-
 
     def buildImage(String tag, InputStream tar) {
         def response = dockerClient.build(tar, new BuildConfig(query: [t: tag]))
@@ -620,21 +571,6 @@ public class DockerClient extends BaseClient {
         return response
     }
 
-    def awaitServiceRemoved(def name,def timeout) {
-        def service = findService(name)
-        def timespent = 0
-        while (service != null && timespent<timeout) {
-            service = findService(name)
-            if (service == null) {
-                break
-            }
-            else {
-                sleep(1000)
-                timespent += 1000
-            }
-        }
-        return service
-    }
 
     def buildAuthConfig(def container) {
         EFClient efClient = new EFClient()
