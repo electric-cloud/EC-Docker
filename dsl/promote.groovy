@@ -14,12 +14,7 @@ def pluginDir = getProperty("/projects/$pluginName/pluginDir").value
 def pluginCategory = 'Container Management'
 
 //List of procedure steps to which the plugin configuration credentials need to be attached
-def stepsWithAttachedCredentials = [
-		[
-				procedureName: 'Populate Certs',
-				stepName: 'populateDockerClientCerts'
-		]
-]
+def stepsWithAttachedCredentials = []
 project pluginName, {
 
 	ec_visibility = 'pickListOnly'
