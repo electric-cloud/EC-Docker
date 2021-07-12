@@ -1,0 +1,180 @@
+---
+pluginInfo:
+  pluginName: "EC-Docker"
+  version: '2.0.0'
+  description: "Integrates with Docker CLI."
+  author: "CloudBees"
+  supportUrl: "https://cloudbees.com"
+  category: "Container Management"
+  shell: "ec-perl"
+properties:
+- propertyName: "dockerfiles"
+  properties:
+  - propertyName: "defaults"
+    properties:
+    - propertyName: "aspnet"
+      value:
+        path: "dsl/properties/dockerfiles/defaults/aspnet"
+    - propertyName: "csproj"
+      value:
+        path: "dsl/properties/dockerfiles/defaults/csproj"
+    - propertyName: "jetty"
+      value:
+        path: "dsl/properties/dockerfiles/defaults/jetty"
+    - propertyName: "springboot"
+      value:
+        path: "dsl/properties/dockerfiles/defaults/springboot"
+- propertyName: "lib"
+  properties:
+  - propertyName: "EC"
+    properties:
+    - propertyName: "PostP"
+      value:
+        path: "dsl/properties/lib/EC/PostP.pm"
+- propertyName: "resources"
+  properties:
+  - propertyName: "report"
+    value:
+      path: "dsl/properties/resources/report.html"
+- propertyName: "postpLoader"
+  value:
+    path: "dsl/properties/postpLoader"
+procedures:
+- name: "runDockerBuild"
+  description: "Performs a docker build"
+  parameters:
+  - name: "use_sudo"
+    type: "checkbox"
+    required: false
+    documentation: "Use sudo for running docker build"
+    label: "Use sudo:"
+    checkedValue: "1"
+    uncheckedValue: "0"
+    initiallyChecked: "0"
+  - name: "build_path"
+    type: "entry"
+    required: true
+    documentation: "Path to source code"
+    label: "Build path:"
+  shell: "ec-perl"
+  properties: []
+- name: "runDockerPull"
+  description: "Performs a docker pull on the requested image"
+  parameters:
+  - name: "use_sudo"
+    type: "checkbox"
+    required: false
+    documentation: "Use sudo for running docker pull"
+    label: "Use sudo:"
+    checkedValue: "1"
+    uncheckedValue: "0"
+    initiallyChecked: "0"
+  - name: "image_name"
+    type: "entry"
+    required: true
+    documentation: "Image to pull from Docker Hub"
+    label: "Image name:"
+  - name: "tag"
+    type: "entry"
+    required: false
+    documentation: "Tag of image"
+    label: "Image tag:"
+  shell: "ec-perl"
+  properties: []
+- name: "runDockerRun"
+  description: "Performs a docker run"
+  parameters:
+  - name: "use_sudo"
+    type: "checkbox"
+    required: false
+    documentation: "Use sudo for running docker run"
+    label: "Use sudo:"
+    checkedValue: "1"
+    uncheckedValue: "0"
+    initiallyChecked: "0"
+  - name: "image_name"
+    type: "entry"
+    required: true
+    documentation: "Image to run a container from"
+    label: "Image name:"
+  - name: "container_name"
+    type: "entry"
+    required: false
+    documentation: "Assign a name to the container"
+    label: "Container name:"
+  - name: "detached_mode"
+    type: "checkbox"
+    required: false
+    documentation: "Detached mode: run the container in the background and print\
+      \ the new container ID"
+    label: "Detached mode (-d):"
+    checkedValue: "1"
+    uncheckedValue: "0"
+    initiallyChecked: "0"
+  - name: "entrypoint"
+    type: "entry"
+    required: false
+    documentation: "Overwrite the default ENTRYPOINT of the image"
+    label: "Entrypoint:"
+  - name: "working_dir"
+    type: "entry"
+    required: false
+    documentation: "Working directory inside the container"
+    label: "Container working directory:"
+  - name: "published_ports"
+    type: "entry"
+    required: false
+    documentation: "Publish a container's port to the host (format: ip:hostPort:containerPort\
+      \ | ip::containerPort | hostPort:containerPort | containerPort). Note: use\
+      \ spaces to delimit port mappings, for example \"2666:1666 8088:8080\""
+    label: "Publish ports:"
+  - name: "publish_all_ports"
+    type: "checkbox"
+    required: false
+    documentation: "Publish all exposed ports to the host interfaces"
+    label: "Publish all ports:"
+    checkedValue: "1"
+    uncheckedValue: "0"
+    initiallyChecked: "0"
+  - name: "privileged"
+    type: "checkbox"
+    required: false
+    documentation: "Give extended privileges to this container"
+    label: "Privileged:"
+    checkedValue: "1"
+    uncheckedValue: "0"
+    initiallyChecked: "0"
+  - name: "container_links"
+    type: "entry"
+    required: false
+    documentation: "Add link to another container in the form of name:alias"
+    label: "Link:"
+  - name: "command_with_args"
+    type: "entry"
+    required: false
+    documentation: "Command to run within container"
+    label: "Command with args:"
+  shell: "ec-perl"
+  properties: []
+configuration:
+  shell: "ec-perl"
+  hasDebugLevel: true
+  checkConnection: true
+  parameters:
+  - name: "config"
+    type: "entry"
+    required: true
+    documentation: "Unique name for the plugin configuration."
+    label: "Configuration:"
+  - name: "desc"
+    type: "entry"
+    required: false
+    documentation: "Description for the plugin configuration."
+    label: "Description:"
+  - name: "logLevel"
+    type: "select"
+    required: false
+    documentation: "Log level to use for logging output. Error=4, Warning=3, Info=2,\
+      \ Debug=1."
+    label: "Log Level:"
+    value: "2"
