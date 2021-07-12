@@ -4,6 +4,7 @@ pluginInfo:
   version: '2.0.0'
   description: "Integrates with Docker CLI."
   author: "CloudBees"
+  supportLevel: 10
   supportUrl: "https://cloudbees.com"
   category: "Container Management"
   shell: "ec-perl"
