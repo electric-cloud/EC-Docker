@@ -26,6 +26,12 @@ class RunDockerPull extends Procedure {
 
     //Generated
     
+    RunDockerPull config(String config) {
+        this.addParam('config', config)
+        return this
+    }
+    
+    
     RunDockerPull imagename(String imagename) {
         this.addParam('image_name', imagename)
         return this

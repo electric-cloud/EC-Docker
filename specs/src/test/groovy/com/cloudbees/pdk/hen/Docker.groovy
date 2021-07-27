@@ -7,8 +7,14 @@ import static com.cloudbees.pdk.hen.Utils.env
 
 class Docker extends Plugin {
 
+    static String DOCKER_AGENT_HOST = env('DOCKER_AGENT_HOST', 'docker')
+    static int DOCKER_AGENT_PORT = env('KUBECTL_AGENT_PORT', '7808').toInteger()
+    static String resourceName = 'docker'
+
+
     static Docker create() {
-        Docker plugin = new Docker(name: 'EC-Docker')
+        ServerHandler.getInstance().setupResource(resourceName, DOCKER_AGENT_HOST, DOCKER_AGENT_PORT as int)
+        Docker plugin = new Docker(name: 'EC-Docker', defaultResource: resourceName)
         plugin.configure(plugin.config)
         return plugin
     }
