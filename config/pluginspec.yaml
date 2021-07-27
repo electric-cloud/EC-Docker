@@ -158,9 +158,8 @@ procedures:
   shell: "ec-perl"
   properties: []
 configuration:
-  shell: "ec-perl"
   hasDebugLevel: true
-  checkConnection: true
+  checkConnection: false
   parameters:
   - name: "config"
     type: "entry"
@@ -172,10 +171,13 @@ configuration:
     required: false
     documentation: "Description for the plugin configuration."
     label: "Description:"
-  - name: "logLevel"
-    type: "select"
+  - name: "registry"
+    type: "entry"
     required: false
-    documentation: "Log level to use for logging output. Error=4, Warning=3, Info=2,\
-      \ Debug=1."
-    label: "Log Level:"
-    value: "2"
+    documentation: "Custom Docker Registry (i.e., myregistry.local or localhost:5000). Leave empty for default Registry which is Docker Hub."
+    label: "Docker Registry:"
+  - name: credential
+    label: Username and password
+    type: credential
+    required: false
+    documentation: Username and password for Docker Registry (Docker Hub or private Docker Registry).
