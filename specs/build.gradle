@@ -1,24 +1,35 @@
-// buildscript{
-//   repositories {
-
-//       mavenCentral()
-//       maven { url "https://plugins.gradle.org/m2/" }
-//       // jcenter()
-//       mavenLocal()
-
-//       dependencies{
-//         classpath 'com.cloudbees.cd.plugins:cbcd-plugin-build:1.4.0-SNAPSHOT'
-//       }
-//   }
-// }
+buildscript {
+    repositories {
+        maven {
+            url 'https://nexus-internal.cloudbees.com/content/repositories/snapshots'
+            credentials {
+                username = System.getenv('NEXUS_USERNAME') ?: nexusUsername
+                password = System.getenv('NEXUS_PASSWORD') ?: nexusPassword
+            }
+        }
+        maven {
+            url 'https://nexus-internal.cloudbees.com/content/groups/mirror'
+            credentials {
+                username = System.getenv('NEXUS_USERNAME') ?: nexusUsername
+                password = System.getenv('NEXUS_PASSWORD') ?: nexusPassword
+            }
+        }
+        mavenLocal()
+        mavenCentral()
+    }
+    dependencies {
+        classpath "com.cloudbees.cd.plugins:hen:+"
+    }
+}
 
 plugins {
-    id "com.cloudbees.cd.plugins.specs" version "1.3.0.0"
+    id "com.cloudbees.cd.plugins.specs" version "1.6.10.0"
 }
 
 apply plugin: "groovy"
 apply plugin: 'idea'
-apply plugin: 'com.cloudbees.cd.plugins.specs'
+apply plugin: 'java'
+apply plugin: 'com.cloudbees.cd.plugins.specs-hen'
 
 version = "1.0"
 description = "EC-Docker Specs"
@@ -28,34 +39,46 @@ sourceCompatibility = 1.8
 defaultTasks 'test'
 
 repositories {
-    jcenter()
+    mavenLocal()
     mavenCentral()
+
     maven {
-        url  "https://dl.bintray.com/ecpluginsdev/maven"
+        url 'https://nexus-internal.cloudbees.com/content/repositories/snapshots'
+        credentials {
+            username = System.getenv('NEXUS_USERNAME') ?: nexusUsername
+            password = System.getenv('NEXUS_PASSWORD') ?: nexusPassword
+        }
+    }
+    maven {
+        url 'https://nexus-internal.cloudbees.com/content/groups/mirror'
+        credentials {
+            username = System.getenv('NEXUS_USERNAME') ?: nexusUsername
+            password = System.getenv('NEXUS_PASSWORD') ?: nexusPassword
+        }
     }
 }
 
-dependencies {
-    compile 'org.codehaus.groovy:groovy-all:2.4.5:indy'
-    compile 'org.spockframework:spock-core:1.1-groovy-2.4'
-    compile 'com.jayway.restassured:rest-assured:2.4.0'
-
-    compile 'com.electriccloud:ec-specs-plugins-core:1.9.1'
-    compile group: 'org.codehaus.groovy.modules.http-builder', name: 'http-builder', version: '0.7.1'
+generateHenClasses {
+    pluginName = 'EC-Docker'
 }
 
-test {
-    systemProperties['COMMANDER_SERVER'] = findProperty('server') ?: 'localhost'
-    systemProperties['COMMANDER_SERVER'] = findProperty('server') ?: 'localhost'
-    systemProperties['COMMANDER_PASSWORD'] = findProperty('password') ?: 'changeme'
+dependencies {
+    implementation 'org.codehaus.groovy:groovy-all:2.5.13'
+    implementation 'org.spockframework:spock-core:1.3+'
+
+    implementation 'com.jayway.restassured:rest-assured:2.4.0'
+    // Dependency of jayway^^ that has to be added separately for JDK9+
+    implementation 'javax.xml.bind:jaxb-api:2.3.1'
+
+    implementation ('com.electriccloud:ec-specs-plugins-core:1.9.2') {
+        exclude(group: "org.codehaus.groovy", module: "groovy-all")
+    }
+    implementation group: 'org.codehaus.groovy.modules.http-builder', name: 'http-builder', version: '0.7.1'
+    implementation("com.cloudbees.cd.plugins:hen:+") {
+        exclude(group: "org.codehaus.groovy", module: "groovy-all")
+    }
 }
 
 sendAllureReports {
     projectName = 'ec-docker'
-}
-
-configureTests {
-    environmentName = findProperty('envName') ?: 'default'
-    readEnvironmentVariables = true
-    readSecrets = true
 }
