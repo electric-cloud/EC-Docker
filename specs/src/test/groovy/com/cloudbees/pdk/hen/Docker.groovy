@@ -9,6 +9,8 @@ class Docker extends Plugin {
 
     static String DOCKER_AGENT_HOST = env('DOCKER_AGENT_HOST', 'docker')
     static int DOCKER_AGENT_PORT = env('KUBECTL_AGENT_PORT', '7808').toInteger()
+    static String DOCKERHUB_USERNAME = env('DOCKERHUB_USERNAME')
+    static String DOCKERHUB_PASSWORD = env('DOCKERHUB_PASSWORD')
     static String resourceName = 'docker'
 
 
@@ -19,14 +21,14 @@ class Docker extends Plugin {
         return plugin
     }
     static Docker createWithoutConfig() {
-        Docker plugin = new Docker(name: 'EC-Docker')
+        Docker plugin = new Docker(name: 'EC-Docker', defaultResource: resourceName)
         return plugin
     }
 
     //user-defined after boilerplate was generated, default parameters setup
     DockerConfig config = DockerConfig
         .create(this)
-        //.parameter(value) add parameters here
+        .debugLevel(DockerConfig.DebugLevelOptions.DEBUG)
 
 
     EditConfiguration editConfiguration = EditConfiguration.create(this)
