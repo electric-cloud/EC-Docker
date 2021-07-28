@@ -3,6 +3,7 @@ use strict;
 use warnings;
 use base qw/FlowPDF/;
 use FlowPDF::Log;
+use FlowPDF::Helpers qw/bailOut/;
 
 # Feel free to use new libraries here, e.g. use File::Temp;
 
@@ -95,8 +96,40 @@ sub runDockerPull {
     my $configValues = $context->getConfigValues();
     logInfo("Config values are: ", $configValues);
 
-    $sr->setJobStepOutcome('warning');
-    $sr->setJobSummary("This is a job summary.");
+    if(!defined $p->{image_name}) {
+        die "ERROR: image name parameter is required but not set.";
+    }
+
+    logDebug("Try to login...\n");
+    my ($exit_code, $error_message) = $self->login($configValues);
+    if($exit_code) {
+        bailOut($error_message);
+    }
+
+    my $command;
+    if($p->{use_sudo}) {
+        $command = "sudo docker pull";
+    } else {
+        $command = "docker pull";
+    }
+
+    my $image_name = $p->{image_name};
+    if($p->{image_tag}) {
+        $image_name .= ":$p->{image_tag}";
+    }
+
+    $command .= " $image_name 2>&1";
+
+    logInfo("Command to execute: $command");
+    logInfo('Pulling docker image:');
+
+    my $docker_output = system($command);
+    if($? != 0) {
+        bailOut("Exit code: $?.\n$docker_output");
+    }
+    print $docker_output . "\n";
+
+    $sr->setJobStepOutcome('success');
 }
 # Auto-generated method for the procedure runDockerRun/runDockerRun
 # Add your code into this method and it will be called when step runs
@@ -131,5 +164,35 @@ sub runDockerRun {
 ## === step ends ===
 # Please do not remove the marker above, it is used to place new procedures into this file.
 
+
+sub login {
+    my ($self, $configValues, $use_sudo) = @_;
+
+    logDebug('Try to login...');
+    # Get credentials for Docker Registry
+    my $cred = $configValues->getParameter('credential');
+    my ($username, $password);
+    if ($cred) {
+        $username = $cred->getUserName();
+        $password = $cred->getSecretValue();
+    }
+
+    if (!defined $username || $username eq '') {
+        logDebug('Credentials empty, login skipped...');
+        return (0, '');
+    }
+
+    my $cli = FlowPDF::ComponentManager->loadComponent('FlowPDF::Component::CLI', {
+        workingDirectory => $ENV{COMMANDER_WORKSPACE}
+    });
+
+    my $command = $use_sudo ? $cli->newCommand('sudo', ['docker']) : $cli->newCommand('docker');
+    $command->addArguments('login', '-u', $username, '-p', $password);
+    my $res = $cli->runCommand($command);
+    logDebug('LOGIN EXIT CODE: ' . $res->getCode());
+    logInfo('LOGIN STDOUT:', $res->getStdout());
+    logInfo('LOGIN STDERR:', $res->getStderr());
+    return ($res->getCode(), $res->getStderr());
+}
 
 1;
