@@ -85,6 +85,7 @@ procedures:
   properties: []
 - name: "runDockerRun"
   description: "Performs a docker run"
+  hasConfig: true
   parameters:
   - name: "use_sudo"
     type: "checkbox"

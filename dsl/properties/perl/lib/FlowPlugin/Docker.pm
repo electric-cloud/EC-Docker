@@ -97,7 +97,7 @@ sub runDockerPull {
     logInfo("Config values are: ", $configValues);
 
     if(!defined $p->{image_name}) {
-        die "ERROR: image name parameter is required but not set.";
+        bailOut("ERROR: image name parameter is required but not set.");
     }
 
     logDebug("Try to login...\n");
@@ -158,8 +158,77 @@ sub runDockerRun {
     my $configValues = $context->getConfigValues();
     logInfo("Config values are: ", $configValues);
 
-    $sr->setJobStepOutcome('warning');
-    $sr->setJobSummary("This is a job summary.");
+    if(!defined $p->{image_name}) {
+        bailOut("ERROR: image name parameter is required, but not set.");
+    }
+
+    logDebug("Try to login...\n");
+    my ($exit_code, $error_message) = $self->login($configValues);
+    if($exit_code) {
+        bailOut($error_message);
+    }
+
+    my $command;
+    if($p->{use_sudo}) {
+        $command = "sudo docker run";
+    } else {
+        $command = "docker run";
+    }
+
+    if($p->{container_name}) {
+        $command .= " --name=\"$p->{container_name}\"";
+    }
+
+    if($p->{detached_mode}) {
+        $command .= " -d";
+    }
+
+    if($p->{entrypoint}) {
+        $command .= " --entrypoint=\"$p->{entrypoint}\"";
+    }
+
+    if($p->{working_dir}) {
+        $command .= " --workdir=\"$p->{working_dir}\"";
+    }
+
+    if($p->{published_ports}) {
+        my @port_mappings = split / /, $p->{published_ports};
+        foreach my $mapping (@port_mappings) {
+            $command .= " -p $mapping";
+        }
+    }
+
+    if($p->{publish_all_ports}) {
+        $command .= " -P";
+    }
+
+    if($p->{container_links}) {
+        $command .= " --link $p->{container_links}";
+    }
+
+    if($p->{privileged}) {
+        $command .= " --privileged=true";
+    }
+
+    $command .= " $p->{image_name}";
+
+    if($p->{command_with_args}) {
+        $command .= " $p->{command_with_args}";
+    }
+
+    $command .= " 2>&1";
+
+    print "\nCommand to execute: $command\n";
+    print "Launching docker container:\n\n";
+
+    my $docker_output = system($command);
+    if($? != 0) {
+        bailOut("Exit code: $?.\n$docker_output");
+    }
+    print $docker_output . "\n";
+
+
+    $sr->setJobStepOutcome('success');
 }
 ## === step ends ===
 # Please do not remove the marker above, it is used to place new procedures into this file.

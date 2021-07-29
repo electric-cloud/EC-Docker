@@ -2,6 +2,8 @@ out/*
 .idea/*
 EC-Docker.jar
 build/*
+specs/logs/
 .DS_Store
 .*
 *.iml
+
