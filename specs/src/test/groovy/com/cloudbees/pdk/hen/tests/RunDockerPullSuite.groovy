@@ -20,11 +20,13 @@ class RunDockerPullSuite extends Specification {
     @Shared
     String defaultProject = 'specs-' + pluginName
     def setupSpec() {
-        ServerHandler.getInstance().runCommand('docker rmi alpine:latest || exit 0', 'sh', plugin.defaultResource)
+        ServerHandler.getInstance().runCommand('docker rmi alpine:latest -f || exit 0', 'sh', plugin.defaultResource)
     }
 
     @Sanity
     def 'Sanity RunDockerPull only required fields'() {
+        given:
+        ServerHandler.getInstance().runCommand('docker rmi alpine:latest -f || exit 0', 'sh', plugin.defaultResource)
         when:
         def result = plugin.runDockerPull
                 .imagename('alpine')
@@ -34,7 +36,7 @@ class RunDockerPullSuite extends Specification {
         assert result.isSuccessful()
         assert result.jobLog =~ 'Status: Downloaded newer image for alpine:latest'
         cleanup:
-        ServerHandler.getInstance().runCommand('docker rmi alpine:latest', 'sh', plugin.defaultResource)
+        ServerHandler.getInstance().runCommand('docker rmi alpine:latest -f || exit 0', 'sh', plugin.defaultResource)
     }
 
     @Regression
