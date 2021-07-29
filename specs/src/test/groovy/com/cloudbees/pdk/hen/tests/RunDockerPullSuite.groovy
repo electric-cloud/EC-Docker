@@ -27,7 +27,6 @@ class RunDockerPullSuite extends Specification {
     def 'Sanity RunDockerPull only required fields'() {
         when:
         def result = plugin.runDockerPull
-               // .config(plugin.configName)
                 .imagename('alpine')
                 .run()
 
@@ -46,7 +45,7 @@ class RunDockerPullSuite extends Specification {
         DockerConfig conf = DockerConfig
                 .create(plugin)
                 .debugLevel(DockerConfig.DebugLevelOptions.DEBUG)
-        conf.addCredential('credential', Docker.DOCKERHUB_USERNAME, Docker.DOCKERHUB_PASSWORD)
+        conf.addCredential('credential', Docker.DOCKERHUB_SPECS_USERNAME, Docker.DOCKERHUB_SPECS_PASSWORD)
         p.configure(conf)
         ServerHandler.getInstance().runCommand("docker rmi $image || exit 0", 'sh', p.defaultResource)
         when: "Run Plugin Procedure - RunDockerPull"
