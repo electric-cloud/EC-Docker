@@ -43,6 +43,7 @@ properties:
 procedures:
 - name: "runDockerBuild"
   description: "Performs a docker build"
+  hasConfig: true
   parameters:
   - name: "use_sudo"
     type: "checkbox"

@@ -74,8 +74,33 @@ sub runDockerBuild {
     my $configValues = $context->getConfigValues();
     logInfo("Config values are: ", $configValues);
 
-    $sr->setJobStepOutcome('warning');
-    $sr->setJobSummary("This is a job summary.");
+    if(!defined $p->{build_path}) {
+        bailOut("ERROR: build path parameter is required but not set.");
+    }
+
+    logDebug("Try to login...\n");
+    my ($exit_code, $error_message) = $self->login($configValues);
+    if($exit_code) {
+        bailOut($error_message);
+    }
+
+    my $command;
+    if($p->{use_sudo}) {
+        $command = "sudo docker build $p->{build_path} 2>&1";
+    } else {
+        $command = "docker build $p->{build_path} 2>&1";
+    }
+
+    logInfo("Command to execute: $command");
+    logInfo("Building docker image:");
+
+    my $docker_output = system($command);
+    if($? != 0) {
+        bailOut("Exit code: $?.\n$docker_output");
+    }
+    print $docker_output . "\n";
+
+    $sr->setJobStepOutcome('success');
 }
 # Auto-generated method for the procedure runDockerPull/runDockerPull
 # Add your code into this method and it will be called when step runs
