@@ -50,7 +50,7 @@ class RunDockerBuildSuite extends Specification {
         p.configure(conf)
         def cmd = "mkdir /tmp/specs-dockerfile && echo \"$DockerfileContentPrivateImage\" >> /tmp/specs-dockerfile/Dockerfile"
         ServerHandler.getInstance().runCommand(cmd, 'sh', p.defaultResource)
-        ServerHandler.getInstance().runCommand("docker rmi $image || exit 0", 'sh', p.defaultResource)
+        ServerHandler.getInstance().runCommand("docker rmi $image -f || exit 0", 'sh', p.defaultResource)
         when: "Run Plugin Procedure - RunDockerBuild"
         def result = p.runDockerBuild
                 .buildpath('/tmp/specs-dockerfile/')
