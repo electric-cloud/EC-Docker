@@ -263,6 +263,7 @@ sub login {
     my ($self, $configValues, $use_sudo) = @_;
 
     logDebug('Try to login...');
+    my $registry = $configValues->getParameter('registry');
     # Get credentials for Docker Registry
     my $cred = $configValues->getParameter('credential');
     my ($username, $password);
@@ -282,6 +283,11 @@ sub login {
 
     my $command = $use_sudo ? $cli->newCommand('sudo', ['docker']) : $cli->newCommand('docker');
     $command->addArguments('login', '-u', $username, '-p', $password);
+
+    if($registry) {
+        $command->addArguments($registry);
+    }
+
     my $res = $cli->runCommand($command);
     logDebug('LOGIN EXIT CODE: ' . $res->getCode());
     logInfo('LOGIN STDOUT:', $res->getStdout());
