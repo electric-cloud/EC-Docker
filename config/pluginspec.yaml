@@ -2,12 +2,14 @@
 pluginInfo:
   pluginName: "EC-Docker"
   version: '2.0.0'
+  label: Docker
   description: "Integrates with Docker CLI."
   author: "CloudBees"
   supportLevel: 10
   supportUrl: "https://cloudbees.com"
   category: "Container Management"
   shell: "ec-perl"
+  detailedDescription: 'This plugin allows to use Docker build, pull and run commands.'
 properties:
 - propertyName: "dockerfiles"
   properties:
