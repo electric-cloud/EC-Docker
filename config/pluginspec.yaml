@@ -43,6 +43,7 @@ properties:
 procedures:
 - name: "runDockerBuild"
   description: "Performs a docker build"
+  hasConfig: true
   parameters:
   - name: "use_sudo"
     type: "checkbox"
@@ -61,6 +62,7 @@ procedures:
   properties: []
 - name: "runDockerPull"
   description: "Performs a docker pull on the requested image"
+  hasConfig: true
   parameters:
   - name: "use_sudo"
     type: "checkbox"
@@ -84,6 +86,7 @@ procedures:
   properties: []
 - name: "runDockerRun"
   description: "Performs a docker run"
+  hasConfig: true
   parameters:
   - name: "use_sudo"
     type: "checkbox"
