@@ -28,6 +28,7 @@ class RunDockerRunSuite extends Specification {
         then:
         assert result.isSuccessful()
         cleanup:
+        ServerHandler.getInstance().runCommand('docker rm $(docker ps --filter status=exited -q)', 'sh', plugin.defaultResource)
         ServerHandler.getInstance().runCommand('docker rmi alpine:latest || exit 0', 'sh', plugin.defaultResource)
     }
 
@@ -51,6 +52,7 @@ class RunDockerRunSuite extends Specification {
         then:
         assert result.isSuccessful()
         cleanup:
+        ServerHandler.getInstance().runCommand('docker rm $(docker ps --filter status=exited -q)', 'sh', plugin.defaultResource)
         ServerHandler.getInstance().runCommand("docker rmi $image || exit 0", 'sh', p.defaultResource)
     }
 }
