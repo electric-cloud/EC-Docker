@@ -1,6 +1,6 @@
 Plugin version @PLUGIN_VERSION@
 
-Revised on February 12, 2021
+Revised on August 04, 2022
 
 
 
@@ -30,7 +30,7 @@ parameters on procedures that use them.
 
 To create plugin configurations in {CD}, do these steps:
 
-* Go to menu:Admistration[Plugins] to open the Plugin Manager.
+* Go to menu:Administration[Plugins] to open the Plugin Manager.
 * Find the @PLUGIN_NAME@ row.
 * Click *Configure* to open the
      Configurations page.
@@ -46,32 +46,23 @@ For communicating with Docker host, you need
 
 === Configuration procedure parameters
 
-[cols=",",options="header",]
+[cols=",",options="header"]
 |===
 |Parameter |Description
 
-|__**Configuration**__ | Unique name for the plugin configuration.
+|__**Configuration:**__ | Unique name for the plugin configuration.
 
 
-|Description | Description for the plugin configuration.
+|Description: | Description for the plugin configuration.
 
 
-|__**Docker Endpoint**__ | The endpoint at which Docker REST API will be reachable. Must be a IP address or a resolvable DNS name.
+|Docker Registry: | Custom Docker Registry (i.e., myregistry.local or localhost:5000). Leave empty for default Registry which is Docker Hub.
 
 
-|CA Certificate | CA Certificate used for authentication when communicating with a secure Docker end-point. Required if the plugin configuration is used for deploying services on a TLS-enabled Docker engine.
+|Username and password | Username and password for Docker Registry (Docker Hub or private Docker Registry).
 
 
-|Client Certificate | Client certificate used for authentication when communicating with a secure Docker end-point. Required if the plugin configuration is used for deploying services on a TLS-enabled Docker engine.
-
-
-|Client Private Key | Private key used by a Docker client for authentication when communicating with a secure Docker end-point. Required if the plugin configuration is used for deploying services on Docker.
-
-
-|Test Connection | Check this checkbox to verify connectivity to the Docker endpoint.
-
-
-|Log Level | Log level to use for logging output. Error=4, Warning=3, Info=2, Debug=1.
+|Debug Level | This option sets debug level for logs. If info is selected, only summary information will be shown, for debug, there will be some debug information and for trace the whole requests and responses will be shown.
 
 
 |===
@@ -86,213 +77,6 @@ For communicating with Docker host, you need
 
 
 
-[[CheckCluster]]
-=== Check Cluster
-
-
-Checks that the Docker endpoint specified in the plugin configuration is reachable
-
-
-
-==== Check Cluster parameters
-[cols=",",options="header",]
-|===
-|Parameter |Description
-
-| __**Configuration**__ | The name of an existing configuration which holds all the connection information for a stand-alone Docker host or Docker Swarm manager.
-
-
-|===
-
-
-
-
-
-
-[[CreateIngress]]
-=== Create Ingress
-
-
-Configures default ingress network in Docker Swarm cluster
-
-
-
-==== Create Ingress parameters
-[cols=",",options="header",]
-|===
-|Parameter |Description
-
-| __**Configuration**__ | Name of plugin configuration to use.
-
-
-| __**Name**__ | Name of ingress network to create.
-
-
-| Subnets | Comma separated (CSV) list of subnets to create in ingress network. 
-
-
-| Gateways | Comma separated (CSV) list of gateways for subnets mentioned in "Subnets" field.
-
-
-| Enable IPv6 | Enable IPv6 on the network
-
-
-| MTU | MTU to set to ingress network
-
-
-| Labels | Comma separated list of key=value pairs to assign to ingress network.
-
-
-|===
-
-
-
-
-
-
-[[DeleteNetwork]]
-=== Delete Network
-
-
-Deletes a network
-
-
-
-==== Delete Network parameters
-[cols=",",options="header",]
-|===
-|Parameter |Description
-
-| __**Configuration**__ | Name of plugin configuration to use.
-
-
-| __**Network Name**__ | Name of the network to delete.
-
-
-|===
-
-
-
-
-
-
-[[ImportMicroservices]]
-=== Import Microservices
-
-
-Create microservices in {CD} by importing a Docker Compose file.
-
-
- .  *Copy and enter the content of your Docker Compose File (version 3 or greater).* 
- .  *Determine how the new microservices will be created in {CD}* 
- **  *Create the microservices individually at the top-level within the project.*  All microservices will be created at the top-level. Enter the following parameters:
-                    
-
- *** Project Name: Enter the name of the project where the microservices will be created
-
- **  *Create the Microservices within an application in {CD}.*  All microservices will be created as services within a new application. Enter the following parameters:
-                    
-
- *** Project Name: Enter the name of the project where the new application will be created
-
- *** Create Microservices within and Application: Select the checkbox
-
- *** Application Name:  The name of a new application which will be created in {CD} containing the new services.
-
- *  *Optionally map the services to an existing Environment Cluster*  Select an existing Environment that contains a cluster with EC-Docker configuration details where the new microservices can be deployed. Enter the following parameters:
-            
-
- ** Environment Project Name: The project containing the {CD} environment where the services will be deployed.
-
- ** Environment Name: The name of the existing environment that contains a cluster where the newly created microservice(s) will be deployed.
-
- ** Cluster Name: The name of an existing EC-Docker backed cluster in the environment above where the newly created microservice(s) will be deployed.
-
-
-
-
-==== Import Microservices parameters
-[cols=",",options="header",]
-|===
-|Parameter |Description
-
-| __**Docker Compose File Content**__ | Content of the Docker Compose File
-
-
-| __**Project Name**__ | The name of project in which the application or microservices will be created.
-
-
-| Create Microservices within an Application | (Optional) Select to create all services defined in the Docker Compose file within one application in {CD}. If selected, then the application name must be provided. If unselected, microservices will be created at the top-level in the project.
-
-
-| Application Name | (Optional) The name of the new application that will contain the microservices. Required only if 'Create Microservices within an Application' is selected.
-
-
-| Environment Project Name | (Optional) The project containing the Environment where the services will be deployed.
-
-
-| Environment Name | (Optional) The name of an existing environment that contains a cluster where the newly created microservice(s) will be deployed.
-
-
-| Cluster Name | (Optional) The name of the existing EC-Docker backed cluster in the environment above where the newly created microservice(s) will be deployed.
-
-
-|===
-
-
-
-
-
-
-[[PopulateCerts]]
-=== Populate Certs
-
-
-Dump TLS certificates (ca-cert, client cert and client key) on agent machine in temp dir
-
-
-
-==== Populate Certs parameters
-[cols=",",options="header",]
-|===
-|Parameter |Description
-
-| Plugin Configuration | Plugin Configuration Name.
-
-
-|===
-
-
-
-
-
-
-[[RemoveDockerService]]
-=== Remove Docker Service
-
-
-Removes service deployed on a stand-alone Docker host or a Docker Swarm cluster.
-
-
-
-==== Remove Docker Service parameters
-[cols=",",options="header",]
-|===
-|Parameter |Description
-
-| __**Configuration**__ | The name of an existing configuration which holds all the connection information for communicating with a stand-alone Docker host or a Docker Swarm cluster.
-
-
-| __**Service name in Docker**__ | The name of the Docker service that needs to be undeployed.
-
-
-|===
-
-
-
-
-
-
 [[runDockerBuild]]
 === runDockerBuild
 
@@ -300,19 +84,19 @@ Removes service deployed on a stand-alone Docker host or a Docker Swarm cluster.
 Performs a docker build
 
 
-NOTE: This procedure does not use the plugin configuration to connect to a Docker host. It uses the Docker command line _docker_ on the resource that the procedure step is running on to interact with the Docker engine. The procedure expects any required Docker client config files to be available in the default location at `$HOME/.docker` on the resource.
-
-
 
 ==== runDockerBuild parameters
-[cols=",",options="header",]
+[cols=",",options="header"]
 |===
 |Parameter |Description
 
-| Use sudo | Use sudo for running docker build
+| __**Configuration Name**__ | Previously defined configuration for the plugin
 
 
-| __**Build path**__ | Path to source code
+| Use sudo: | Use sudo for running docker build
+
+
+| __**Build path:**__ | Path to source code
 
 
 |===
@@ -331,17 +115,20 @@ Performs a docker pull on the requested image
 
 
 ==== runDockerPull parameters
-[cols=",",options="header",]
+[cols=",",options="header"]
 |===
 |Parameter |Description
 
-| Use sudo | Use sudo for running docker pull
+| __**Configuration Name**__ | Previously defined configuration for the plugin
 
 
-| __**Image name**__ | Image to pull from Docker Hub
+| Use sudo: | Use sudo for running docker pull
 
 
-| Image tag | Tag of image
+| __**Image name:**__ | Image to pull from Docker Hub
+
+
+| Image tag: | Tag of image
 
 
 |===
@@ -360,347 +147,44 @@ Performs a docker run
 
 
 ==== runDockerRun parameters
-[cols=",",options="header",]
+[cols=",",options="header"]
 |===
 |Parameter |Description
 
-| Use sudo | Use sudo for running docker run
+| __**Configuration Name**__ | Previously defined configuration for the plugin
 
 
-| __**Image name**__ | Image to run a container from
+| Use sudo: | Use sudo for running docker run
 
 
-| Container name | Assign a name to the container
+| __**Image name:**__ | Image to run a container from
 
 
-| Detached mode (-d) | Detached mode: run the container in the background and print the new container ID
+| Container name: | Assign a name to the container
 
 
-| Entrypoint | Overwrite the default ENTRYPOINT of the image
+| Detached mode (-d): | Detached mode: run the container in the background and print the new container ID
 
 
-| Container working directory | Working directory inside the container
+| Entrypoint: | Overwrite the default ENTRYPOINT of the image
 
 
-| Publish ports | Publish a container's port to the host (format: ip:hostPort:containerPort \| ip::containerPort \| hostPort:containerPort \| containerPort). Note: use spaces to delimit port mappings, for example "2666:1666 8088:8080"
+| Container working directory: | Working directory inside the container
 
 
-| Publish all ports | Publish all exposed ports to the host interfaces
+| Publish ports: | Publish a container's port to the host (format: ip:hostPort:containerPort \| ip::containerPort \| hostPort:containerPort \| containerPort). Note: use spaces to delimit port mappings, for example "2666:1666 8088:8080"
 
 
-| Privileged | Give extended privileges to this container
+| Publish all ports: | Publish all exposed ports to the host interfaces
 
 
-| Link | Add link to another container in the form of name:alias
+| Privileged: | Give extended privileges to this container
 
 
-| Command with args | Command to run within container
+| Link: | Add link to another container in the form of name:alias
 
 
-|===
-
-
-
-
-
-
-[[UndeployService]]
-=== Undeploy Service
-
-
-Undeploys a previously deployed service on a stand-alone Docker host or a Docker Swarm cluster
-
-
-
-==== Undeploy Service parameters
-[cols=",",options="header",]
-|===
-|Parameter |Description
-
-| __**Service Name**__ | The name of the service in {CD} that encapsulates the service that was previously deployed on a stand-alone Docker host or a Docker Swarm cluster. Please note that this name will be modified to comply with the naming conventions of Docker. Specifically characters such as "space , _ " will be converted to "-".
-
-
-| Service Revision ID | Revision Id of the service in {CD}.
-
-
-| __**Project Name**__ | The name of the project that the service belongs to. In case of an application-level service it also owns the application.
-
-
-| Application Name | The name of the application that the service belongs to. Not applicable for a top-level service.
-
-
-| Application Revision ID | Revision Id of the application version that the service belongs to.
-
-
-| __**Environment Name**__ | The name of the environment that the cluster belongs to.
-
-
-| Environment Project Name | The name of the project that the environment belongs to. If not specified, the environment is assumed to be in the same project as the service.
-
-
-| Cluster Name | The name of the cluster in the environment on which the service was previously deployed. If not specified, the application tier mapping will be used to find the cluster name.
-
-
-|===
-
-
-
-
-
-
-[[Artifact2Image]]
-=== Artifact2Image
-
-
-Creates and pushes a new docker image from the existing artifact
-
-
-The following artifacts are supported:
- * .war (will be treated as web application and image will be built with Jetty image as base)
- * .jar (will be treated as Springboot application)
- * .NET (built application with web.config and *.dll is expected).
- * .csproj (will be built)
-
-For .csproj artifact one needs to specify Command field.
-
-==== Jetty
-
-If .war file is found in the artifact folder, the artifact will be treated as web application. The Dockerfile will look like below:
-
-[source,text]
-----
-FROM ${BASE_IMAGE:'jetty:9.4.7-jre8-alpine'} # Will use Base Image parameter or jetty:9.4.7-jre8-alpine by default
-
-COPY ${FILENAME} /var/lib/jetty/webapps/ROOT.war # FILENAME is the filename of artifact, e.g. hello-world.war
-EXPOSE ${PORTS:8080} # Will use Ports parameter or 8080 by default
-<% if (ENV) { %> # Will use Environment Variables parameter if provided
-ENV ${ENV}
-<% } %>
-
-<% if (COMMAND) { %> # Will use Command parameter if provided
-CMD [${COMMAND}]
-<% } %>
-----
-
-==== Springboot
-
-If `.jar` file is found in the artifact folder, the artifact will be treated as Springboot application. The Dockerfile will look like below:
-
-[source,text]
-----
-FROM ${BASE_IMAGE:'openjdk:8-jdk-alpine'}
-
-ADD ${FILENAME} app.jar
-EXPOSE ${PORTS:8080}
-<% if (ENV) { %>
-ENV ${ENV}
-<% } %>
-
-CMD [${COMMAND:'"java", "-jar", "/app.jar"'}]
-----
-
-==== ASP.NET
-
-If web.config is found in the artifact folder, the artifact will be treated as .NET application. Dockerfile will look like below:
-
-[source,text]
-----
-FROM ${BASE_IMAGE:'microsoft/aspnetcore:2.0'}
-
-EXPOSE ${PORTS:80}
-<% if (ENV) { %>
-ENV ${ENV}
-<% } %>
-
-WORKDIR /app
-COPY . .
-RUN rm Dockerfile
-
-<%
-DEFAULT_COMMAND = '"dotnet", ' + '"' + FILENAME + '"'
-%>
-ENTRYPOINT [${COMMAND:DEFAULT_COMMAND}]
-----
-
-==== CSPROJ
-
-If .csproj file is found in the artifact folder, the artifact will be treated as raw .NET application.
-NOTE: In this case Command field will be needed in order to build a correct Dockerfile.
-
-[source,text]
-----
-FROM microsoft/aspnetcore-build:2.0 AS build-env
-WORKDIR /app
-
-COPY ${FILENAME} ./
-RUN dotnet restore
-
-COPY . ./
-RUN dotnet publish -c Release -o out
-
-# build runtime image
-FROM ${BASE_IMAGE:'microsoft/aspnetcore:2.0'}
-WORKDIR /app
-COPY --from=build-env /app/out .
-
-EXPOSE ${PORTS:80}
-<% if (ENV) { %>
-ENV ${ENV}
-<% } %>
-
-CMD [${COMMAND}]
-----
-
-
-
-
-==== Artifact2Image parameters
-[cols=",",options="header",]
-|===
-|Parameter |Description
-
-| __**EC-Docker Configuration**__ | Name of the existing EC-Docker plugin configuration
-
-
-| EC-Artifact Name | If reading artifact from the {CD} Artifact repository: provide the name in the format 'group:artifact'
-
-
-| EC-Artifact Version | Provide the artifact version that will be retrieved from EC-Artifact repository (e.g. 0.0.1).  If left empty, the latest artifact version will be retrieved.
-
-
-| Artifact Filesystem Location | If reading the artifact directly from a filesystem location, provide the path to the folder containing the artifact or to the artifact itself (e.g. /myArtifactStorage/artifact.war or /my-storage/artifact1/)
-
-
-| Artifactory - Configuration Name | If reading artifact from Artifactory: Name of an existing configuration for the EC-Artifactory plugin. Please note: the EC-Artifactory plugin must be installed and promoted.
-
-
-| Artifactory Repository Type | Required if retrieving from Artifactory
-
-
-| Artifactory Repository Key | Repository key for the repository in Artifactory, e.g. myrepo, libs-release-local. Required if Artifactory is used.
-
-
-| Artifactory Organization Path | Organization path for the artifact in Artifactory, e.g. com/mycompany. Required if Artifactory is used.
-
-
-| Artifactory Artifact Name | Name of the artifact (module name) in the artifactory. E.g. my-artifact. Required if Artifactory is used.
-
-
-| Artifactory Artifact Version | Artifact version in Artifactory, e.g. 1.0.0. If left blank, the latest version will be retrieved (Artifactory Pro is required for non-Maven repositories to retrieve the latest version). Required if retrieving from Artifactory.
-
-
-| Artifactory Artifact Extension | Artifact extension, e.g. jar or war. Required if retrieving from Artifactory.
-
-
-| Artifactory Classifier | Classifier to use with Artifactory, e.g. sources.
-
-
-| Artifactory Extract Archive | Check to extract archive downloaded from Artifactory.
-
-
-| __**Image Name**__ | Name and version of the new container image, provided in format: myrepo/image:v1.0.
-
-
-| Registry URL | Registry URL (if not specified, Dockerhub will be used).
-
-
-| Docker Connection Credential | Select an existing credential to use to connect to the Docker Registry
-
-
-| Base Image | Base Image for the DockerFile. If not specified, the default base image for the artifact will be used.
-        
-
-
-| Ports | The ports to list in the EXPOSE instruction in the DockerFile. If not specified, the default port defined in the template DockerFile for the artifact will be used.
-        
-
-
-| Command | Command instruction for the DockerFile. E.g., "executable","param1","param2". If not specified, the default command defined in the template DockerFile for the artifact will be used.
-        
-
-
-| Environment Variables | Multi-line name=value pairs. If specified, merge with any existing environment variables defined in the template DockerFile for the artifact.
-        
-
-
-| Remove Image After Push? | If checked, the built image will be removed from the machine after it is pushed to the registry.
-
-
-|===
-
-
-
-
-
-
-[[DeployService]]
-=== Deploy Service
-
-
-Deploys or updates a service on a stand-alone Docker host or a Docker Swarm cluster
-
-
-
-User can provide a comma-separated list of networks on which to deploy the container or the swarm service in the service mapping page when mapping the service to a cluster in {CD}. If the network does not already exist then the procedure will create one with the provided subnet and gateway. If no subnet and gateway is specified, Docker uses default values. Each of the user-defined networks can have multiple subnets and gateways. In that case, multiple subnets/gateways must be separated by '|'(pipe). If deploying to a stand-alone Docker engine then the user-defined **"bridge"** network is created.  If deploying to a Docker swarm cluster then the user-defined **"overlay"** network is created.
-
-
-For example,
-<table class="grid">
-<thead>
-    <tr>
-        <td>Networks:</td>
-        <td>bridge, net1, net2</td>
-    </tr>
-</thead>
-<tbody>
-    <tr>
-        <td>Subnets:</td>
-        <td>,10.200.1.10/24|10.200.2.10/24,198.168.10.10/24</td>
-    </tr>
-    <tr>
-        <td>Gateways:</td>
-        <td>,10.200.1.1|10.200.2.1,198.168.10.1</td>
-    </tr>
-</tbody>
-</table>
-In this example, container gets attached to bridge, net1 and net2 networks. "bridge" network is already created by Docker and no need to specify subnet/gateway for it. "net1" and "net2" are user defined networks. "net1" have two subnet IP ranges i.e. 10.200.1.10/24(Gateway:10.200.1.1) and 10.200.2.10/24(Gateway:10.200.2.1) while "net2" have single subnet IP range i.e. 198.168.10.10/24(Gateway:198.168.10.1).
-</p>
-<p>
-For more information on docker networking, see <a href="https://docs.docker.com/engine/userguide/networking/">here</a>
-</p>
-
-
-
-==== Deploy Service parameters
-[cols=",",options="header",]
-|===
-|Parameter |Description
-
-| __**Service Name**__ | The name of the service in {CD} that encapsulates the service to be deployed on a stand-alone Docker host or a Docker Swarm cluster. Please note that this name will be modified to comply with the naming conventions of Docker. Specifically characters such as "space , _ " will be converted to "-".
-
-
-| Service Revision ID | Revision Id of the service in {CD}.
-
-
-| __**Project Name**__ | The name of the project that the service belongs to. In case of an application-level service it also owns the application.
-
-
-| Application Name | The name of the application that the service belongs to. Not applicable for a top-level service.
-
-
-| Application Revision ID | Revision Id of the application version that the service belongs to.
-
-
-| __**Cluster Name**__ | The name of the cluster in {CD} that encapsulates the stand-alone Docker host or a Docker Swarm cluster on which the service is to be deployed.
-
-
-| Cluster Or Environment Project Name | The name of the project that the cluster belongs to if it is a top-level project cluster. Or the name of the project that the environment belongs to if it is an environment-scoped cluster.
-
-
-| Environment Name | The name of the environment that the cluster belongs to. Not applicable for a top-level project cluster.
-
-
-| Results Property Sheet | Name of the property sheet where the output properties for the deployed service will be saved. If not specified, will default to '/myParent/parent'.
+| Command with args: | Command to run within container
 
 
 |===
@@ -729,6 +213,11 @@ Backslashes (\) are not supported in `.dockerignore` for Artifact2Image procedur
 
 [[rns]]
 == Release notes
+
+
+=== EC-Docker 2.0.0
+
+- Revised EC-Docker plugin to drop the old microservices model and adopt pure Docker procedures with authorization handling.
 
 
 === EC-Docker 1.6.5
