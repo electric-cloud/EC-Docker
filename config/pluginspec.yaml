@@ -6,10 +6,11 @@ pluginInfo:
   description: "Integrates with Docker CLI."
   author: "CloudBees"
   supportLevel: 10
+  hasAdoc: true
   supportUrl: "https://cloudbees.com"
   category: "Container Management"
   shell: "ec-perl"
-  detailedDescription: 'This plugin allows to use Docker build, pull and run commands.'
+  detailedDescription: 'This plugin allows you to use Docker to build, pull, and run commands.'
 properties:
 - propertyName: "dockerfiles"
   properties:
@@ -44,122 +45,141 @@ properties:
     path: "dsl/properties/postpLoader"
 procedures:
 - name: "runDockerBuild"
-  description: "Performs a docker build"
+  description: "Performs a Docker build."
   hasConfig: true
   parameters:
   - name: "use_sudo"
     type: "checkbox"
     required: false
-    documentation: "Use sudo for running docker build"
-    label: "Use sudo:"
+    adoc: Use sudo for running the Docker build.
+    documentation: "Use sudo for running the Docker build."
+    label: "Use sudo"
     checkedValue: "1"
     uncheckedValue: "0"
     initiallyChecked: "0"
   - name: "build_path"
     type: "entry"
     required: true
-    documentation: "Path to source code"
-    label: "Build path:"
+    adoc: Required. The path to the source code.
+    documentation: "The path to the source code."
+    label: "Build path"
   shell: "ec-perl"
   properties: []
 - name: "runDockerPull"
-  description: "Performs a docker pull on the requested image"
+  description: "Performs a Docker pull on the requested image."
   hasConfig: true
   parameters:
   - name: "use_sudo"
     type: "checkbox"
     required: false
-    documentation: "Use sudo for running docker pull"
-    label: "Use sudo:"
+    adoc: Use sudo for running the Docker pull.
+    documentation: "Use sudo for running the Docker pull."
+    label: "Use sudo"
     checkedValue: "1"
     uncheckedValue: "0"
     initiallyChecked: "0"
   - name: "image_name"
     type: "entry"
     required: true
-    documentation: "Image to pull from Docker Hub"
-    label: "Image name:"
+    adoc: Required. The image to pull from Docker Hub.
+    documentation: "The image to pull from Docker Hub."
+    label: "Image name"
   - name: "tag"
     type: "entry"
     required: false
-    documentation: "Tag of image"
-    label: "Image tag:"
+    adoc: The image tag.
+    documentation: "The image tag."
+    label: "Image tag"
   shell: "ec-perl"
   properties: []
 - name: "runDockerRun"
-  description: "Performs a docker run"
+  description: "Performs a Docker run."
   hasConfig: true
   parameters:
   - name: "use_sudo"
     type: "checkbox"
     required: false
-    documentation: "Use sudo for running docker run"
-    label: "Use sudo:"
+    adoc: Use sudo for running the Docker run.
+    documentation: "Use sudo for running the Docker run."
+    label: "Use sudo"
     checkedValue: "1"
     uncheckedValue: "0"
     initiallyChecked: "0"
   - name: "image_name"
     type: "entry"
     required: true
-    documentation: "Image to run a container from"
-    label: "Image name:"
+    adoc: Required. The image to run a container from.
+    documentation: "The image to run a container from."
+    label: "Image name"
   - name: "container_name"
     type: "entry"
     required: false
-    documentation: "Assign a name to the container"
-    label: "Container name:"
+    adoc: Assigns a name to the container.
+    documentation: "Assigns a name to the container."
+    label: "Container name"
   - name: "detached_mode"
     type: "checkbox"
     required: false
-    documentation: "Detached mode: run the container in the background and print\
-      \ the new container ID"
-    label: "Detached mode (-d):"
+    adoc: Runs the container in the background and prints the new container ID.
+    documentation: "Runs the container in the background and prints\
+      \ the new container ID."
+    label: "Detached mode (-d)"
     checkedValue: "1"
     uncheckedValue: "0"
     initiallyChecked: "0"
   - name: "entrypoint"
     type: "entry"
     required: false
-    documentation: "Overwrite the default ENTRYPOINT of the image"
-    label: "Entrypoint:"
+    adoc: Overwrites the default ENTRYPOINT of the image.
+    documentation: "Overwrites the default ENTRYPOINT of the image."
+    label: "Entrypoint"
   - name: "working_dir"
     type: "entry"
     required: false
-    documentation: "Working directory inside the container"
-    label: "Container working directory:"
+    adoc: The working directory inside the container.
+    documentation: "The working directory inside the container."
+    label: "Container working directory"
   - name: "published_ports"
     type: "entry"
     required: false
-    documentation: "Publish a container's port to the host (format: ip:hostPort:containerPort\
-      \ | ip::containerPort | hostPort:containerPort | containerPort). Note: use\
+    adoc: |
+      Publish a container's port to the host using the following format: `ip:hostPort:containerPort | ip::containerPort | hostPort:containerPort | containerPort`.
+      
+      NOTE: Use spaces to delimit port mappings. For example, `2666:1666 8088:8080`.
+    documentation: "Publish a container's port to the host using the following format: ip:hostPort:containerPort\
+      \ | ip::containerPort | hostPort:containerPort | containerPort). Note: Use\
       \ spaces to delimit port mappings, for example \"2666:1666 8088:8080\""
-    label: "Publish ports:"
+    label: "Publish ports"
   - name: "publish_all_ports"
     type: "checkbox"
     required: false
-    documentation: "Publish all exposed ports to the host interfaces"
-    label: "Publish all ports:"
+    adoc: Publish all exposed ports to the host interfaces.
+    documentation: "Publish all exposed ports to the host interfaces."
+    label: "Publish all ports"
     checkedValue: "1"
     uncheckedValue: "0"
     initiallyChecked: "0"
   - name: "privileged"
     type: "checkbox"
     required: false
-    documentation: "Give extended privileges to this container"
-    label: "Privileged:"
+    adoc: Give extended privileges to this container.
+    documentation: "Give extended privileges to this container."
+    label: "Privileged"
     checkedValue: "1"
     uncheckedValue: "0"
     initiallyChecked: "0"
   - name: "container_links"
     type: "entry"
     required: false
-    documentation: "Add link to another container in the form of name:alias"
-    label: "Link:"
+    adoc: Add a link to another container in the form of `name:alias`.
+    documentation: "Add a link to another container in the form of name:alias"
+    label: "Link"
   - name: "command_with_args"
     type: "entry"
     required: false
-    documentation: "Command to run within container"
-    label: "Command with args:"
+    adoc: The command to run within the container.
+    documentation: "Command to run within the container"
+    label: "Command with args"
   shell: "ec-perl"
   properties: []
 configuration:
@@ -169,20 +189,24 @@ configuration:
   - name: "config"
     type: "entry"
     required: true
-    documentation: "Unique name for the plugin configuration."
-    label: "Configuration:"
+    adoc: Required. The unique name for the plugin configuration.
+    documentation: "The unique name for the plugin configuration."
+    label: "Configuration"
   - name: "desc"
     type: "entry"
     required: false
-    documentation: "Description for the plugin configuration."
-    label: "Description:"
+    adoc: The description for the plugin configuration.
+    documentation: "The description for the plugin configuration."
+    label: "Description"
   - name: "registry"
     type: "entry"
     required: false
-    documentation: "Custom Docker Registry (i.e., myregistry.local or localhost:5000). Leave empty for default Registry which is Docker Hub."
-    label: "Docker Registry:"
+    adoc: The custom Docker Registry. For example, `myregistry.local` or `localhost:5000`. Leave empty to use the default Registry, which is Docker Hub.
+    documentation: "The custom Docker Registry. For example, myregistry.local or localhost:5000. Leave empty to use the default Registry, which is Docker Hub."
+    label: "Docker Registry"
   - name: credential
     label: Username and password
     type: credential
     required: false
-    documentation: Username and password for Docker Registry (Docker Hub or private Docker Registry).
+    adoc: The username and password for the Docker Registry (Docker Hub or private Docker Registry).
+    documentation: The username and password for the Docker Registry (Docker Hub or private Docker Registry).
