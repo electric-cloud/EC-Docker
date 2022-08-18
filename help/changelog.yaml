@@ -1,9 +1,9 @@
 1.0.0:
-  * Introduced the EC-Docker plugin.
+  - Introduced the EC-Docker plugin.
 1.0.1:
-  * Added the *Discover* procedure.
+  - Added the *Discover* procedure.
 1.2.0:
-  * |
+  - |
     Added support for deploying microservices modeled in ElectricFlow to Docker. Deploying microservices to the following Docker environments are supported:
 
       ** Standalone Docker instances
@@ -11,50 +11,50 @@
       ** Docker Enterprise Edition
       ** Windows Docker containers on Windows 2016
 
-  * Added the *Undeploy Service* procedure to undeploy a previously deployed service.
-  * Added the *Remove Docker Service* procedure to remove a service running on a standalone Docker host or a Docker Swarm cluster.
-  * Removed support for using EC-Docker as a component plugin. Microservices-based applications should be modeled as applications with services. The services can then be deployed using the native ElectricFlow services deployment capability.
+  - Added the *Undeploy Service* procedure to undeploy a previously deployed service.
+  - Added the *Remove Docker Service* procedure to remove a service running on a standalone Docker host or a Docker Swarm cluster.
+  - Removed support for using EC-Docker as a component plugin. Microservices-based applications should be modeled as applications with services. The services can then be deployed using the native ElectricFlow services deployment capability.
 1.2.1:
-  * |
+  - |
     Added support for Docker network creation.
 
       ** For standalone Docker instances, the *Deploy Service* procedure creates a user-defined bridge network if the network name is specified on the service mapping page. The procedure uses this network to deploy containers.
       ** For Docker Swarm instances, the *Deploy Service* procedure now creates a user defined overlay network if the network name is specified on the service mapping page. The Procedure uses this network to deploy Docker Swarm services.
 
 1.2.2:
-  * Registered the *Undeploy Service* procedure as an *Undeploy Service* operation, to enable undeploying microservices modeled in ElectricFlow from Docker using the service process.
-  * Added the *Create Ingress* and *Delete Network* procedures.
-  * Added support for container updates on a standalone Docker engine.
-  * Added support for attaching additional networks during container updates.
+  - Registered the *Undeploy Service* procedure as an *Undeploy Service* operation, to enable undeploying microservices modeled in ElectricFlow from Docker using the service process.
+  - Added the *Create Ingress* and *Delete Network* procedures.
+  - Added support for container updates on a standalone Docker engine.
+  - Added support for attaching additional networks during container updates.
 1.3.0:
-  * Added the *Import Microservices* procedure, which can be used through the *Import Docker Compose file* catalog item in the *Containers* service catalog for creating microservice models in ElectricFlow.
-  * Added the *Artifact2Image* procedure.
-  * The *Discover* procedure has been deprecated. Use the the *Import Microservices* procedure to create microservice models based on the given Docker Compose file contents.
-  * Added support for retrieving and creating the plugin configurations through the *Configurations* option on the application process step and the pipeline stage task editors.
+  - Added the *Import Microservices* procedure, which can be used through the *Import Docker Compose file* catalog item in the *Containers* service catalog for creating microservice models in ElectricFlow.
+  - Added the *Artifact2Image* procedure.
+  - The *Discover* procedure has been deprecated. Use the the *Import Microservices* procedure to create microservice models based on the given Docker Compose file contents.
+  - Added support for retrieving and creating the plugin configurations through the *Configurations* option on the application process step and the pipeline stage task editors.
 1.4.0:
-  * The previously deprecated *Discover* procedure has been removed. You can use the *Import Microservices* procedure to create microservice models based on the given Docker Compose file contents.
-  * Fixed the report link for unsupported tags that were not processed by the *Import Microservices* procedure.
-  * Configured the plugin to allow the ElectricFlow UI to create configs inline of the procedure form.
+  - The previously deprecated *Discover* procedure has been removed. You can use the *Import Microservices* procedure to create microservice models based on the given Docker Compose file contents.
+  - Fixed the report link for unsupported tags that were not processed by the *Import Microservices* procedure.
+  - Configured the plugin to allow the ElectricFlow UI to create configs inline of the procedure form.
 1.5.0:
-  * Plugin promotion time has been improved.
+  - Plugin promotion time has been improved.
 1.5.1:
-  * Configurations can now be created by users with an `@` sign in a name.
+  - Configurations can now be created by users with an `@` sign in a name.
 1.5.2:
-  * Corrected images in the documentation.
+  - Corrected images in the documentation.
 1.5.3:
-  * Renaming to "{PRODUCT}".
+  - Renaming to "{PRODUCT}".
 1.6.0:
-  * Introduced a new Plugin Dependency Management mechanism to deliver provisioning of binary dependencies (for example, Grape jars) to the agent resource. Binary dependencies are now seamlessly delivered to the agent resource from the Flow Server, when a new version of a plugin is invoked the first time. Flow Repository set up is no longer required for this plugin.
-  * Add checking connection while creating/editing a configuration.
+  - Introduced a new Plugin Dependency Management mechanism to deliver provisioning of binary dependencies (for example, Grape jars) to the agent resource. Binary dependencies are now seamlessly delivered to the agent resource from the Flow Server, when a new version of a plugin is invoked the first time. Flow Repository set up is no longer required for this plugin.
+  - Add checking connection while creating/editing a configuration.
 1.6.1:
-  * Renamed to "{CD}"
+  - Renamed to "{CD}"
 1.6.2:
-  * Upgraded dependencies to address security issues.
+  - Upgraded dependencies to address security issues.
 1.6.3:
-  * The documentation has been migrated to the main site.
+  - The documentation has been migrated to the main site.
 1.6.4:
-  * Support for the *Artifactory Classifier* and *Artifactory Extract* fields was added to the Artifact2Image procedure
+  - Support for the *Artifactory Classifier* and *Artifactory Extract* fields was added to the Artifact2Image procedure
 1.6.5:
-  * Upgraded third-party dependencies to address security issues.
+  - Upgraded third-party dependencies to address security issues.
 2.0.0:
-  * The EC-Docker plugin has been updated to remove the older microservices model and adopt pure Docker procedures with authorization handling.
+  - The EC-Docker plugin has been updated to remove the older microservices model and adopt pure Docker procedures with authorization handling.
