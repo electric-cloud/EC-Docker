@@ -143,7 +143,7 @@ procedures:
     type: "entry"
     required: false
     adoc: |
-      Publish a container's port to the host using the following format: `ip:hostPort:containerPort | ip::containerPort | hostPort:containerPort | containerPort`.
+      Publish a container's port to the host using the following format: `ip:hostPort:containerPort \| ip::containerPort \| hostPort:containerPort \| containerPort`.
       
       NOTE: Use spaces to delimit port mappings. For example, `2666:1666 8088:8080`.
     documentation: "Publish a container's port to the host using the following format: ip:hostPort:containerPort\
