@@ -45,7 +45,7 @@ properties:
     path: "dsl/properties/postpLoader"
 procedures:
 - name: "runDockerBuild"
-  description: "This procedure performs a Docker build."
+  description: "Performs a Docker build."
   hasConfig: true
   parameters:
   - name: "use_sudo"
@@ -66,7 +66,7 @@ procedures:
   shell: "ec-perl"
   properties: []
 - name: "runDockerPull"
-  description: "This procedure performs a Docker pull on the requested image."
+  description: "Performs a Docker pull on the requested image."
   hasConfig: true
   parameters:
   - name: "use_sudo"
@@ -93,7 +93,7 @@ procedures:
   shell: "ec-perl"
   properties: []
 - name: "runDockerRun"
-  description: "This procedure performs a Docker run."
+  description: "Performs a Docker run."
   hasConfig: true
   parameters:
   - name: "use_sudo"
