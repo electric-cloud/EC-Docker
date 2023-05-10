@@ -18,7 +18,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath "com.cloudbees.cd.plugins:hen:+"
+        classpath "com.cloudbees.cd.plugins:hen:1.8.13"
     }
 }
 
@@ -74,7 +74,7 @@ dependencies {
         exclude(group: "org.codehaus.groovy", module: "groovy-all")
     }
     implementation group: 'org.codehaus.groovy.modules.http-builder', name: 'http-builder', version: '0.7.1'
-    implementation("com.cloudbees.cd.plugins:hen:+") {
+    implementation("com.cloudbees.cd.plugins:hen:1.8.13") {
         exclude(group: "org.codehaus.groovy", module: "groovy-all")
     }
 }
