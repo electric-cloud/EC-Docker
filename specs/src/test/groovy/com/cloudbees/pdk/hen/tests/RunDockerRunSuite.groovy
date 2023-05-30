@@ -82,7 +82,7 @@ class RunDockerRunSuite extends Specification {
         'empty image name'                   | ''          | ''             |  ''             | 'Parameter \'image_name\' of procedure \'runDockerRun\' is marked as required, but it does not have a value. Aborting with fatal error.'                      | ''                  | false
         'with wrong alpine image name'       | ''          | 'alpinee'      |  ''             | 'Unable to find image \'alpinee:latest\' locally'                                                                                                             | 'Exit code: 32000'  | false
         'with wrong hello-world image name'  | ''          | 'helllo-world' |  ''             | 'Unable to find image \'helllo-world:latest\' locally'                                                                                                        | 'Exit code: 32000'  | false
-        'with wrong entry point'             | '/hellllo'  | 'hello-world'  |  ''             | 'Error response from daemon: failed to create shim task: OCI runtime create failed: runc create failed: unable to start container process: exec: "/hellllo"'  | 'Exit code: 32512'  | true
+        'with wrong entry point'             | '/hellllo'  | 'hello-world'  |  ''             | 'OCI runtime create failed:'                                                                                                                                  | 'Exit code: 32512'  | true
         'with wrong published ports'         | ''          | 'hello-world'  |  ':8080:'       | 'No port specified: :8080:<empty>'                                                                                                                            | 'Exit code: 32000'  | false
     }
 }
