@@ -98,7 +98,7 @@ class RunDockerBuildSuite extends Specification {
         then:
         def jobLog = result.getJobLog()
         assert result.getOutcome().toString() == 'ERROR'
-        assert jobLog.contains('ERROR: failed to solve: dockerfile parse error on line 1: unknown instruction: FROMMM')
+        assert jobLog.contains('line 1: unknown instruction: FROMMM')
         assert jobLog.contains('Exit code: 256')
 
         cleanup:

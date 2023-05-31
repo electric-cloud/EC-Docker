@@ -8,6 +8,7 @@ import com.electriccloud.plugins.annotations.Regression
 import com.electriccloud.plugins.annotations.Sanity
 import spock.lang.Shared
 import spock.lang.Specification
+import spock.lang.Unroll
 
 import static com.cloudbees.pdk.hen.Utils.*
 
@@ -61,5 +62,24 @@ class RunDockerPullSuite extends Specification {
         assert result.jobLog =~ "Status: Downloaded newer image for $image"
         cleanup:
         ServerHandler.getInstance().runCommand("docker rmi $image || exit 0", 'sh', p.defaultResource)
+    }
+
+    @Unroll
+    def 'RunDockerPull #caseId - negative'() {
+        when:
+        def result = plugin.runDockerPull
+                .imagename(imageName)
+                .run()
+
+        then:
+        assert result.getOutcome().toString() == 'ERROR'
+        def jobLog= result.getJobLog()
+        assert jobLog.contains(logError)
+        assert jobLog.contains(exitCode)
+
+        where: 'The following params will be: '
+        caseId                     | imageName             |  logError                                                                                                                    | exitCode
+        'with not existing image'  | 'alpinesssx'          |  'Error response from daemon: pull access denied for alpinesssx, repository does not exist or may require \'docker login\''  | 'Exit code: 256'
+        'with not existing tag'    | 'alpine:357.331.128'  |  'Error response from daemon: manifest for alpine:357.331.128 not found: manifest unknown: manifest unknown'                 | 'Exit code: 256'
     }
 }
