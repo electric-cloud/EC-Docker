@@ -63,4 +63,47 @@ class RunDockerBuildSuite extends Specification {
         ServerHandler.getInstance().runCommand('docker rm $(docker ps --filter status=exited -q)', 'sh', p.defaultResource)
         ServerHandler.getInstance().runCommand("docker rmi $image || exit 0", 'sh', p.defaultResource)
     }
+
+    def 'RunDockerBuild Negative with wrong build path'() {
+        given:
+        def cmd = "mkdir /tmp/specs-dockerfile && echo \"$DockerfileContent\" >> /tmp/specs-dockerfile/Dockerfile"
+        ServerHandler.getInstance().runCommand(cmd, 'sh', plugin.defaultResource)
+        when:
+        def result = plugin.runDockerBuild
+                .buildpath('/tmp/wrong-specs-dockerfile/')
+                .run()
+
+        then:
+        def jobLog = result.getJobLog()
+        assert result.getOutcome().toString() == 'ERROR'
+        assert jobLog.contains('ERROR: unable to prepare context: path "/tmp/wrong-specs-dockerfile/" not found')
+        assert jobLog.contains('Exit code: 256')
+
+        cleanup:
+        ServerHandler.getInstance().runCommand('rm /tmp/specs-dockerfile -r', 'sh', plugin.defaultResource)
+        ServerHandler.getInstance().runCommand('docker rm $(docker ps --filter status=exited -q)', 'sh', plugin.defaultResource)
+        ServerHandler.getInstance().runCommand('docker rmi alpine:latest || exit 0', 'sh', plugin.defaultResource)
+    }
+
+    def 'RunDockerBuild Negative with wrong Dockerfile'() {
+        given:
+        def WrongDockerfileContent = "FROMMM alpine\nRUN echo 'hello world'"
+        def cmd = "mkdir /tmp/specs-dockerfile && echo \"$WrongDockerfileContent\" >> /tmp/specs-dockerfile/Dockerfile"
+        ServerHandler.getInstance().runCommand(cmd, 'sh', plugin.defaultResource)
+        when:
+        def result = plugin.runDockerBuild
+                .buildpath('/tmp/specs-dockerfile/')
+                .run()
+
+        then:
+        def jobLog = result.getJobLog()
+        assert result.getOutcome().toString() == 'ERROR'
+        assert jobLog.contains('line 1: unknown instruction: FROMMM')
+        assert jobLog.contains('Exit code: 256')
+
+        cleanup:
+        ServerHandler.getInstance().runCommand('rm /tmp/specs-dockerfile -r', 'sh', plugin.defaultResource)
+        ServerHandler.getInstance().runCommand('docker rm $(docker ps --filter status=exited -q)', 'sh', plugin.defaultResource)
+        ServerHandler.getInstance().runCommand('docker rmi alpine:latest || exit 0', 'sh', plugin.defaultResource)
+    }
 }
