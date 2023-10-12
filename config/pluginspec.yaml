@@ -6,6 +6,7 @@ pluginInfo:
   description: "Integrates with Docker CLI."
   author: "CloudBees"
   supportLevel: 10
+  minCommanderVersion: 10.3
   hasAdoc: true
   supportUrl: "https://cloudbees.com"
   category: "Container Management"
