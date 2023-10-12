@@ -171,7 +171,7 @@ class ContainerHelper extends PluginSpockTestSupport {
                             return \$content;
                         }
                         '''
-                        shell = 'ec-perl'
+                        shell = 'cb-perl'
                     }
                     formalParameter 'path', defaultValue: '', {
                         type = 'entry'
