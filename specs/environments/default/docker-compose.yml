@@ -9,6 +9,11 @@ services:
       - "80:80"
     networks:
       - internal
+    # Blocking access to maven (to force using local grapes)
+    extra_hosts:
+      - maven.org:127.0.0.1
+      - repo1.maven.org:127.0.0.1
+      - jcenter.bintray.com:127.0.0.1
     container_name: electricflow
     tty: true
     extra_hosts:
