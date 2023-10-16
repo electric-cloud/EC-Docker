@@ -1,15 +1,16 @@
 ---
 pluginInfo:
   pluginName: "EC-Docker"
-  version: '2.0.0'
+  version: '2.1.0'
   label: Docker
   description: "Integrates with Docker CLI."
   author: "CloudBees"
   supportLevel: 10
+  minCommanderVersion: 10.3
   hasAdoc: true
   supportUrl: "https://cloudbees.com"
   category: "Container Management"
-  shell: "ec-perl"
+  shell: "cb-perl"
   detailedDescription: 'This plugin allows you to use Docker to build, pull, and run commands.'
 properties:
 - propertyName: "dockerfiles"
@@ -63,7 +64,7 @@ procedures:
     adoc: Required. The path to the source code.
     documentation: "The path to the source code."
     label: "Build path"
-  shell: "ec-perl"
+  shell: "cb-perl"
   properties: []
 - name: "runDockerPull"
   description: "Performs a Docker pull on the requested image."
@@ -90,7 +91,7 @@ procedures:
     adoc: The image tag.
     documentation: "The image tag."
     label: "Image tag"
-  shell: "ec-perl"
+  shell: "cb-perl"
   properties: []
 - name: "runDockerRun"
   description: "Performs a Docker run."
@@ -180,7 +181,7 @@ procedures:
     adoc: The command to run within the container.
     documentation: "Command to run within the container"
     label: "Command with args"
-  shell: "ec-perl"
+  shell: "cb-perl"
   properties: []
 configuration:
   hasDebugLevel: true
