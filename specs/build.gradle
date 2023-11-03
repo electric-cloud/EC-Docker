@@ -68,16 +68,18 @@ generateHenClasses {
 }
 
 ext {
-    groovyVersion = '3.0.17'
-    groovyGroup = 'org.codehaus.groovy'
+    groovyVersion = "3.0.17"
+    groovyGroup = "org.codehaus.groovy"
 
-    spockVersion = '2.4-M1-groovy-3.0'
+    spockVersion = "2.4-M1-groovy-3.0"
 
-    specCoreVersion = '3.0.0'
+    specCoreVersion = "3.0.0"
 
     henVersion = "2.0.0"
 
     restAssuredVersion = "5.3.1"
+
+    slf4jVersion = "1.7.36"
 }
 
 dependencies {
@@ -110,6 +112,8 @@ dependencies {
         exclude(group: groovyGroup, module: "groovy-all")
         exclude(group: groovyGroup, module: "groovy")
     }
+
+    implementation "org.slf4j:slf4j-api:$slf4jVersion"
 }
 
 sendAllureReports {
