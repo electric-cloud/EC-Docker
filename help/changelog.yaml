@@ -60,3 +60,5 @@
   - The EC-Docker plugin has been updated to remove the older microservices model and adopt pure Docker procedures with authorization handling.
 2.1.0:
   - Upgraded from Perl 5.8 to Perl 5.32. The plugin is not backward compatible with {PRODUCT} versions prior to 10.3. Starting from this release, a new agent is required to run EC-Docker plugin procedures.
+2.1.1:
+  - Improved SSL/TLS certificate validation to ensure that when the *Ignore SSL issues* parameter is selected that SSL/TLS validation is properly disabled.
