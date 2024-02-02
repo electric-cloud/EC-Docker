@@ -18,7 +18,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath "com.cloudbees.cd.plugins:hen:${henVersion}"
+        classpath "com.cloudbees.cd.plugins:hen:2.0.2"
     }
 }
 
@@ -75,8 +75,6 @@ ext {
 
     specCoreVersion = "3.0.0"
 
-    henVersion = "2.0.2"
-
     restAssuredVersion = "5.3.1"
 
     slf4jVersion = "1.7.36"
@@ -108,7 +106,7 @@ dependencies {
 
     implementation group: 'org.codehaus.groovy.modules.http-builder', name: 'http-builder', version: '0.7.1'
 
-    implementation("com.cloudbees.cd.plugins:hen:$henVersion") {
+    implementation("com.cloudbees.cd.plugins:hen:2.0.2") {
         exclude(group: groovyGroup, module: "groovy-all")
         exclude(group: groovyGroup, module: "groovy")
     }
