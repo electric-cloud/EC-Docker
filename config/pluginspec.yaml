@@ -1,7 +1,7 @@
 ---
 pluginInfo:
   pluginName: "EC-Docker"
-  version: '2.1.0'
+  version: '2.1.1'
   label: Docker
   description: "Integrates with Docker CLI."
   author: "CloudBees"
@@ -145,7 +145,7 @@ procedures:
     required: false
     adoc: |
       Publish a container's port to the host using the following format: `ip:hostPort:containerPort \| ip::containerPort \| hostPort:containerPort \| containerPort`.
-      
+
       NOTE: Use spaces to delimit port mappings. For example, `2666:1666 8088:8080`.
     documentation: "Publish a container's port to the host using the following format: ip:hostPort:containerPort\
       \ | ip::containerPort | hostPort:containerPort | containerPort). Note: Use\
