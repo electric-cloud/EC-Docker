@@ -171,6 +171,7 @@ sub runDockerPull {
 # Parameter: privileged
 # Parameter: container_links
 # Parameter: command_with_args
+# Parameter: additional_options
 
 # $sr - StepResult object
 sub runDockerRun {
@@ -233,6 +234,13 @@ sub runDockerRun {
 
     if($p->{privileged}) {
         $command .= " --privileged=true";
+    }
+
+    #Additional options can be added to the Docker run command
+    if($p->{additional_options}  && $p->{additional_options} ne "") {
+        foreach my $aoCmd (split(' ',$p->{additional_options})) {
+            $command .= " $aoCmd";
+        }
     }
 
     $command .= " $p->{image_name}";

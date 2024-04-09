@@ -62,3 +62,5 @@
   - Upgraded from Perl 5.8 to Perl 5.32. The plugin is not backward compatible with {PRODUCT} versions prior to 10.3. Starting from this release, a new agent is required to run EC-Docker plugin procedures.
 2.1.1:
   - Improved SSL/TLS certificate validation to ensure that when the *Ignore SSL issues* parameter is selected that SSL/TLS validation is properly disabled.
+2.2.0:
+  - Added additional options parameter to *runDockerRun* procedure.
