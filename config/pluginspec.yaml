@@ -187,9 +187,10 @@ procedures:
     adoc: |
       Add any valid Docker run option to the command.
 
-      NOTE: Use space to delimit each option and its value. For example, `-v /home/test:/home/test -w /home/test`.
-    documentation: "Add any valid Docker run option to the command.\
-      \ NOTE: Use space to delimit each option and its value. For example, \"-v /home/test:/home/test -w /home/test\"."
+      NOTE: Use a space to delimit each option and its value. For example, `-v /home/test:/home/test -w /home/test`.
+    htmlDocumentation: |
+      Add any valid Docker run option to the command.<br/>
+      <b>NOTE:</b> Use a space to delimit each option and its value. For example, <code>-v /home/test:/home/test -w /home/test</code>.
     label: "Additional options"
   shell: "cb-perl"
   properties: []
