@@ -90,6 +90,12 @@ class RunDockerRun extends Procedure {
         this.addParam('working_dir', workingdir)
         return this
     }
+
+
+    RunDockerRun additionaloptions(String additionaloptions) {
+        this.addParam('additional_options', additionaloptions)
+        return this
+    }
     
     
     

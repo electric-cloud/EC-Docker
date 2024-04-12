@@ -1,7 +1,7 @@
 ---
 pluginInfo:
   pluginName: "EC-Docker"
-  version: '2.1.1'
+  version: '2.2.0'
   label: Docker
   description: "Integrates with Docker CLI."
   author: "CloudBees"
@@ -181,6 +181,17 @@ procedures:
     adoc: The command to run within the container.
     documentation: "Command to run within the container"
     label: "Command with args"
+  - name: "additional_options"
+    type: "entry"
+    required: false
+    adoc: |
+      Add any valid Docker run option to the command.
+
+      NOTE: Use a space to delimit each option and its value. For example, `-v /home/test:/home/test -w /home/test`.
+    htmlDocumentation: |
+      Add any valid Docker run option to the command.<br/>
+      <b>NOTE:</b> Use a space to delimit each option and its value. For example, <code>-v /home/test:/home/test -w /home/test</code>.
+    label: "Additional options"
   shell: "cb-perl"
   properties: []
 configuration:

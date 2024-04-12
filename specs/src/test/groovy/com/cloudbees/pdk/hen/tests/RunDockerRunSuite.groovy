@@ -58,6 +58,21 @@ class RunDockerRunSuite extends Specification {
     }
 
     @Unroll
+    def 'RunDockerRun with additional options parameter'() {
+        when:
+        def result = plugin.runDockerRun
+                .imagename('alpine')
+                .additionaloptions('-v $(pwd):$(pwd) -w $(pwd)')
+                .run()
+
+        then:
+        assert result.isSuccessful()
+        cleanup:
+        ServerHandler.getInstance().runCommand('docker rm $(docker ps --filter status=exited -q)', 'sh', plugin.defaultResource)
+        ServerHandler.getInstance().runCommand('docker rmi alpine:latest || exit 0', 'sh', plugin.defaultResource)
+    }
+
+    @Unroll
     def ' RunDockerRun #caseId - negative'() {
         when:
         def result = plugin.runDockerRun
