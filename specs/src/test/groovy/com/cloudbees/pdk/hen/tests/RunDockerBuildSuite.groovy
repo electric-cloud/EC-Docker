@@ -76,7 +76,7 @@ class RunDockerBuildSuite extends Specification {
         then:
         def jobLog = result.getJobLog()
         assert result.getOutcome().toString() == 'ERROR'
-        assert jobLog.contains('ERROR: unable to prepare context: path "/tmp/wrong-specs-dockerfile/" not found')
+        assert jobLog.contains('unable to prepare context: path "/tmp/wrong-specs-dockerfile/" not found')
         assert jobLog.contains('Exit code: 256')
 
         cleanup:
