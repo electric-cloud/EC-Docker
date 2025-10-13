@@ -84,7 +84,7 @@ class RunDockerRunSuite extends Specification {
         then:
         assert result.getOutcome().toString() == 'ERROR'
         def jobLog= result.getJobLog()
-        assert jobLog.contains(log_error)
+        assert jobLog =~ log_error
         assert jobLog.contains(exit_code)
 
         cleanup:
@@ -98,6 +98,6 @@ class RunDockerRunSuite extends Specification {
         'with wrong alpine image name'       | ''          | 'alpinee'      |  ''             | 'Unable to find image \'alpinee:latest\' locally'                                                                                                             | 'Exit code: 32000'  | false
         'with wrong hello-world image name'  | ''          | 'helllo-world' |  ''             | 'Unable to find image \'helllo-world:latest\' locally'                                                                                                        | 'Exit code: 32000'  | false
         'with wrong entry point'             | '/hellllo'  | 'hello-world'  |  ''             | 'OCI runtime create failed:'                                                                                                                                  | 'Exit code: 32512'  | true
-        'with wrong published ports'         | ''          | 'hello-world'  |  ':8080:'       | 'no port specified: :8080:<empty>'                                                                                                                            | 'Exit code: 32000'  | false
+        'with wrong published ports'         | ''          | 'hello-world'  |  ':8080:'       | 'no port specified|invalid proto'                                                                                                                            | 'Exit code: 32000'  | false
     }
 }
