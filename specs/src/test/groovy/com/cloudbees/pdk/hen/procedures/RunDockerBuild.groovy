@@ -1,10 +1,7 @@
 package com.cloudbees.pdk.hen.procedures
 
-import groovy.transform.AutoClone
-import com.cloudbees.pdk.hen.*
 import com.cloudbees.pdk.hen.*
 
-@AutoClone
 //generated
 class RunDockerBuild extends Procedure {
 
@@ -24,10 +21,23 @@ class RunDockerBuild extends Procedure {
         return this
     }
 
+
+    RunDockerBuild clone() {
+        RunDockerBuild cloned = new RunDockerBuild(procedureName: 'runDockerBuild', plugin: plugin, )
+        cloned.parameters = this.parameters.clone()
+        return cloned
+    }
+
     //Generated
     
     RunDockerBuild buildpath(String buildpath) {
         this.addParam('build_path', buildpath)
+        return this
+    }
+    
+    
+    RunDockerBuild config(String config) {
+        this.addParam('config', config)
         return this
     }
     

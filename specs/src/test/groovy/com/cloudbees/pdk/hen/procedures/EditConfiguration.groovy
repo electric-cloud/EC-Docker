@@ -1,10 +1,7 @@
 package com.cloudbees.pdk.hen.procedures
 
-import groovy.transform.AutoClone
-import com.cloudbees.pdk.hen.*
 import com.cloudbees.pdk.hen.*
 
-@AutoClone
 //generated
 class EditConfiguration extends Procedure {
 
@@ -28,7 +25,30 @@ class EditConfiguration extends Procedure {
         return this
     }
 
+
+    EditConfiguration clone() {
+        EditConfiguration cloned = new EditConfiguration(procedureName: 'EditConfiguration', plugin: plugin, credentials: [
+                    
+                    'credential': null,
+                    
+                ])
+        cloned.parameters = this.parameters.clone()
+        return cloned
+    }
+
     //Generated
+    
+    EditConfiguration checkConnection(boolean checkConnection) {
+        this.addParam('checkConnection', checkConnection)
+        return this
+    }
+    
+    
+    EditConfiguration checkConnectionResource(String checkConnectionResource) {
+        this.addParam('checkConnectionResource', checkConnectionResource)
+        return this
+    }
+    
     
     EditConfiguration config(String config) {
         this.addParam('config', config)

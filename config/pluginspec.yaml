@@ -1,7 +1,7 @@
 ---
 pluginInfo:
   pluginName: "EC-Docker"
-  version: '2.2.0'
+  version: '2.2.1'
   label: Docker
   description: "Integrates with Docker CLI."
   author: "CloudBees"
@@ -195,8 +195,10 @@ procedures:
   shell: "cb-perl"
   properties: []
 configuration:
+  shell: 'cb-perl'
   hasDebugLevel: true
-  checkConnection: false
+  checkConnection: 'true'
+  resourceName: $[checkConnectionResource]
   parameters:
   - name: "config"
     type: "entry"
@@ -222,3 +224,9 @@ configuration:
     required: false
     adoc: The username and password for the Docker Registry (Docker Hub or private Docker Registry).
     documentation: The username and password for the Docker Registry (Docker Hub or private Docker Registry).
+  - name: checkConnectionResource
+    htmlDocumentation: Resource to be used for connection testing.
+    adoc: Resource to be used for connection testing.
+    required: false
+    type: entry
+    label: Check connection Resource

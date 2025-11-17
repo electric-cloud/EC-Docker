@@ -39,4 +39,6 @@ class Docker extends Plugin {
 
     RunDockerRun runDockerRun = RunDockerRun.create(this)
 
+    TestConfiguration testConfiguration = TestConfiguration.create(this)
+
 }
