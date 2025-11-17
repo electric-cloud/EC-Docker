@@ -64,3 +64,5 @@
   - Improved SSL/TLS certificate validation to ensure that when the *Ignore SSL issues* parameter is selected that SSL/TLS validation is properly disabled.
 2.2.0:
   - Added additional options parameter to *runDockerRun* procedure.
+2.2.1:
+  - Improved the **Test Connection** feature in plugin configuration to validate connectivity on the specified resource.
