@@ -17,7 +17,7 @@ services:
       - jcenter.bintray.com:127.0.0.1
 
   docker:
-    image: "us-east1-docker.pkg.dev/cloudbees-artifact-registry/flow/plugin-specs/electricflow/dind:latest"
+    image: "us-east1-docker.pkg.dev/cloudbees-artifact-registry/flow/plugin-specs/electricflow/dind:v1.52"
     ports:
       - "7808:7808"
     networks:
