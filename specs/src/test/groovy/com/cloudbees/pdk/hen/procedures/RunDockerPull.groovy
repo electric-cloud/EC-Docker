@@ -1,10 +1,7 @@
 package com.cloudbees.pdk.hen.procedures
 
-import groovy.transform.AutoClone
-import com.cloudbees.pdk.hen.*
 import com.cloudbees.pdk.hen.*
 
-@AutoClone
 //generated
 class RunDockerPull extends Procedure {
 
@@ -22,6 +19,13 @@ class RunDockerPull extends Procedure {
     RunDockerPull withUser(User user) {
         this.contextUser = user
         return this
+    }
+
+
+    RunDockerPull clone() {
+        RunDockerPull cloned = new RunDockerPull(procedureName: 'runDockerPull', plugin: plugin, )
+        cloned.parameters = this.parameters.clone()
+        return cloned
     }
 
     //Generated

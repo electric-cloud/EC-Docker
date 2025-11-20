@@ -3,10 +3,10 @@ package com.cloudbees.pdk.hen.procedures
 import com.cloudbees.pdk.hen.*
 
 //generated
-class EditConfiguration extends Procedure {
+class TestConfiguration extends Procedure {
 
-    static EditConfiguration create(Plugin plugin) {
-        return new EditConfiguration(procedureName: 'EditConfiguration', plugin: plugin, credentials: [
+    static TestConfiguration create(Plugin plugin) {
+        return new TestConfiguration(procedureName: 'TestConfiguration', plugin: plugin, credentials: [
             
             'credential': null,
             
@@ -14,20 +14,20 @@ class EditConfiguration extends Procedure {
     }
 
 
-    EditConfiguration flush() {
+    TestConfiguration flush() {
         this.flushParams()
         this.contextUser = null
         return this
     }
 
-    EditConfiguration withUser(User user) {
+    TestConfiguration withUser(User user) {
         this.contextUser = user
         return this
     }
 
 
-    EditConfiguration clone() {
-        EditConfiguration cloned = new EditConfiguration(procedureName: 'EditConfiguration', plugin: plugin, credentials: [
+    TestConfiguration clone() {
+        TestConfiguration cloned = new TestConfiguration(procedureName: 'TestConfiguration', plugin: plugin, credentials: [
                     
                     'credential': null,
                     
@@ -38,54 +38,54 @@ class EditConfiguration extends Procedure {
 
     //Generated
     
-    EditConfiguration checkConnection(boolean checkConnection) {
+    TestConfiguration checkConnection(boolean checkConnection) {
         this.addParam('checkConnection', checkConnection)
         return this
     }
     
     
-    EditConfiguration checkConnectionResource(String checkConnectionResource) {
+    TestConfiguration checkConnectionResource(String checkConnectionResource) {
         this.addParam('checkConnectionResource', checkConnectionResource)
         return this
     }
     
     
-    EditConfiguration config(String config) {
+    TestConfiguration config(String config) {
         this.addParam('config', config)
         return this
     }
     
     
-    EditConfiguration debugLevel(String debugLevel) {
+    TestConfiguration debugLevel(String debugLevel) {
         this.addParam('debugLevel', debugLevel)
         return this
     }
     
-    EditConfiguration debugLevel(DebugLevelOptions debugLevel) {
+    TestConfiguration debugLevel(DebugLevelOptions debugLevel) {
         this.addParam('debugLevel', debugLevel.toString())
         return this
     }
     
     
-    EditConfiguration desc(String desc) {
+    TestConfiguration desc(String desc) {
         this.addParam('desc', desc)
         return this
     }
     
     
-    EditConfiguration registry(String registry) {
+    TestConfiguration registry(String registry) {
         this.addParam('registry', registry)
         return this
     }
     
     
     
-    EditConfiguration credential(String user, String password) {
+    TestConfiguration credential(String user, String password) {
         this.addCredential('credential', user, password)
         return this
     }
 
-    EditConfiguration credentialReference(String path) {
+    TestConfiguration credentialReference(String path) {
         this.addCredentialReference('credential', path)
         return this
     }

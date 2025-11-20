@@ -1,10 +1,7 @@
 package com.cloudbees.pdk.hen.procedures
 
-import groovy.transform.AutoClone
-import com.cloudbees.pdk.hen.*
 import com.cloudbees.pdk.hen.*
 
-@AutoClone
 //generated
 class DockerConfig extends Procedure {
 
@@ -28,7 +25,30 @@ class DockerConfig extends Procedure {
         return this
     }
 
+
+    DockerConfig clone() {
+        DockerConfig cloned = new DockerConfig(procedureName: 'CreateConfiguration', plugin: plugin, credentials: [
+                    
+                    'credential': null,
+                    
+                ])
+        cloned.parameters = this.parameters.clone()
+        return cloned
+    }
+
     //Generated
+    
+    DockerConfig checkConnection(boolean checkConnection) {
+        this.addParam('checkConnection', checkConnection)
+        return this
+    }
+    
+    
+    DockerConfig checkConnectionResource(String checkConnectionResource) {
+        this.addParam('checkConnectionResource', checkConnectionResource)
+        return this
+    }
+    
     
     DockerConfig config(String config) {
         this.addParam('config', config)

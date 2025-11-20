@@ -35,24 +35,19 @@ sub checkConnection {
     my ($self, $p, $sr) = @_;
 
     my $context = $self->getContext();
-    my $configValues = $context->getConfigValues()->asHashref();
+    my $configValues = $context->getConfigValues();
     logInfo("Config values are: ", $configValues);
 
-    eval {
-        # Use $configValues to check connection, e.g. perform some ping request
-        # my $client = Client->new($configValues); $client->ping();
-        my $password = $configValues->{password};
-        if ($password ne 'secret') {
-            # die "Failed to test connection - dummy check connection error\n";
-        }
-        1;
-    } or do {
-        my $err = $@;
-        # Use this property to surface the connection error details in the CD server UI
-        $sr->setOutcomeProperty("/myJob/configError", $err);
+    # Use $configValues to check connection, e.g. perform some ping request
+    # my $client = Client->new($configValues); $client->ping();
+    my ($exit_code, $error_message) = $self->login($configValues);
+    if($exit_code) {
+        $sr->setOutcomeProperty("/myJob/configError", $error_message);
         $sr->apply();
-        die $err;
-    };
+        die $error_message;
+    }
+    logInfo("Connection is successful.");
+    1;
 }
 ## === check connection ends ===
 
