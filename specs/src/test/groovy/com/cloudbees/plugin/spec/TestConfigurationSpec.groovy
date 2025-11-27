@@ -2,7 +2,6 @@ package com.cloudbees.plugin.spec
 
 import com.cloudbees.pdk.hen.Docker
 import com.cloudbees.pdk.hen.ServerHandler
-import com.electriccloud.plugins.annotations.NewFeature
 import spock.lang.Requires
 import spock.lang.Shared
 import spock.lang.Unroll
@@ -18,7 +17,7 @@ class TestConfigurationSpec extends PluginHelper {
     def setupSpec() {
         plugin = Docker.createWithoutConfig()
         ServerHandler.getInstance().setupResource("docker-resource", "docker", 7808)
-        version = pluginVersion
+        version = getPluginVersion(PLUGIN_NAME)
     }
 
     def cleanupSpec() {
