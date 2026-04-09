@@ -26,8 +26,8 @@ allprojects {
 }
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_17
-    targetCompatibility = JavaVersion.VERSION_17
+    sourceCompatibility = JavaVersion.VERSION_21
+    targetCompatibility = JavaVersion.VERSION_21
 }
 
 version = "2.0"
@@ -51,16 +51,16 @@ generateHenClasses {
 }
 
 ext {
-    groovyVersion = "3.0.19"
+    groovyVersion = "3.0.23"
     groovyGroup = "org.codehaus.groovy"
 
-    spockVersion = "2.4-M1-groovy-3.0"
+    spockVersion = "2.4-M4-groovy-3.0"
 
     specCoreVersion = "3.0.1"
 
-    restAssuredVersion = "5.3.1"
+    restAssuredVersion = "5.5.0"
 
-    slf4jVersion = "1.7.36"
+    slf4jVersion = "2.0.16"
 }
 
 dependencies {
@@ -105,13 +105,13 @@ configureTests {
     environmentName = findProperty('envName') ?: 'default'
     readEnvironmentVariables = true
     readSecrets = true
-    dependsOn(['compileGroovy', 'compileTestGroovy', 'compileJava', 'compileTestJava', 'processResources', 'processTestResources'])
+    dependsOn(['jar', 'compileGroovy', 'compileTestGroovy', 'compileJava', 'compileTestJava', 'processResources', 'processTestResources'])
 }
 
 configurations {
     testCompile {
         extendsFrom testImplementation
-        resolutionStrategy.force "io.qameta.allure:allure-spock:2.23.0"
+        resolutionStrategy.force "io.qameta.allure:allure-spock:2.27.0"
     }
 }
 
