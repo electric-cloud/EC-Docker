@@ -36,12 +36,12 @@ class RunDockerRunSuite extends Specification {
     @Regression
     def 'Regression RunDockerRun private image'() {
         given: "Create plugin config with DockerHub credentials"
-        def image = 'specstests/for_ec_docker_specstests:latest'
+        def image = 'eftestuser/for-ec-docker-specstests:latest'
         Docker p = Docker.createWithoutConfig()
         DockerConfig conf = DockerConfig
                 .create(plugin)
                 .debugLevel(DockerConfig.DebugLevelOptions.DEBUG)
-        conf.addCredential('credential', Docker.DOCKERHUB_SPECS_USERNAME, Docker.DOCKERHUB_SPECS_PASSWORD)
+        conf.addCredential('credential', Docker.EC_DOCKERHUB_USER, Docker.EC_DOCKERHUB_PASSWORD)
         p.configure(conf)
         ServerHandler.getInstance().runCommand("docker rmi $image || exit 0", 'sh', p.defaultResource)
         when: "Run Plugin Procedure - RunDockerRun"

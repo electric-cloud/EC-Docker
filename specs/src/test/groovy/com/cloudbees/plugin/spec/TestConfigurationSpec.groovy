@@ -30,7 +30,7 @@ class TestConfigurationSpec extends PluginHelper {
         when:
         def r = plugin
                 .testConfiguration.flush()
-                .credential(DOCKERHUB_SPECS_USERNAME, DOCKERHUB_SPECS_PASSWORD)
+                .credential(EC_DOCKERHUB_USER, EC_DOCKERHUB_PASSWORD)
                 .registry(DOCKER_HUB_HOST)
                 .checkConnectionResource('docker-resource')
                 .run()
@@ -70,7 +70,7 @@ class TestConfigurationSpec extends PluginHelper {
         when:
         def r = plugin
                 .testConfiguration.flush()
-                .credential(DOCKERHUB_SPECS_USERNAME, DOCKERHUB_SPECS_PASSWORD)
+                .credential(EC_DOCKERHUB_USER, EC_DOCKERHUB_PASSWORD)
                 .registry(DOCKER_HUB_HOST)
                 .checkConnectionResource("wrong-resource")
                 .runNaked()
