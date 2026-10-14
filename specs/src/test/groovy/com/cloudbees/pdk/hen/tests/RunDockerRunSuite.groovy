@@ -59,10 +59,16 @@ class RunDockerRunSuite extends Specification {
 
     @Unroll
     def 'RunDockerRun with additional options parameter'() {
+        // Previously this relied on the step's shell expanding "$(pwd)" via command
+        // substitution. The shell was removed from runDockerRun (no shell = no
+        // command injection), so "$(pwd)" is now passed to docker literally - the
+        // literal path is resolved here instead, in the test, before being passed in.
+        given:
+        def pwd = ServerHandler.getInstance().runCommand('pwd', 'sh', plugin.defaultResource).jobLog.trim()
         when:
-        def result = plugin.runDockerRun
+        def result = plugin.runDockerRun.flush()
                 .imagename('alpine')
-                .additionaloptions('-v $(pwd):$(pwd) -w $(pwd)')
+                .additionaloptions("-v ${pwd}:${pwd} -w ${pwd}")
                 .run()
 
         then:
@@ -70,6 +76,52 @@ class RunDockerRunSuite extends Specification {
         cleanup:
         ServerHandler.getInstance().runCommand('docker rm $(docker ps --filter status=exited -q)', 'sh', plugin.defaultResource)
         ServerHandler.getInstance().runCommand('docker rmi alpine:latest || exit 0', 'sh', plugin.defaultResource)
+    }
+
+    def 'RunDockerRun with multi-token command_with_args parameter'() {
+        when:
+        def result = plugin.runDockerRun.flush()
+                .imagename('alpine')
+                .commandwithargs('echo hello world')
+                .run()
+
+        then:
+        assert result.isSuccessful()
+        assert result.getJobLog().contains('hello world')
+        cleanup:
+        ServerHandler.getInstance().runCommand('docker rm $(docker ps --filter status=exited -q)', 'sh', plugin.defaultResource)
+        ServerHandler.getInstance().runCommand('docker rmi alpine:latest || exit 0', 'sh', plugin.defaultResource)
+    }
+
+    @Unroll
+    def 'Security - #paramName command injection is neutralized'() {
+        given:
+        def marker = "/tmp/specs-cdro18006-run-${paramName}-pwned"
+        ServerHandler.getInstance().runCommand("rm -f $marker", 'sh', plugin.defaultResource)
+        when:
+        def proc = plugin.runDockerRun.flush().imagename('alpine')
+        proc.addParam(paramName, payload.replace('MARKER', marker))
+        def result = proc.run()
+
+        then:
+        assert result.getOutcome().toString() == 'ERROR'
+        def check = ServerHandler.getInstance().runCommand("test -f $marker && echo FOUND || echo NOTFOUND", 'sh', plugin.defaultResource)
+        assert check.jobLog.contains('NOTFOUND')
+
+        cleanup:
+        ServerHandler.getInstance().runCommand("rm -f $marker", 'sh', plugin.defaultResource)
+        ServerHandler.getInstance().runCommand('docker rm $(docker ps --filter status=created -q) 2>/dev/null || exit 0', 'sh', plugin.defaultResource)
+
+        where: 'The following params will be injected: '
+        paramName             | payload
+        'container_name'      | 'x"; touch MARKER; echo "'
+        'entrypoint'           | 'x"; touch MARKER; echo "'
+        'working_dir'          | 'x"; touch MARKER; echo "'
+        'published_ports'      | '8080:80; touch MARKER'
+        'container_links'      | 'x; touch MARKER'
+        'additional_options'   | '--rm; touch MARKER'
+        'command_with_args'    | '; touch MARKER #'
+        'image_name'           | 'alpine; touch MARKER'
     }
 
     @Unroll

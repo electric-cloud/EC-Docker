@@ -79,17 +79,17 @@ sub runDockerBuild {
         bailOut($error_message);
     }
 
-    my $command;
+    my @command;
     if($p->{use_sudo}) {
-        $command = "sudo docker build $p->{build_path} 2>&1";
+        @command = ('sudo', 'docker', 'build', $p->{build_path});
     } else {
-        $command = "docker build $p->{build_path} 2>&1";
+        @command = ('docker', 'build', $p->{build_path});
     }
 
-    logInfo("Command to execute: $command");
+    logInfo("Command to execute: " . join(' ', @command));
     logInfo("Building docker image:");
 
-    my $docker_output = system($command);
+    my $docker_output = _runDockerCommand(@command);
     if($? != 0) {
         bailOut("Exit code: $?.\n$docker_output");
     }
@@ -126,24 +126,23 @@ sub runDockerPull {
         bailOut($error_message);
     }
 
-    my $command;
+    my @command;
     if($p->{use_sudo}) {
-        $command = "sudo docker pull";
+        @command = ('sudo', 'docker', 'pull');
     } else {
-        $command = "docker pull";
+        @command = ('docker', 'pull');
     }
 
     my $image_name = $p->{image_name};
     if($p->{image_tag}) {
         $image_name .= ":$p->{image_tag}";
     }
+    push @command, $image_name;
 
-    $command .= " $image_name 2>&1";
-
-    logInfo("Command to execute: $command");
+    logInfo("Command to execute: " . join(' ', @command));
     logInfo('Pulling docker image:');
 
-    my $docker_output = system($command);
+    my $docker_output = _runDockerCommand(@command);
     if($? != 0) {
         bailOut("Exit code: $?.\n$docker_output");
     }
@@ -189,67 +188,67 @@ sub runDockerRun {
         bailOut($error_message);
     }
 
-    my $command;
+    my @command;
     if($p->{use_sudo}) {
-        $command = "sudo docker run";
+        @command = ('sudo', 'docker', 'run');
     } else {
-        $command = "docker run";
+        @command = ('docker', 'run');
     }
 
     if($p->{container_name}) {
-        $command .= " --name=\"$p->{container_name}\"";
+        push @command, "--name=$p->{container_name}";
     }
 
     if($p->{detached_mode}) {
-        $command .= " -d";
+        push @command, '-d';
     }
 
     if($p->{entrypoint}) {
-        $command .= " --entrypoint=\"$p->{entrypoint}\"";
+        push @command, "--entrypoint=$p->{entrypoint}";
     }
 
     if($p->{working_dir}) {
-        $command .= " --workdir=\"$p->{working_dir}\"";
+        push @command, "--workdir=$p->{working_dir}";
     }
 
     if($p->{published_ports}) {
         my @port_mappings = split / /, $p->{published_ports};
         foreach my $mapping (@port_mappings) {
-            $command .= " -p $mapping";
+            push @command, '-p', $mapping;
         }
     }
 
     if($p->{publish_all_ports}) {
-        $command .= " -P";
+        push @command, '-P';
     }
 
     if($p->{container_links}) {
-        $command .= " --link $p->{container_links}";
+        push @command, '--link', $p->{container_links};
     }
 
     if($p->{privileged}) {
-        $command .= " --privileged=true";
+        push @command, '--privileged=true';
     }
 
     #Additional options can be added to the Docker run command
     if($p->{additional_options}  && $p->{additional_options} ne "") {
         foreach my $aoCmd (split(' ',$p->{additional_options})) {
-            $command .= " $aoCmd";
+            push @command, $aoCmd;
         }
     }
 
-    $command .= " $p->{image_name}";
+    push @command, $p->{image_name};
 
     if($p->{command_with_args}) {
-        $command .= " $p->{command_with_args}";
+        foreach my $cmdArg (split(' ', $p->{command_with_args})) {
+            push @command, $cmdArg;
+        }
     }
 
-    $command .= " 2>&1";
-
-    print "\nCommand to execute: $command\n";
+    print "\nCommand to execute: " . join(' ', @command) . "\n";
     print "Launching docker container:\n\n";
 
-    my $docker_output = system($command);
+    my $docker_output = _runDockerCommand(@command);
     if($? != 0) {
         bailOut("Exit code: $?.\n$docker_output");
     }
@@ -261,6 +260,31 @@ sub runDockerRun {
 ## === step ends ===
 # Please do not remove the marker above, it is used to place new procedures into this file.
 
+
+# Runs an external command with no shell involved (list-form system()), so
+# that no step parameter can be interpreted as shell syntax regardless of
+# metacharacters it contains. Temporarily duplicates STDERR onto STDOUT for
+# the call, reproducing the old "2>&1" shell redirection without a shell.
+sub _runDockerCommand {
+    my (@command) = @_;
+
+    open(my $saved_stderr, '>&', \*STDERR)
+        or bailOut("ERROR: Unable to save STDERR before running docker command: $!");
+    open(STDERR, '>&', \*STDOUT)
+        or bailOut("ERROR: Unable to redirect STDERR to STDOUT before running docker command: $!");
+
+    my $rc = system(@command);
+
+    open(STDERR, '>&', $saved_stderr)
+        or bailOut("ERROR: Unable to restore STDERR after running docker command: $!");
+    close($saved_stderr);
+
+    if ($rc == -1) {
+        bailOut("ERROR: Failed to execute '$command[0]': $!");
+    }
+
+    return $rc;
+}
 
 sub login {
     my ($self, $configValues, $use_sudo) = @_;
