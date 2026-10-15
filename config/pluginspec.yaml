@@ -1,7 +1,7 @@
 ---
 pluginInfo:
   pluginName: "EC-Docker"
-  version: '2.2.1'
+  version: '2.2.2'
   label: Docker
   description: "Integrates with Docker CLI."
   author: "CloudBees"
