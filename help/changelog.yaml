@@ -67,4 +67,4 @@
 2.2.1:
   - Improved the **Test Connection** feature in plugin configuration to validate connectivity on the specified resource.
 2.2.2:
-  - Fixed a security issue in the *Run Docker Build*, *Run Docker Pull*, and *Run Docker Run* procedures. Before this fix, a specially crafted value in a step parameter (for example, image name, container name, entrypoint, working directory, published ports, link, command with args, or additional options) could make the agent run commands that were not intended by the pipeline author. These procedures now pass each parameter value directly to Docker, so a crafted value can no longer be run as a separate command.
+  - Fixed a security issue in the *Run Docker Build*, *Run Docker Pull*, and *Run Docker Run* procedures.
