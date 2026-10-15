@@ -9,10 +9,10 @@ class PluginHelper extends PluginSpockTestSupport{
     static final String DOCKER_HUB_HOST = 'https://registry-1.docker.io/v2/'
 
     @Lazy
-    static String DOCKERHUB_SPECS_USERNAME = { return getCheckedVariable('DOCKERHUB_SPECS_USERNAME') }()
+    static String EC_DOCKERHUB_USER = { return getCheckedVariable('EC_DOCKERHUB_USER') }()
 
     @Lazy
-    static String DOCKERHUB_SPECS_PASSWORD= { return getCheckedVariable('DOCKERHUB_SPECS_PASSWORD') }()
+    static String EC_DOCKERHUB_PASSWORD= { return getCheckedVariable('EC_DOCKERHUB_PASSWORD') }()
 
     static String getCheckedVariable(String variableName) {
         def value = System.getenv(variableName)

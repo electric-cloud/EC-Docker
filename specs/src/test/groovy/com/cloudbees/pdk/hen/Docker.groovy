@@ -9,8 +9,8 @@ class Docker extends Plugin {
 
     static String DOCKER_AGENT_HOST = env('DOCKER_AGENT_HOST', 'docker')
     static int DOCKER_AGENT_PORT = env('KUBECTL_AGENT_PORT', '7808').toInteger()
-    static String DOCKERHUB_SPECS_USERNAME = env('DOCKERHUB_SPECS_USERNAME')
-    static String DOCKERHUB_SPECS_PASSWORD = env('DOCKERHUB_SPECS_PASSWORD')
+    static String EC_DOCKERHUB_USER = env('EC_DOCKERHUB_USER')
+    static String EC_DOCKERHUB_PASSWORD = env('EC_DOCKERHUB_PASSWORD')
     static String resourceName = 'docker'
 
 

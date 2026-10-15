@@ -13,7 +13,7 @@ class RunDockerBuildSuite extends Specification {
     static final String pluginName = 'EC-Docker'
 
     static final String DockerfileContent = "FROM alpine\nRUN echo 'hello world'"
-    static final String DockerfileContentPrivateImage = "FROM specstests/for_ec_docker_specstests:latest\nRUN echo 'hello world'"
+    static final String DockerfileContentPrivateImage = "FROM eftestuser/for-ec-docker-specstests:latest\nRUN echo 'hello world'"
 
     @Shared
     Docker plugin = Docker.create()
@@ -41,12 +41,12 @@ class RunDockerBuildSuite extends Specification {
     @Regression
     def 'Regression RunDockerRun private image'() {
         given: "Create plugin config with DockerHub credentials"
-        def image = 'specstests/for_ec_docker_specstests:latest'
+        def image = 'eftestuser/for-ec-docker-specstests:latest'
         Docker p = Docker.createWithoutConfig()
         DockerConfig conf = DockerConfig
                 .create(plugin)
                 .debugLevel(DockerConfig.DebugLevelOptions.DEBUG)
-        conf.addCredential('credential', Docker.DOCKERHUB_SPECS_USERNAME, Docker.DOCKERHUB_SPECS_PASSWORD)
+        conf.addCredential('credential', Docker.EC_DOCKERHUB_USER, Docker.EC_DOCKERHUB_PASSWORD)
         p.configure(conf)
         def cmd = "mkdir /tmp/specs-dockerfile && echo \"$DockerfileContentPrivateImage\" >> /tmp/specs-dockerfile/Dockerfile"
         ServerHandler.getInstance().runCommand(cmd, 'sh', p.defaultResource)
