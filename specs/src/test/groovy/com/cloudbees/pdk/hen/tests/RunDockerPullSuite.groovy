@@ -64,6 +64,51 @@ class RunDockerPullSuite extends Specification {
         ServerHandler.getInstance().runCommand("docker rmi $image || exit 0", 'sh', p.defaultResource)
     }
 
+    def 'Security - image_name command injection is neutralized'() {
+        given:
+        def marker = '/tmp/specs-cdro18006-pull-pwned'
+        ServerHandler.getInstance().runCommand("rm -f $marker", 'sh', plugin.defaultResource)
+        when:
+        def result = plugin.runDockerPull.flush()
+                .imagename("alpine; touch $marker; echo ")
+                .run()
+
+        then:
+        assert result.getOutcome().toString() == 'ERROR'
+        def check = ServerHandler.getInstance().runCommand("test -f $marker && echo FOUND || echo NOTFOUND", 'sh', plugin.defaultResource)
+        assert check.jobLog.contains('NOTFOUND')
+
+        cleanup:
+        ServerHandler.getInstance().runCommand("rm -f $marker", 'sh', plugin.defaultResource)
+    }
+
+    def 'Security - image_tag command injection is neutralized'() {
+        // NOTE: the generated .tag() setter writes the 'tag' parameter, which Docker.pm
+        // does not read (it reads 'image_tag') - a pre-existing, unrelated wiring mismatch
+        // flagged separately. addParam() is used here to exercise the actual
+        // 'image_tag' parameter that the plugin reads.
+        given:
+        def marker = '/tmp/specs-cdro18006-pulltag-pwned'
+        ServerHandler.getInstance().runCommand("rm -f $marker", 'sh', plugin.defaultResource)
+        when:
+        def proc = plugin.runDockerPull.flush().imagename('alpine')
+        proc.addParam('image_tag', "latest; touch $marker; echo ")
+        def result = proc.run()
+
+        then:
+        assert result.getOutcome().toString() == 'ERROR'
+        def check = ServerHandler.getInstance().runCommand("test -f $marker && echo FOUND || echo NOTFOUND", 'sh', plugin.defaultResource)
+        assert check.jobLog.contains('NOTFOUND')
+
+        cleanup:
+        ServerHandler.getInstance().runCommand("rm -f $marker", 'sh', plugin.defaultResource)
+        // 'image_tag' has no setter on the generated RunDockerPull wrapper (see note
+        // above) so it can't be overwritten by a later test's normal param calls the
+        // way every other field is - flush it explicitly or it leaks into whatever
+        // runs next on this shared plugin.runDockerPull instance.
+        plugin.runDockerPull.flush()
+    }
+
     @Unroll
     def 'RunDockerPull #caseId - negative'() {
         when:

@@ -66,3 +66,5 @@
   - Added additional options parameter to *runDockerRun* procedure.
 2.2.1:
   - Improved the **Test Connection** feature in plugin configuration to validate connectivity on the specified resource.
+2.2.2:
+  - Fixed a security issue in the *Run Docker Build*, *Run Docker Pull*, and *Run Docker Run* procedures.

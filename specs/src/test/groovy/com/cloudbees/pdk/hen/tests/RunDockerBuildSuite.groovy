@@ -85,6 +85,24 @@ class RunDockerBuildSuite extends Specification {
         ServerHandler.getInstance().runCommand('docker rmi alpine:latest || exit 0', 'sh', plugin.defaultResource)
     }
 
+    def 'Security - build_path command injection is neutralized'() {
+        given:
+        def marker = '/tmp/specs-cdro18006-build-pwned'
+        ServerHandler.getInstance().runCommand("rm -f $marker", 'sh', plugin.defaultResource)
+        when:
+        def result = plugin.runDockerBuild.flush()
+                .buildpath("/tmp/nonexistent-dockerfile\"; touch $marker; echo \"")
+                .run()
+
+        then:
+        assert result.getOutcome().toString() == 'ERROR'
+        def check = ServerHandler.getInstance().runCommand("test -f $marker && echo FOUND || echo NOTFOUND", 'sh', plugin.defaultResource)
+        assert check.jobLog.contains('NOTFOUND')
+
+        cleanup:
+        ServerHandler.getInstance().runCommand("rm -f $marker", 'sh', plugin.defaultResource)
+    }
+
     def 'RunDockerBuild Negative with wrong Dockerfile'() {
         given:
         def WrongDockerfileContent = "FROMMM alpine\nRUN echo 'hello world'"
