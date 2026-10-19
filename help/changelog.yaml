@@ -67,4 +67,9 @@
 2.2.1:
   - Improved the **Test Connection** feature in plugin configuration to validate connectivity on the specified resource.
 2.2.2:
-  - Fixed a security issue in the *Run Docker Build*, *Run Docker Pull*, and *Run Docker Run* procedures.
+  - |
+    Fixed a security issue in the *Run Docker Build*, *Run Docker Pull*, and *Run Docker Run* procedures. Before this fix, a specially crafted value in a step parameter (for example, image name, container name, entrypoint, working directory, published ports, link, command with args, or additional options) could make the agent run commands that were not intended by the pipeline author.
+
+      ** Parameter values are no longer passed through a shell to build the Docker command. This closes the security issue, but it also means a value is now always used exactly as typed. A shell variable (`$VAR`), a command inside `$(...)` or backticks, a `~` for a home directory, and a wildcard such as `*` are no longer expanded - they are passed to Docker as literal text.
+      ** Values in the *Additional options* and *Command with args* fields are still split into separate words the same way as before, including respecting quotes, so a quoted value such as `-e "MSG=hello world"` is still passed as one value.
+      ** The *Build path* field now accepts additional Docker build options in the same field, split the same way, for compatibility with existing step configurations that relied on this.
