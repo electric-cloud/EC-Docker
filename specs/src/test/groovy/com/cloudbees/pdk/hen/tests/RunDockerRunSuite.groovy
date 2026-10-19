@@ -78,6 +78,27 @@ class RunDockerRunSuite extends Specification {
         ServerHandler.getInstance().runCommand('docker rmi alpine:latest || exit 0', 'sh', plugin.defaultResource)
     }
 
+    def 'RunDockerRun with a quoted value in additional_options'() {
+        // Proves a quoted value is kept together as one value instead of
+        // being torn apart on every space - '-e "MSG=hello world"' must
+        // set one env var whose value is "hello world", not two broken
+        // tokens. Asserts the container's own printed env line, not the
+        // "Step parameters are:" debug dump of the raw input.
+        when:
+        def result = plugin.runDockerRun.flush()
+                .imagename('alpine')
+                .additionaloptions('-e "MSG=hello world"')
+                .commandwithargs('env')
+                .run()
+
+        then:
+        assert result.isSuccessful()
+        assert result.getJobLog() =~ /(?m)^MSG=hello world$/
+        cleanup:
+        ServerHandler.getInstance().runCommand('docker rm $(docker ps --filter status=exited -q)', 'sh', plugin.defaultResource)
+        ServerHandler.getInstance().runCommand('docker rmi alpine:latest || exit 0', 'sh', plugin.defaultResource)
+    }
+
     def 'RunDockerRun with multi-token command_with_args parameter'() {
         when:
         def result = plugin.runDockerRun.flush()
@@ -87,7 +108,12 @@ class RunDockerRunSuite extends Specification {
 
         then:
         assert result.isSuccessful()
-        assert result.getJobLog().contains('hello world')
+        // .contains('hello world') would also match the "Step parameters
+        // are:" debug dump of the command_with_args input value itself,
+        // regardless of whether the container ever ran anything - assert
+        // a whole output line instead, which only the container's own
+        // "echo hello world" can produce.
+        assert result.getJobLog() =~ /(?m)^hello world$/
         cleanup:
         ServerHandler.getInstance().runCommand('docker rm $(docker ps --filter status=exited -q)', 'sh', plugin.defaultResource)
         ServerHandler.getInstance().runCommand('docker rmi alpine:latest || exit 0', 'sh', plugin.defaultResource)

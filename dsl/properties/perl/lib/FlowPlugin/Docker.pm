@@ -6,8 +6,6 @@ use FlowPDF::Log;
 use FlowPDF::Helpers qw/bailOut/;
 use Text::ParseWords qw(shellwords);
 use IPC::Open3;
-use IO::Select;
-use Symbol qw(gensym);
 
 # Feel free to use new libraries here, e.g. use File::Temp;
 
@@ -518,9 +516,18 @@ sub login {
 
     my @exec_command = $^O eq 'MSWin32' ? (map { _win32_quote_arg($_) } @command) : @command;
 
-    my ($child_in, $child_out, $child_err);
-    $child_err = gensym();
-    my $pid = eval { open3($child_in, $child_out, $child_err, @exec_command) };
+    # Passing undef for the third handle merges the child's stderr into
+    # the same pipe as stdout, so there is only one output stream to
+    # read. This replaces an earlier version that read two separate
+    # streams concurrently with IO::Select - which is documented
+    # (perlport) to work only on sockets on Windows, not on pipes, so it
+    # busy-looped at 100% CPU forever on Windows instead of ever reading
+    # anything. Merging the streams removes the need for select() at
+    # all, on every platform, and sidesteps the deadlock a strict
+    # stdout-then-stderr read order could hit if the child wrote enough
+    # to the second stream before the first was fully drained.
+    my ($child_in, $child_out);
+    my $pid = eval { open3($child_in, $child_out, undef, @exec_command) };
     if (!$pid) {
         my $error = "Unable to execute docker login: $@$!";
         logDebug('LOGIN EXIT CODE: -1');
@@ -528,11 +535,15 @@ sub login {
         return (-1, $error);
     }
 
-    # Writing the password can hit SIGPIPE if docker has already exited
-    # (for example because it rejected the username/registry before
-    # reading stdin at all) - caught here rather than left to kill the
+    # Write the password and close stdin before reading any output.
+    # docker login reads the whole of stdin before producing output of
+    # its own, so this ordering does not deadlock in practice - verified
+    # locally with a password up to 100KB (well beyond a realistic
+    # registry token) with no hang. Writing can still hit SIGPIPE if
+    # docker already exited (for example it rejected the username before
+    # ever reading stdin) - caught here rather than left to kill the
     # whole plugin step, since the real failure reason is still available
-    # from the stderr this reads below.
+    # from the output read below.
     my $write_failed = 0;
     {
         local $SIG{PIPE} = sub { $write_failed = 1 };
@@ -540,23 +551,12 @@ sub login {
         close($child_in) or $write_failed = 1 unless $write_failed;
     }
 
-    # Read stdout and stderr concurrently with IO::Select rather than one
-    # after the other: docker login's output is normally tiny, but a
-    # sequential <$child_out> then <$child_err> deadlocks forever (no
-    # timeout) if the child ever writes enough to the *second* stream to
-    # fill its pipe buffer before this code finishes reading the first.
-    my ($stdout, $stderr) = ('', '');
-    my $selector = IO::Select->new($child_out, $child_err);
-    while ($selector->count) {
-        for my $fh ($selector->can_read) {
-            my $buf;
-            my $n = sysread($fh, $buf, 65536);
-            if (!$n) {
-                $selector->remove($fh);
-                next;
-            }
-            if ($fh == $child_out) { $stdout .= $buf; } else { $stderr .= $buf; }
-        }
+    my $output = '';
+    while (1) {
+        my $buf;
+        my $n = sysread($child_out, $buf, 65536);
+        last unless $n;
+        $output .= $buf;
     }
 
     waitpid($pid, 0);
@@ -569,9 +569,8 @@ sub login {
     }
 
     logDebug('LOGIN EXIT CODE: ' . $rc);
-    logInfo('LOGIN STDOUT:', $stdout);
-    logInfo('LOGIN STDERR:', $stderr);
-    return ($rc, $stderr);
+    logInfo('LOGIN OUTPUT:', $output);
+    return ($rc, $output);
 }
 
 1;

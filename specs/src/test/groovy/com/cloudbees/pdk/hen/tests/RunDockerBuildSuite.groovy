@@ -38,6 +38,33 @@ class RunDockerBuildSuite extends Specification {
         ServerHandler.getInstance().runCommand('docker rmi alpine:latest || exit 0', 'sh', plugin.defaultResource)
     }
 
+    def 'RunDockerBuild with extra docker build flags in build_path'() {
+        // There is no separate "tag" field for runDockerBuild, so a usable
+        // build needs -t somewhere - the old shell-based code let people
+        // pack it into build_path along with the path itself. Proves that
+        // still works: build_path is split the same way as
+        // additional_options, so "-t name path" reaches docker as two
+        // separate, correct arguments, not one broken literal string.
+        given:
+        def cmd = "mkdir /tmp/specs-dockerfile-tag && echo \"$DockerfileContent\" >> /tmp/specs-dockerfile-tag/Dockerfile"
+        ServerHandler.getInstance().runCommand(cmd, 'sh', plugin.defaultResource)
+        when:
+        def result = plugin.runDockerBuild.flush()
+                .buildpath('-t specs-build-path-flag-test:1.0 /tmp/specs-dockerfile-tag/')
+                .run()
+
+        then:
+        assert result.isSuccessful()
+        def check = ServerHandler.getInstance().runCommand(
+                "docker images specs-build-path-flag-test:1.0 --format '{{.Repository}}:{{.Tag}}'",
+                'sh', plugin.defaultResource)
+        assert check.jobLog.contains('specs-build-path-flag-test:1.0')
+
+        cleanup:
+        ServerHandler.getInstance().runCommand('rm /tmp/specs-dockerfile-tag -r', 'sh', plugin.defaultResource)
+        ServerHandler.getInstance().runCommand('docker rmi specs-build-path-flag-test:1.0 || exit 0', 'sh', plugin.defaultResource)
+    }
+
     @Regression
     def 'Regression RunDockerRun private image'() {
         given: "Create plugin config with DockerHub credentials"

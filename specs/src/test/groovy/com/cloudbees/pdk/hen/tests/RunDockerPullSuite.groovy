@@ -83,18 +83,22 @@ class RunDockerPullSuite extends Specification {
     }
 
     def 'RunDockerPull with tag parameter pulls the correct image'() {
+        // 'latest' is Docker's own default when no tag is given at all, so
+        // it would pass even if the tag parameter were never wired through
+        // to the plugin - use a specific, non-default tag so this only
+        // passes if the value genuinely reached the pull command.
         when:
         def result = plugin.runDockerPull.flush()
                 .imagename('alpine')
-                .tag('latest')
+                .tag('3.19')
                 .run()
 
         then:
         assert result.isSuccessful()
-        assert result.jobLog =~ 'Status: Downloaded newer image for alpine:latest'
+        assert result.jobLog =~ 'Status: Downloaded newer image for alpine:3.19'
 
         cleanup:
-        ServerHandler.getInstance().runCommand('docker rmi alpine:latest -f || exit 0', 'sh', plugin.defaultResource)
+        ServerHandler.getInstance().runCommand('docker rmi alpine:3.19 -f || exit 0', 'sh', plugin.defaultResource)
         // 'tag' has no explicit value in later tests on this shared
         // plugin.runDockerPull instance (they only call .imagename()), so it
         // is never overwritten the way every other field is - flush it
