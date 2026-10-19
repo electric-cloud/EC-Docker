@@ -95,6 +95,11 @@ class RunDockerPullSuite extends Specification {
 
         cleanup:
         ServerHandler.getInstance().runCommand('docker rmi alpine:latest -f || exit 0', 'sh', plugin.defaultResource)
+        // 'tag' has no explicit value in later tests on this shared
+        // plugin.runDockerPull instance (they only call .imagename()), so it
+        // is never overwritten the way every other field is - flush it
+        // explicitly or it leaks into whatever runs next.
+        plugin.runDockerPull.flush()
     }
 
     def 'Security - tag command injection is neutralized'() {
@@ -114,6 +119,9 @@ class RunDockerPullSuite extends Specification {
 
         cleanup:
         ServerHandler.getInstance().runCommand("rm -f $marker", 'sh', plugin.defaultResource)
+        // same reason as the test above - 'tag' is never reset by the
+        // negative-path tests that follow, so it must be flushed here.
+        plugin.runDockerPull.flush()
     }
 
     @Unroll
