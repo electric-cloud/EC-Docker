@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use base qw/FlowPDF/;
 use FlowPDF::Log;
-use FlowPDF::Helpers qw/bailOut/;
+use FlowPDF::Helpers qw/bailOut trim isWin/;
 use Text::ParseWords qw(shellwords);
 use IPC::Open3;
 
@@ -76,7 +76,7 @@ sub runDockerBuild {
     }
 
     logDebug("Try to login...\n");
-    my ($exit_code, $error_message) = $self->login($configValues);
+    my ($exit_code, $error_message) = $self->login($configValues, $p->{use_sudo});
     if($exit_code) {
         bailOut($error_message);
     }
@@ -124,7 +124,7 @@ sub runDockerPull {
     }
 
     logDebug("Try to login...\n");
-    my ($exit_code, $error_message) = $self->login($configValues);
+    my ($exit_code, $error_message) = $self->login($configValues, $p->{use_sudo});
     if($exit_code) {
         bailOut($error_message);
     }
@@ -136,9 +136,17 @@ sub runDockerPull {
         @command = ('docker', 'pull');
     }
 
-    my $image_name = _trim($p->{image_name});
-    if($p->{tag}) {
-        $image_name .= ':' . _trim($p->{tag});
+    my $image_name = trim($p->{image_name});
+    # Checking for a non-empty string *after* trimming, not the raw
+    # parameter's truthiness: a raw value of the single character "0" is
+    # a legitimate Docker tag but is false in a Perl boolean context, and
+    # a whitespace-only value is true before trimming but empty after,
+    # which would otherwise silently produce a malformed "image:" with no
+    # tag. Guard trim() with "defined" first - trim(undef) warns and the
+    # common case is this field being unset entirely.
+    my $tag = defined $p->{tag} ? trim($p->{tag}) : undef;
+    if (defined $tag && $tag ne '') {
+        $image_name .= ':' . $tag;
     }
     # The literal '--' marks the end of options, so Docker always treats
     # image_name as data even if it starts with '-' - without it, Docker's
@@ -190,7 +198,7 @@ sub runDockerRun {
     }
 
     logDebug("Try to login...\n");
-    my ($exit_code, $error_message) = $self->login($configValues);
+    my ($exit_code, $error_message) = $self->login($configValues, $p->{use_sudo});
     if($exit_code) {
         bailOut($error_message);
     }
@@ -202,20 +210,29 @@ sub runDockerRun {
         @command = ('docker', 'run');
     }
 
-    if($p->{container_name}) {
-        push @command, '--name=' . _trim($p->{container_name});
+    # Each of these trims first and then checks for a non-empty string,
+    # rather than checking the raw parameter's truthiness first: checking
+    # truthiness before trimming would treat a whitespace-only value as
+    # set (producing a malformed, empty flag value after trimming), and
+    # would treat a legitimate single-character "0" value as unset
+    # (since the string "0" is false in a Perl boolean context).
+    my $container_name = defined $p->{container_name} ? trim($p->{container_name}) : undef;
+    if (defined $container_name && $container_name ne '') {
+        push @command, '--name=' . $container_name;
     }
 
     if($p->{detached_mode}) {
         push @command, '-d';
     }
 
-    if($p->{entrypoint}) {
-        push @command, '--entrypoint=' . _trim($p->{entrypoint});
+    my $entrypoint = defined $p->{entrypoint} ? trim($p->{entrypoint}) : undef;
+    if (defined $entrypoint && $entrypoint ne '') {
+        push @command, '--entrypoint=' . $entrypoint;
     }
 
-    if($p->{working_dir}) {
-        push @command, '--workdir=' . _trim($p->{working_dir});
+    my $working_dir = defined $p->{working_dir} ? trim($p->{working_dir}) : undef;
+    if (defined $working_dir && $working_dir ne '') {
+        push @command, '--workdir=' . $working_dir;
     }
 
     if($p->{published_ports}) {
@@ -232,8 +249,9 @@ sub runDockerRun {
         push @command, '-P';
     }
 
-    if($p->{container_links}) {
-        push @command, '--link', _trim($p->{container_links});
+    my $container_links = defined $p->{container_links} ? trim($p->{container_links}) : undef;
+    if (defined $container_links && $container_links ne '') {
+        push @command, '--link', $container_links;
     }
 
     if($p->{privileged}) {
@@ -253,7 +271,7 @@ sub runDockerRun {
     # grant any capability additional_options doesn't already have -
     # whoever can set it can already pass arbitrary Docker options such as
     # --privileged - so it is a documented caveat, not a privilege gap.
-    push @command, '--', _trim($p->{image_name});
+    push @command, '--', trim($p->{image_name});
 
     if($p->{command_with_args}) {
         push @command, _split_tokens($p->{command_with_args});
@@ -324,7 +342,7 @@ sub _split_tokens {
     return () if $trimmed eq '';
 
     my $to_split = $trimmed;
-    if ($^O eq 'MSWin32') {
+    if (isWin()) {
         $to_split =~ s/\\/\\\\/g;
     }
 
@@ -333,19 +351,6 @@ sub _split_tokens {
         bailOut("ERROR: Unable to parse parameter value (unbalanced quote?): $value");
     }
     return @tokens;
-}
-
-# Trims leading/trailing whitespace from a step parameter that is a single
-# value rather than multiple tokens (image_name, image_tag, container_name,
-# container_links). Several of these were interpolated unquoted into the
-# old shell string, where unquoted leading/trailing whitespace is just a
-# word separator and never became part of the value; trimming here keeps
-# that same behavior now that there is no shell to do it implicitly.
-sub _trim {
-    my ($value) = @_;
-    return $value unless defined $value;
-    $value =~ s/^\s+|\s+$//g;
-    return $value;
 }
 
 # Renders an argv list for the job log so a reader can see where one
@@ -357,6 +362,12 @@ sub _quote_for_log {
     my (@args) = @_;
     return join(' ', map {
         my $arg = $_;
+        # An embedded newline would otherwise split the log into text
+        # that reads as independent, legitimate-looking log lines (for
+        # example a container_name of "foo\nException: Login successful,
+        # continuing") - shown visibly instead, so the log always reflects
+        # one argument per quoted segment.
+        $arg =~ s/\r?\n/\\n/g;
         $arg =~ s/'/'\\''/g;
         "'$arg'";
     } @args);
@@ -412,8 +423,8 @@ sub _win32_quote_arg {
 sub _resolve_executable {
     my ($name) = @_;
     return $name if $name =~ m{[\\/]} && -x $name;
-    my $sep = $^O eq 'MSWin32' ? ';' : ':';
-    my @exts = $^O eq 'MSWin32' ? (split /;/, $ENV{PATHEXT} // '.EXE;.BAT;.CMD') : ('');
+    my $sep = isWin() ? ';' : ':';
+    my @exts = isWin() ? (split /;/, $ENV{PATHEXT} // '.EXE;.BAT;.CMD') : ('');
     for my $dir (split /\Q$sep\E/, $ENV{PATH} // '') {
         next unless length $dir;
         for my $ext (@exts) {
@@ -442,7 +453,7 @@ sub _runDockerCommand {
     my (@command) = @_;
     my $program = $command[0];
 
-    if ($^O eq 'MSWin32') {
+    if (isWin()) {
         @command = map { _win32_quote_arg($_) } @command;
     }
 
@@ -483,6 +494,15 @@ sub login {
         return (0, '');
     }
 
+    # FlowPDF::Component::CLI::runCommand chdir()s to the configured
+    # working directory before running its command; this rewrite replaces
+    # that component entirely (see below) but keeps the same chdir so
+    # anything cwd-sensitive about the login (a relative credential
+    # helper path, for example) still sees the same directory as before.
+    if ($ENV{COMMANDER_WORKSPACE}) {
+        chdir($ENV{COMMANDER_WORKSPACE}) or bailOut("ERROR: Unable to chdir to $ENV{COMMANDER_WORKSPACE}: $!");
+    }
+
     # Shells out via FlowPDF::Component::CLI, same as every other call in
     # this file used to: it still routes through single-string system()
     # internally, and its argument quoting does not escape an embedded
@@ -497,7 +517,11 @@ sub login {
     } else {
         @command = ('docker', 'login', '-u', $username, '--password-stdin');
     }
-    push @command, $registry if $registry;
+    # Same '--' end-of-options marker used for image_name elsewhere in
+    # this file: without it, a configured registry value starting with
+    # '-' would be read by Docker's own CLI parser as a flag rather than
+    # the positional SERVER argument.
+    push @command, '--', $registry if $registry;
 
     logInfo('Command to execute: ' . _quote_for_log(@command));
 
@@ -514,7 +538,7 @@ sub login {
         return (-1, $error);
     }
 
-    my @exec_command = $^O eq 'MSWin32' ? (map { _win32_quote_arg($_) } @command) : @command;
+    my @exec_command = isWin() ? (map { _win32_quote_arg($_) } @command) : @command;
 
     # Passing undef for the third handle merges the child's stderr into
     # the same pipe as stdout, so there is only one output stream to
@@ -544,11 +568,17 @@ sub login {
     # ever reading stdin) - caught here rather than left to kill the
     # whole plugin step, since the real failure reason is still available
     # from the output read below.
+    # close() always runs, even if the print already failed: an earlier
+    # version used "close(...) or ... unless $write_failed", but Perl's
+    # "unless" statement modifier guards the *entire* preceding
+    # statement, so when $write_failed was already true it skipped
+    # close() entirely instead of still closing the handle - leaking one
+    # file descriptor per failed login.
     my $write_failed = 0;
     {
         local $SIG{PIPE} = sub { $write_failed = 1 };
         print($child_in $password) or $write_failed = 1;
-        close($child_in) or $write_failed = 1 unless $write_failed;
+        close($child_in) or $write_failed = 1;
     }
 
     my $output = '';
@@ -560,7 +590,11 @@ sub login {
     }
 
     waitpid($pid, 0);
-    my $rc = $? == -1 ? -1 : ($? >> 8);
+    # $? >> 8 alone would report a signal-killed docker login (for
+    # example OOM-killed) as exit code 0 - success - because the exit
+    # status byte is 0 when a process dies by signal; check for that
+    # first so a killed login is never treated as a successful one.
+    my $rc = $? == -1 ? -1 : ($? & 127) ? 1 : ($? >> 8);
     if ($write_failed && $rc == 0) {
         # system/pipe close failed but the child still reported success
         # (e.g. a race rather than a real rejection) - do not mask that
