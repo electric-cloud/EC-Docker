@@ -92,11 +92,15 @@ sub runDockerBuild {
     logInfo("Command to execute: " . _quote_for_log(@command));
     logInfo("Building docker image:");
 
-    my $docker_output = _runDockerCommand(@command);
+    # docker's own stdout/stderr already stream live to the job log via
+    # the inherited file descriptors _runDockerCommand() sets up - its
+    # return value is the raw system() wait-status integer, not captured
+    # output text, so it is never printed or embedded in a message here
+    # (doing so would show a stray number like "0" or "256", not output).
+    _runDockerCommand(@command);
     if($? != 0) {
-        bailOut("Exit code: $?.\n$docker_output");
+        bailOut("Exit code: $?.");
     }
-    print $docker_output . "\n";
 
     $sr->setJobStepOutcome('success');
 }
@@ -157,11 +161,12 @@ sub runDockerPull {
     logInfo("Command to execute: " . _quote_for_log(@command));
     logInfo('Pulling docker image:');
 
-    my $docker_output = _runDockerCommand(@command);
+    # See runDockerBuild's identical comment: _runDockerCommand()'s return
+    # value is a wait-status integer, not captured output text.
+    _runDockerCommand(@command);
     if($? != 0) {
-        bailOut("Exit code: $?.\n$docker_output");
+        bailOut("Exit code: $?.");
     }
-    print $docker_output . "\n";
 
     $sr->setJobStepOutcome('success');
 }
@@ -235,7 +240,11 @@ sub runDockerRun {
         push @command, '--workdir=' . $working_dir;
     }
 
-    if($p->{published_ports}) {
+    # "defined", not truthiness: a raw value of "0" is a legitimate (if
+    # unusual) port mapping but is false in a Perl boolean context, which
+    # would otherwise silently drop it, the same bug class already fixed
+    # above for container_name/entrypoint/working_dir/container_links.
+    if (defined $p->{published_ports}) {
         # split on runs of whitespace (not a single literal space) and
         # drop empty tokens, so a leading/trailing/doubled space does not
         # produce an empty -p value that Docker then rejects
@@ -259,9 +268,11 @@ sub runDockerRun {
     }
 
     #Additional options can be added to the Docker run command
-    if($p->{additional_options}  && $p->{additional_options} ne "") {
-        push @command, _split_tokens($p->{additional_options});
-    }
+    # _split_tokens() already treats undef/whitespace-only as "nothing to
+    # add" and returns an empty list - no truthiness guard needed here,
+    # and one would silently drop a literal "0" value (same bug class
+    # fixed above for container_name/entrypoint/working_dir).
+    push @command, _split_tokens($p->{additional_options});
 
     # Same '--' end-of-options marker as runDockerPull. Caveat: if
     # additional_options ends in a flag that itself takes a value (for
@@ -273,19 +284,20 @@ sub runDockerRun {
     # --privileged - so it is a documented caveat, not a privilege gap.
     push @command, '--', trim($p->{image_name});
 
-    if($p->{command_with_args}) {
-        push @command, _split_tokens($p->{command_with_args});
-    }
+    # Same reasoning as additional_options above: _split_tokens() already
+    # handles undef/empty correctly, and a truthiness guard here would
+    # silently drop a literal "0" command_with_args value.
+    push @command, _split_tokens($p->{command_with_args});
 
     print "\nCommand to execute: " . _quote_for_log(@command) . "\n";
     print "Launching docker container:\n\n";
 
-    my $docker_output = _runDockerCommand(@command);
+    # See runDockerBuild's identical comment: _runDockerCommand()'s return
+    # value is a wait-status integer, not captured output text.
+    _runDockerCommand(@command);
     if($? != 0) {
-        bailOut("Exit code: $?.\n$docker_output");
+        bailOut("Exit code: $?.");
     }
-    print $docker_output . "\n";
-
 
     $sr->setJobStepOutcome('success');
 }
@@ -422,14 +434,18 @@ sub _win32_quote_arg {
 # the fallback is never reached.
 sub _resolve_executable {
     my ($name) = @_;
-    return $name if $name =~ m{[\\/]} && -x $name;
+    # "-x" alone is true for a directory (its search/traversal bit), so a
+    # directory literally named e.g. "docker" earlier in PATH than the
+    # real binary would be wrongly reported as found - checked and
+    # rejected with "-d" before every "-x" test below.
+    return $name if $name =~ m{[\\/]} && -x $name && !-d $name;
     my $sep = isWin() ? ';' : ':';
     my @exts = isWin() ? (split /;/, $ENV{PATHEXT} // '.EXE;.BAT;.CMD') : ('');
     for my $dir (split /\Q$sep\E/, $ENV{PATH} // '') {
         next unless length $dir;
         for my $ext (@exts) {
             my $candidate = "$dir/$name$ext";
-            return $candidate if -x $candidate;
+            return $candidate if -x $candidate && !-d $candidate;
         }
     }
     return undef;
@@ -585,7 +601,18 @@ sub login {
     while (1) {
         my $buf;
         my $n = sysread($child_out, $buf, 65536);
-        last unless $n;
+        if (!defined $n) {
+            # sysread() returns undef, not 0, when an unrelated signal
+            # interrupts the blocking read (EINTR) - verified directly: a
+            # SIGALRM arriving mid-read reproduces this even with a
+            # handler that just returns. Treating undef the same as 0
+            # (real EOF) would stop reading and silently truncate the
+            # captured login output. Retry on EINTR; give up on any other
+            # read error, since there is nothing more this loop can do.
+            next if $!{EINTR};
+            last;
+        }
+        last if $n == 0;
         $output .= $buf;
     }
 
