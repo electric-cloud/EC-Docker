@@ -91,7 +91,7 @@ class RunDockerBuildSuite extends Specification {
         ServerHandler.getInstance().runCommand("rm -f $marker", 'sh', plugin.defaultResource)
         when:
         def result = plugin.runDockerBuild.flush()
-                .buildpath("/tmp/nonexistent-dockerfile\"; touch $marker; echo \"")
+                .buildpath("/tmp/nonexistent-dockerfile; touch $marker #")
                 .run()
 
         then:

@@ -139,8 +139,8 @@ sub runDockerPull {
     }
 
     my $image_name = _trim($p->{image_name});
-    if($p->{image_tag}) {
-        $image_name .= ':' . _trim($p->{image_tag});
+    if($p->{tag}) {
+        $image_name .= ':' . _trim($p->{tag});
     }
     # The literal '--' marks the end of options, so Docker always treats
     # image_name as data even if it starts with '-' - without it, Docker's

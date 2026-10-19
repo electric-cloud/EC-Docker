@@ -117,7 +117,7 @@ class RunDockerRunSuite extends Specification {
         'container_name'      | 'x"; touch MARKER; echo "'
         'entrypoint'           | 'x"; touch MARKER; echo "'
         'working_dir'          | 'x"; touch MARKER; echo "'
-        'published_ports'      | '8080:80; touch MARKER'
+        'published_ports'      | '8080:80$(touch${IFS}MARKER)'
         'container_links'      | 'x; touch MARKER'
         'additional_options'   | '--rm; touch MARKER'
         'command_with_args'    | '; touch MARKER #'

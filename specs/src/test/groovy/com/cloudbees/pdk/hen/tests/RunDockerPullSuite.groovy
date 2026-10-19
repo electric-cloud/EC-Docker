@@ -82,18 +82,30 @@ class RunDockerPullSuite extends Specification {
         ServerHandler.getInstance().runCommand("rm -f $marker", 'sh', plugin.defaultResource)
     }
 
-    def 'Security - image_tag command injection is neutralized'() {
-        // NOTE: the generated .tag() setter writes the 'tag' parameter, which Docker.pm
-        // does not read (it reads 'image_tag') - a pre-existing, unrelated wiring mismatch
-        // flagged separately. addParam() is used here to exercise the actual
-        // 'image_tag' parameter that the plugin reads.
+    def 'RunDockerPull with tag parameter pulls the correct image'() {
+        when:
+        def result = plugin.runDockerPull.flush()
+                .imagename('alpine')
+                .tag('latest')
+                .run()
+
+        then:
+        assert result.isSuccessful()
+        assert result.jobLog =~ 'Status: Downloaded newer image for alpine:latest'
+
+        cleanup:
+        ServerHandler.getInstance().runCommand('docker rmi alpine:latest -f || exit 0', 'sh', plugin.defaultResource)
+    }
+
+    def 'Security - tag command injection is neutralized'() {
         given:
         def marker = '/tmp/specs-cdro18006-pulltag-pwned'
         ServerHandler.getInstance().runCommand("rm -f $marker", 'sh', plugin.defaultResource)
         when:
-        def proc = plugin.runDockerPull.flush().imagename('alpine')
-        proc.addParam('image_tag', "latest; touch $marker; echo ")
-        def result = proc.run()
+        def result = plugin.runDockerPull.flush()
+                .imagename('alpine')
+                .tag("latest; touch $marker; echo ")
+                .run()
 
         then:
         assert result.getOutcome().toString() == 'ERROR'
@@ -102,11 +114,6 @@ class RunDockerPullSuite extends Specification {
 
         cleanup:
         ServerHandler.getInstance().runCommand("rm -f $marker", 'sh', plugin.defaultResource)
-        // 'image_tag' has no setter on the generated RunDockerPull wrapper (see note
-        // above) so it can't be overwritten by a later test's normal param calls the
-        // way every other field is - flush it explicitly or it leaks into whatever
-        // runs next on this shared plugin.runDockerPull instance.
-        plugin.runDockerPull.flush()
     }
 
     @Unroll
