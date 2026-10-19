@@ -589,12 +589,19 @@ sub login {
         $output .= $buf;
     }
 
-    waitpid($pid, 0);
+    # waitpid() itself can fail (return -1, e.g. ECHLD if something else
+    # in this process reaps SIGCHLD globally), in which case $? is stale
+    # or meaningless - checked separately from the exit-status decode
+    # below so a wait failure can never be misread as a real exit code.
+    my $wait_rc = waitpid($pid, 0);
+    if ($wait_rc == -1) {
+        bailOut("ERROR: Unable to determine docker login's exit status (waitpid failed: $!)");
+    }
     # $? >> 8 alone would report a signal-killed docker login (for
     # example OOM-killed) as exit code 0 - success - because the exit
     # status byte is 0 when a process dies by signal; check for that
     # first so a killed login is never treated as a successful one.
-    my $rc = $? == -1 ? -1 : ($? & 127) ? 1 : ($? >> 8);
+    my $rc = ($? & 127) ? 1 : ($? >> 8);
     if ($write_failed && $rc == 0) {
         # system/pipe close failed but the child still reported success
         # (e.g. a race rather than a real rejection) - do not mask that
