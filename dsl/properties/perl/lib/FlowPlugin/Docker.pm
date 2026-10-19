@@ -141,15 +141,8 @@ sub runDockerPull {
     }
 
     my $image_name = trim($p->{image_name});
-    # Checking for a non-empty string *after* trimming, not the raw
-    # parameter's truthiness: a raw value of the single character "0" is
-    # a legitimate Docker tag but is false in a Perl boolean context, and
-    # a whitespace-only value is true before trimming but empty after,
-    # which would otherwise silently produce a malformed "image:" with no
-    # tag. Guard trim() with "defined" first - trim(undef) warns and the
-    # common case is this field being unset entirely.
-    my $tag = defined $p->{tag} ? trim($p->{tag}) : undef;
-    if (defined $tag && $tag ne '') {
+    my $tag = _trimmed_or_undef($p->{tag});
+    if (defined $tag) {
         $image_name .= ':' . $tag;
     }
     # The literal '--' marks the end of options, so Docker always treats
@@ -215,14 +208,8 @@ sub runDockerRun {
         @command = ('docker', 'run');
     }
 
-    # Each of these trims first and then checks for a non-empty string,
-    # rather than checking the raw parameter's truthiness first: checking
-    # truthiness before trimming would treat a whitespace-only value as
-    # set (producing a malformed, empty flag value after trimming), and
-    # would treat a legitimate single-character "0" value as unset
-    # (since the string "0" is false in a Perl boolean context).
-    my $container_name = defined $p->{container_name} ? trim($p->{container_name}) : undef;
-    if (defined $container_name && $container_name ne '') {
+    my $container_name = _trimmed_or_undef($p->{container_name});
+    if (defined $container_name) {
         push @command, '--name=' . $container_name;
     }
 
@@ -230,13 +217,13 @@ sub runDockerRun {
         push @command, '-d';
     }
 
-    my $entrypoint = defined $p->{entrypoint} ? trim($p->{entrypoint}) : undef;
-    if (defined $entrypoint && $entrypoint ne '') {
+    my $entrypoint = _trimmed_or_undef($p->{entrypoint});
+    if (defined $entrypoint) {
         push @command, '--entrypoint=' . $entrypoint;
     }
 
-    my $working_dir = defined $p->{working_dir} ? trim($p->{working_dir}) : undef;
-    if (defined $working_dir && $working_dir ne '') {
+    my $working_dir = _trimmed_or_undef($p->{working_dir});
+    if (defined $working_dir) {
         push @command, '--workdir=' . $working_dir;
     }
 
@@ -258,8 +245,8 @@ sub runDockerRun {
         push @command, '-P';
     }
 
-    my $container_links = defined $p->{container_links} ? trim($p->{container_links}) : undef;
-    if (defined $container_links && $container_links ne '') {
+    my $container_links = _trimmed_or_undef($p->{container_links});
+    if (defined $container_links) {
         push @command, '--link', $container_links;
     }
 
@@ -304,6 +291,24 @@ sub runDockerRun {
 ## === step ends ===
 # Please do not remove the marker above, it is used to place new procedures into this file.
 
+
+# Trims a step/config value and returns undef if it is undef or empty
+# after trimming. Checking truthiness on the raw value before trimming
+# gets this wrong two ways: a literal "0" is a legitimate value (a Docker
+# tag, a registry host) but is false in a Perl boolean context, and a
+# whitespace-only value is true before trimming but empty after, which
+# would otherwise produce a malformed, empty flag. This same three-line
+# idiom was previously copy-pasted at every call site (container_name,
+# entrypoint, working_dir, container_links, tag) and one copy - the
+# registry argument in login() - was missed, silently dropping a
+# literal "0" registry; one shared helper instead of N copies removes
+# that drift risk.
+sub _trimmed_or_undef {
+    my ($value) = @_;
+    return undef unless defined $value;
+    my $trimmed = trim($value);
+    return $trimmed eq '' ? undef : $trimmed;
+}
 
 # Splits a step parameter that is documented as holding multiple
 # whitespace-separated tokens (additional_options, command_with_args,
@@ -536,8 +541,10 @@ sub login {
     # Same '--' end-of-options marker used for image_name elsewhere in
     # this file: without it, a configured registry value starting with
     # '-' would be read by Docker's own CLI parser as a flag rather than
-    # the positional SERVER argument.
-    push @command, '--', $registry if $registry;
+    # the positional SERVER argument. _trimmed_or_undef(), not raw
+    # truthiness, so a literal "0" registry host is not silently dropped.
+    my $registry_value = _trimmed_or_undef($registry);
+    push @command, '--', $registry_value if defined $registry_value;
 
     logInfo('Command to execute: ' . _quote_for_log(@command));
 
