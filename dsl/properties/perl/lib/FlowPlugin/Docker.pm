@@ -364,6 +364,68 @@ sub _quote_for_log {
     } @args);
 }
 
+# Quotes a single argument the way CommandLineToArgvW expects, so a value
+# survives Windows' own command-line round trip unchanged. Verified on a
+# real Windows agent (cb-perl 5.32.1, MSWin32-x64): without this, a value
+# containing an embedded double quote (for example a container_name of
+# foo"bar) corrupts argv entirely - two adjacent arguments silently merge
+# into one, moving every later argument (including the image name) out of
+# place - and a backslash immediately before a quote is silently dropped.
+# Both are real, reproduced bugs in Perl's default Win32 argument-to-
+# command-line conversion, not a security issue by themselves (there is
+# still no shell involved), but a correctness one worth closing since the
+# fix was on hand to verify.
+sub _win32_quote_arg {
+    my ($arg) = @_;
+    return '""' if $arg eq '';
+    return $arg unless $arg =~ /[\s"]/;
+    my $result = '"';
+    my $i = 0;
+    my $len = length($arg);
+    while ($i < $len) {
+        my $num_backslashes = 0;
+        while ($i < $len && substr($arg, $i, 1) eq '\\') {
+            $num_backslashes++;
+            $i++;
+        }
+        if ($i == $len) {
+            $result .= ('\\' x ($num_backslashes * 2));
+        } elsif (substr($arg, $i, 1) eq '"') {
+            $result .= ('\\' x ($num_backslashes * 2 + 1)) . '"';
+            $i++;
+        } else {
+            $result .= ('\\' x $num_backslashes) . substr($arg, $i, 1);
+            $i++;
+        }
+    }
+    $result .= '"';
+    return $result;
+}
+
+# Looks up a program name against PATH (and PATHEXT on Windows) the same
+# way the OS loader would, returning the resolved path or undef. Used
+# only to fail cleanly before IPC::Open3 ever attempts to spawn a missing
+# program: open3 has no PROGRAM-LIST form (unlike system/exec), so on
+# Windows it falls back to cmd.exe whenever the spawn it tries fails -
+# verified on a real Windows agent, where a missing program plus an
+# "&"-joined command actually ran the injected command via cmd.exe and
+# reported success. Checking first means that failure never happens, so
+# the fallback is never reached.
+sub _resolve_executable {
+    my ($name) = @_;
+    return $name if $name =~ m{[\\/]} && -x $name;
+    my $sep = $^O eq 'MSWin32' ? ';' : ':';
+    my @exts = $^O eq 'MSWin32' ? (split /;/, $ENV{PATHEXT} // '.EXE;.BAT;.CMD') : ('');
+    for my $dir (split /\Q$sep\E/, $ENV{PATH} // '') {
+        next unless length $dir;
+        for my $ext (@exts) {
+            my $candidate = "$dir/$name$ext";
+            return $candidate if -x $candidate;
+        }
+    }
+    return undef;
+}
+
 # Runs an external command with no shell involved (list-form system()), so
 # that no step parameter can be interpreted as shell syntax regardless of
 # metacharacters it contains. Temporarily duplicates STDERR onto STDOUT for
@@ -374,15 +436,17 @@ sub _quote_for_log {
 # reliably avoids the shell - plain LIST form, even with multiple
 # elements, silently falls back to cmd.exe if the first spawn attempt
 # fails, which would reopen the shell-injection hole this fix closes.
-#
-# Known limitation, not verified here: Perl's own Win32 argument-to-
-# command-line conversion is reported not to escape an embedded double
-# quote correctly in some builds. This has not been verified against a
-# real Windows CDRO agent (none was available while writing this fix) and
-# should be checked there before being relied on for Windows agents.
+# Verified on a real Windows agent: a nonexistent program name with a
+# "&"-joined command in plain LIST form ran the injected command via
+# cmd.exe and reported success; the identical PROGRAM-LIST call correctly
+# failed to find the program and ran nothing.
 sub _runDockerCommand {
     my (@command) = @_;
     my $program = $command[0];
+
+    if ($^O eq 'MSWin32') {
+        @command = map { _win32_quote_arg($_) } @command;
+    }
 
     open(my $saved_stderr, '>&', \*STDERR)
         or bailOut("ERROR: Unable to save STDERR before running docker command: $!");
@@ -429,13 +493,6 @@ sub login {
     # and run it with no shell instead, exactly like the other procedures.
     # The password goes in via --password-stdin, never as a CLI argument,
     # so it never appears in argv, in a process listing, or in this log.
-    #
-    # Known limitation, not verified here: IPC::Open3 falls back to
-    # plain "system LIST" internally on Windows (not the PROGRAM-LIST form
-    # _runDockerCommand uses), so the same Windows cmd.exe-fallback-on-
-    # failed-spawn risk described there also applies to this login, and
-    # is not mitigated by that other fix. Not verified against a real
-    # Windows CDRO agent.
     my @command;
     if ($use_sudo) {
         @command = ('sudo', 'docker', 'login', '-u', $username, '--password-stdin');
@@ -446,9 +503,24 @@ sub login {
 
     logInfo('Command to execute: ' . _quote_for_log(@command));
 
+    # IPC::Open3 has no PROGRAM-LIST form, so unlike _runDockerCommand this
+    # can't avoid the Windows cmd.exe-on-failed-spawn fallback by syntax
+    # alone - instead, resolve the program against PATH first so that
+    # failure never happens. Verified on a real Windows agent: without
+    # this check, a missing program plus an injected argument ran via
+    # cmd.exe and reported success instead of failing cleanly.
+    if (!defined _resolve_executable($command[0])) {
+        my $error = "Unable to execute docker login: '$command[0]' not found";
+        logDebug('LOGIN EXIT CODE: -1');
+        logInfo('LOGIN STDERR:', $error);
+        return (-1, $error);
+    }
+
+    my @exec_command = $^O eq 'MSWin32' ? (map { _win32_quote_arg($_) } @command) : @command;
+
     my ($child_in, $child_out, $child_err);
     $child_err = gensym();
-    my $pid = eval { open3($child_in, $child_out, $child_err, @command) };
+    my $pid = eval { open3($child_in, $child_out, $child_err, @exec_command) };
     if (!$pid) {
         my $error = "Unable to execute docker login: $@$!";
         logDebug('LOGIN EXIT CODE: -1');
