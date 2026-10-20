@@ -64,6 +64,70 @@ class RunDockerPullSuite extends Specification {
         ServerHandler.getInstance().runCommand("docker rmi $image || exit 0", 'sh', p.defaultResource)
     }
 
+    def 'Security - image_name command injection is neutralized'() {
+        given:
+        def marker = '/tmp/specs-cdro18006-pull-pwned'
+        ServerHandler.getInstance().runCommand("rm -f $marker", 'sh', plugin.defaultResource)
+        when:
+        def result = plugin.runDockerPull.flush()
+                .imagename("alpine; touch $marker; echo ")
+                .run()
+
+        then:
+        assert result.getOutcome().toString() == 'ERROR'
+        def check = ServerHandler.getInstance().runCommand("test -f $marker && echo FOUND || echo NOTFOUND", 'sh', plugin.defaultResource)
+        assert check.jobLog.contains('NOTFOUND')
+
+        cleanup:
+        ServerHandler.getInstance().runCommand("rm -f $marker", 'sh', plugin.defaultResource)
+    }
+
+    def 'RunDockerPull with tag parameter pulls the correct image'() {
+        // 'latest' is Docker's own default when no tag is given at all, so
+        // it would pass even if the tag parameter were never wired through
+        // to the plugin - use a specific, non-default tag so this only
+        // passes if the value genuinely reached the pull command.
+        when:
+        def result = plugin.runDockerPull.flush()
+                .imagename('alpine')
+                .tag('3.19')
+                .run()
+
+        then:
+        assert result.isSuccessful()
+        assert result.jobLog =~ 'Status: Downloaded newer image for alpine:3.19'
+
+        cleanup:
+        ServerHandler.getInstance().runCommand('docker rmi alpine:3.19 -f || exit 0', 'sh', plugin.defaultResource)
+        // 'tag' has no explicit value in later tests on this shared
+        // plugin.runDockerPull instance (they only call .imagename()), so it
+        // is never overwritten the way every other field is - flush it
+        // explicitly or it leaks into whatever runs next.
+        plugin.runDockerPull.flush()
+    }
+
+    def 'Security - tag command injection is neutralized'() {
+        given:
+        def marker = '/tmp/specs-cdro18006-pulltag-pwned'
+        ServerHandler.getInstance().runCommand("rm -f $marker", 'sh', plugin.defaultResource)
+        when:
+        def result = plugin.runDockerPull.flush()
+                .imagename('alpine')
+                .tag("latest; touch $marker; echo ")
+                .run()
+
+        then:
+        assert result.getOutcome().toString() == 'ERROR'
+        def check = ServerHandler.getInstance().runCommand("test -f $marker && echo FOUND || echo NOTFOUND", 'sh', plugin.defaultResource)
+        assert check.jobLog.contains('NOTFOUND')
+
+        cleanup:
+        ServerHandler.getInstance().runCommand("rm -f $marker", 'sh', plugin.defaultResource)
+        // same reason as the test above - 'tag' is never reset by the
+        // negative-path tests that follow, so it must be flushed here.
+        plugin.runDockerPull.flush()
+    }
+
     @Unroll
     def 'RunDockerPull #caseId - negative'() {
         when:
