@@ -30,7 +30,7 @@ services:
     entrypoint: ["/bin/sh", "-c"]
     command:
       - >-
-        export DOCKER_API_VERSION="$$(docker version -f '{{.Server.APIVersion}}' 2>/dev/null)";
+        export DOCKER_API_VERSION="$$(curl -s --unix-socket /var/run/docker.sock -I http://localhost/_ping 2>/dev/null | tr -d '\r' | grep -i '^api-version:' | cut -d' ' -f2)";
         exec /bin/s6-svscan /etc/s6
 
 networks:
