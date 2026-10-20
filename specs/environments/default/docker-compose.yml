@@ -25,10 +25,8 @@ services:
     container_name: docker
     tty: true
     privileged: true
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
     environment:
-      - DOCKER_API_VERSION=1.43
+      - DOCKER_TLS_CERTDIR=
 
 networks:
   internal:
